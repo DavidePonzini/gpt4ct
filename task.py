@@ -7,6 +7,21 @@ class Task:
         self.lvl = lvl
         self.tasks = []
 
+    def format_descr(self, size):
+        words = self.description.split()
+        current_line = words[0]
+        result = ''
+
+        for word in words:
+            if len(current_line) + len(word) > size:
+                result += '\n' + current_line
+                current_line = word
+            else:
+                current_line += ' ' + word
+
+        result += current_line
+        return result
+
     def decompose(self, *tasks, j=None):
         for (name, descr) in tasks:
             subtask = Task(name, descr, self.lvl+1)
