@@ -11,15 +11,21 @@ if __name__ == '__main__':
     argument_parser.add_argument('--prompt', help='Print ChatGPT prompt', action=ArgumentAction.STORE_TRUE)
     argument_parser.add_argument('--visualize', help='Visualize tree', action=ArgumentAction.STORE_TRUE)
     argument_parser.add_argument('--list', help='Visualize in list format', action=ArgumentAction.STORE_TRUE)
+    argument_parser.add_argument('--out', help='Output file')
     
     if argument_parser.args.visualize:
         show_tree(root_task)
+
     if argument_parser.args.prompt:
-        prompt = make_prompt(root_task, sub1[2])
+        prompt = make_prompt(root_task, sub121[1])
         
         print(prompt)
 
         pyperclip.copy(prompt)
         messages.info('Prompt copied to clipboard')
+    
     if argument_parser.args.list:
         print(root_task)
+
+    if argument_parser.args.out:
+        show_tree(root_task, argument_parser.args.out)

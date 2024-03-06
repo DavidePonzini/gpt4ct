@@ -13,7 +13,7 @@ def draw_node_face(node):
     
     ete3.add_face_to_node(face, node, column=0, position='branch-bottom')
 
-def show_tree(root):
+def show_tree(root, filename=None):
     tree = ete3.Tree()
     add_nodes_to_tree(tree, root)
 
@@ -22,7 +22,10 @@ def show_tree(root):
     ts.show_leaf_name = False
     ts.draw_guiding_lines = True
 
-    tree.show(tree_style=ts, layout=draw_node_face)
+    if filename is None:
+        tree.show(tree_style=ts, layout=draw_node_face)
+    else:
+        tree.render(filename, tree_style=ts, layout=draw_node_face)
 
 def add_nodes_to_tree(tree, node):
     tree.name = node.name

@@ -63,3 +63,15 @@ sub12 = sub1[2].decompose(j = [
     "description": "Develop a strategy for securely attaching components to the bicycle frame, considering factors such as strength, stability, and ease of assembly and disassembly."
   }
 ])
+
+sub121 = sub12[1].decompose(j = [
+  {
+    "name": "Identify attachment points on the bicycle frame",
+    "description": "Examine the bicycle frame design plan to locate suitable areas for attaching components such as the handlebars, saddle, brakes, and drivetrain."
+  },
+  {
+    "name": "Select appropriate attachment methods",
+    "description": "Research and decide on the most suitable methods for attaching components to the bicycle frame, considering factors such as stability, weight distribution, ease of assembly, and potential for adjustments."
+  }
+])
+

@@ -56,6 +56,6 @@ class Task:
     def to_dict(self) -> str:
         return {
             'name': self.name,
-            'description': self.description,
+            # 'description': self.description,
             'subtasks': [ task.to_dict() for task in self.tasks ]
         }
