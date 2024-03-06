@@ -1,6 +1,12 @@
 import ete3
 
-def draw_node_face(node):
+def draw_node_face(node: ete3.Tree):
+    # node style
+    ns = ete3.NodeStyle()
+    ns['size'] = 3 if node.is_leaf() else 0
+    node.set_style(ns)
+
+    # face style
     face = ete3.TextFace(node.name, tight_text=True)
     
     face.margin_left = 5
@@ -29,6 +35,7 @@ def show_tree(root, filename=None):
 
 def add_nodes_to_tree(tree, node):
     tree.name = node.name
+    tree.size = 10
 
     for subtask in node.tasks:
         child = tree.add_child()
