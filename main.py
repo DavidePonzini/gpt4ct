@@ -1,7 +1,7 @@
 from task import Task    
 from prompt_decompose import make_prompt
 from visualization import show_tree
-from problem_bicycle import *
+from problem_bicycle_conversation import *
 
 from dav_tools import argument_parser, ArgumentAction, messages
 import pyperclip
@@ -9,15 +9,15 @@ import pyperclip
 
 if __name__ == '__main__':
     argument_parser.add_argument('--prompt', help='Print ChatGPT prompt', action=ArgumentAction.STORE_TRUE)
-    argument_parser.add_argument('--visualize', help='Visualize tree', action=ArgumentAction.STORE_TRUE)
+    argument_parser.add_argument('--tree', help='Visualize tree', nargs='?', const=100, metavar='DEPTH', type=int)
     argument_parser.add_argument('--list', help='Visualize in list format', action=ArgumentAction.STORE_TRUE)
     argument_parser.add_argument('--out', help='Output file')
     
-    if argument_parser.args.visualize:
-        show_tree(root_task)
+    if argument_parser.args.tree:
+        show_tree(root_task, depth=argument_parser.args.tree)
 
     if argument_parser.args.prompt:
-        prompt = make_prompt(root_task, sub121[1])
+        prompt = make_prompt(root_task, root_task)
         
         print(prompt)
 
@@ -28,4 +28,4 @@ if __name__ == '__main__':
         print(root_task)
 
     if argument_parser.args.out:
-        show_tree(root_task, argument_parser.args.out)
+        show_tree(root_task, filename=argument_parser.args.out)

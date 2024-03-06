@@ -22,15 +22,16 @@ class Task:
         result += current_line
         return result
 
-    def decompose(self, *tasks, j=None):
+    def decompose(self, *tasks):
         for (name, descr) in tasks:
             subtask = Task(name, descr, self.lvl+1)
             self.tasks.append(subtask)
+        return self.tasks
 
-        if j is not None:
-            for subtask in j:
-                self.tasks.append(Task(subtask['name'], subtask['description'], self.lvl+1))
-
+    def decompose_json(self, tasks: list):
+        for task in tasks:
+            subtask = Task(task['name'], task['description'], self.lvl+1)
+            self.tasks.append(subtask)
         return self.tasks
 
     def __str__(self) -> str:

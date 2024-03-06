@@ -17,11 +17,11 @@ def draw_node_face(node: ete3.Tree):
     if node.is_leaf():
         face.inner_background.color = 'yellow'
     
-    ete3.add_face_to_node(face, node, column=0, position='branch-bottom')
+    ete3.add_face_to_node(face, node, column=0, position='branch-top')
 
-def show_tree(root, filename=None):
+def show_tree(root, filename=None, depth=100):
     tree = ete3.Tree()
-    add_nodes_to_tree(tree, root)
+    add_nodes_to_tree(tree, root, max_depth=depth)
 
     ts = ete3.TreeStyle()
     ts.show_scale = False
@@ -33,11 +33,12 @@ def show_tree(root, filename=None):
     else:
         tree.render(filename, tree_style=ts, layout=draw_node_face)
 
-def add_nodes_to_tree(tree, node):
+def add_nodes_to_tree(tree, node, max_depth):
     tree.name = node.name
     tree.size = 10
 
-    for subtask in node.tasks:
-        child = tree.add_child()
-        add_nodes_to_tree(child, subtask)
+    if node.lvl + 1 < max_depth:
+        for subtask in node.tasks:
+            child = tree.add_child()
+            add_nodes_to_tree(child, subtask, max_depth)
 
