@@ -1,10 +1,12 @@
 import json
+from dav_tools import text_format
 
 class Task:
-    def __init__(self, name, description, lvl=0) -> None:
+    def __init__(self, name, description, id='') -> None:
+        self.id = id
         self.name = name
         self.description = description
-        self.lvl = lvl
+        self.lvl = len(self.id)
         self.tasks = []
 
     def format_descr(self, size):
@@ -23,28 +25,29 @@ class Task:
         return result
 
     def decompose(self, *tasks):
-        for (name, descr) in tasks:
-            subtask = Task(name, descr, self.lvl+1)
+        for i, (name, descr) in enumerate(tasks):
+            subtask = Task(name, descr, f'{self.id}{i}')
             self.tasks.append(subtask)
         return self.tasks
 
     def decompose_json(self, tasks: list):
-        for task in tasks:
-            subtask = Task(task['name'], task['description'], self.lvl+1)
+        for i, task in enumerate(tasks):
+            subtask = Task(task['name'], task['description'], f'{self.id}{i}')
             self.tasks.append(subtask)
         return self.tasks
 
     def __str__(self) -> str:
-        result = '\t' * self.lvl + self.name
-
+        result = text_format.format_text('|\t' * self.lvl + f'[{self.id}]', text_format.TextFormat.Style.DIM) + \
+            f' {self.name}'
+        
         for subtask in self.tasks:
             result += '\n' + str(subtask)
 
         return result
 
+    # textual decomposition format - does not work very well
     def get_decomposition(self) -> str:
         result = self.name + '('
-        
 
         for i, subtask in enumerate(self.tasks):
             result += subtask.get_decomposition()
@@ -54,6 +57,7 @@ class Task:
         result += ')'
         return result
 
+    # used to convert to JSON
     def to_dict(self) -> str:
         return {
             'name': self.name,
