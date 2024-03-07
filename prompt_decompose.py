@@ -13,3 +13,6 @@ A subtask at level `n+1` of a given task of level `n` should not include any ele
 Ensure that there are no missing steps: i.e. the sum of all subtasks solves the entire task.
 The results should be formatted as a JSON list of objects. Each object should contain the fields name and description.
 '''
+
+def make_followup_prompt():
+    return f'Using the same approach, decompose the task ""'

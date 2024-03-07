@@ -19,10 +19,7 @@ def draw_node_face(node: ete3.Tree):
     
     ete3.add_face_to_node(face, node, column=0, position='branch-top')
 
-def show_tree(root, filename=None, depth=100):
-    tree = ete3.Tree()
-    add_nodes_to_tree(tree, root, max_depth=depth)
-
+def show_tree(tree, filename=None):
     ts = ete3.TreeStyle()
     ts.show_scale = False
     ts.show_leaf_name = False
@@ -42,3 +39,8 @@ def add_nodes_to_tree(tree, node, max_depth):
             child = tree.add_child()
             add_nodes_to_tree(child, subtask, max_depth)
 
+def build_tree(root, depth=100):
+    tree = ete3.Tree()
+    add_nodes_to_tree(tree, root, max_depth=depth)
+
+    return tree
