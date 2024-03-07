@@ -1,4 +1,5 @@
 import ete3
+from task import Task
 
 def draw_node_face(node: ete3.Tree):
     # node style
@@ -28,10 +29,12 @@ def show_tree(tree, filename=None):
     if filename is None:
         tree.show(tree_style=ts, layout=draw_node_face)
     else:
-        tree.render(filename, tree_style=ts, layout=draw_node_face)
+        tree.render(f'decompositions/{filename}', tree_style=ts, layout=draw_node_face)
 
-def add_nodes_to_tree(tree, node, max_depth):
+def add_nodes_to_tree(tree: ete3.Tree, node: Task, max_depth: int):
     tree.name = node.name
+    tree.add_feature('description', node.description)
+    tree.add_feature('id', node.id)
     tree.size = 10
 
     if node.lvl + 1 < max_depth:

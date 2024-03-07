@@ -11,6 +11,7 @@ class Task:
         self.description = description
         self.lvl = len(self.id)
         self.tasks = []
+        self.implementation = None
 
     def format_descr(self, size):
         '''Format the description to have lines of a max given length'''
