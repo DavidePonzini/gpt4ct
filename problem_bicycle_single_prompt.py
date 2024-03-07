@@ -1,7 +1,7 @@
-from task import Task
+from task import Task, decompose
 
 root_task = Task('Solve the whole problem', 'Design a bicycle from scratch')
-sub = root_task.decompose(j = [
+sub = decompose(root_task, [
   {
     "name": "Research bicycle components and design principles",
     "description": "Gather information on various bicycle components such as frame, wheels, gears, brakes, etc. Study design principles and considerations related to bicycle engineering and ergonomics."
@@ -16,7 +16,7 @@ sub = root_task.decompose(j = [
   }
 ])
 
-sub1 = sub[1].decompose(j = [
+sub1 = decompose(sub[1], [
   {
     "name": "Specify bicycle frame design",
     "description": "Define the dimensions, geometry, and material specifications for the bicycle frame based on research and ergonomic considerations."
@@ -31,7 +31,7 @@ sub1 = sub[1].decompose(j = [
   }
 ])
 
-sub10 = sub1[0].decompose(j = [
+sub10 = decompose(sub1[0], [
   {
     "name": "Define frame dimensions and geometry",
     "description": "Determine the appropriate dimensions (length, height, width) and geometry (e.g., angles, tube shapes) for the bicycle frame based on research findings and ergonomic considerations."
@@ -42,7 +42,7 @@ sub10 = sub1[0].decompose(j = [
   }
 ])
 
-sub11 = sub1[1].decompose(j = [
+sub11 = decompose(sub1[1], [
   {
     "name": "Select bicycle wheel components",
     "description": "Research and choose the appropriate rims, spokes, hubs, and tires for the bicycle wheel assembly based on factors such as intended use, rider weight, terrain, and budget."
@@ -53,7 +53,7 @@ sub11 = sub1[1].decompose(j = [
   }
 ])
 
-sub12 = sub1[2].decompose(j = [
+sub12 = decompose(sub1[2], [
   {
     "name": "Identify component locations on the bicycle frame",
     "description": "Determine the optimal positions for integrating components such as gears, brakes, pedals, and handlebars onto the bicycle frame, ensuring functionality and ergonomic comfort."
@@ -64,7 +64,7 @@ sub12 = sub1[2].decompose(j = [
   }
 ])
 
-sub121 = sub12[1].decompose(j = [
+sub121 = decompose(sub12[1], [
   {
     "name": "Identify attachment points on the bicycle frame",
     "description": "Examine the bicycle frame design plan to locate suitable areas for attaching components such as the handlebars, saddle, brakes, and drivetrain."
@@ -72,6 +72,17 @@ sub121 = sub12[1].decompose(j = [
   {
     "name": "Select appropriate attachment methods",
     "description": "Research and decide on the most suitable methods for attaching components to the bicycle frame, considering factors such as stability, weight distribution, ease of assembly, and potential for adjustments."
+  }
+])
+
+sub1211 = decompose(sub121[1], [
+  {
+    "name": "Identify attachment points on the bicycle frame",
+    "description": "Determine locations on the bicycle frame where components need to be attached. This includes areas such as the frame tubes, fork, handlebars, seatpost, and rear dropouts."
+  },
+  {
+    "name": "Research suitable attachment methods",
+    "description": "Investigate various methods for attaching components to the identified attachment points on the bicycle frame. This may include methods such as welding, brazing, bolting, riveting, clamping, or adhesive bonding."
   }
 ])
 

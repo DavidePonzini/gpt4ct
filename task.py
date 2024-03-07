@@ -71,3 +71,13 @@ class Task:
             # 'description': self.description,
             'subtasks': [ task.to_dict() for task in self.tasks ]
         }
+    
+def decompose(task: Task, decomposition: list[dict[str, str]]) -> list[Task]:
+    '''
+    (Helper function) Decompose the given task in subtasks
+    :param task: the task to decompose
+    :param decomposition: list of dictionaries, each containing "name" and "description"
+
+    :return: the list of subtasks
+    '''
+    return task.decompose(decomposition)

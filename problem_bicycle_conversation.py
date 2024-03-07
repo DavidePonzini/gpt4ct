@@ -1,7 +1,7 @@
-from task import Task
+from task import Task, decompose
 
 root_task = Task('Design a bicycle from scratch', 'Design a bicycle from scratch')
-sub = root_task.decompose([
+sub = decompose(root_task, [
   {
     "name": "Frame Design",
     "description": "Design the main structure of the bicycle including dimensions, materials, and geometry."
@@ -17,7 +17,7 @@ sub = root_task.decompose([
 ]
 )
 
-sub0 = sub[0].decompose([
+sub0 = decompose(sub[0], [
   {
     "name": "Frame Geometry",
     "description": "Define the shape and dimensions of the frame, including tube lengths, angles, and positions."
@@ -33,7 +33,7 @@ sub0 = sub[0].decompose([
 ]
 )
 
-sub00 = sub0[0].decompose([
+sub00 = decompose(sub0[0], [
   {
     "name": "Frame Type Selection",
     "description": "Choose the type of frame, such as diamond, step-through, or recumbent, based on intended use and rider preferences."
@@ -49,7 +49,7 @@ sub00 = sub0[0].decompose([
 ]
 )
 
-sub1 = sub[1].decompose([
+sub1 = decompose(sub[1], [
   {
     "name": "Wheel Selection",
     "description": "Choose appropriate wheels based on factors such as size, material, weight, and intended use (road, mountain, hybrid, etc.)."
@@ -69,7 +69,7 @@ sub1 = sub[1].decompose([
 ]
 )
 
-sub2 = sub[2].decompose([
+sub2 = decompose(sub[2], [
   {
     "name": "Preparation",
     "description": "Gather all necessary tools and components required for assembly, ensuring everything is organized and easily accessible."
@@ -97,7 +97,7 @@ sub2 = sub[2].decompose([
 ]
 )
 
-sub21 = sub2[1].decompose([
+sub21 = decompose(sub2[1], [
   {
     "name": "Preparation of Frame Components",
     "description": "Ensure all frame components such as tubes, joints, and fittings are cleaned, inspected, and prepared for assembly."
@@ -121,7 +121,7 @@ sub21 = sub2[1].decompose([
 ]
 )
 
-sub22 = sub2[2].decompose([
+sub22 = decompose(sub2[2], [
   {
     "name": "Handlebar and Stem Installation",
     "description": "Attach the handlebar and stem to the fork and adjust them to the desired position and angle."
@@ -149,7 +149,7 @@ sub22 = sub2[2].decompose([
 ]
 )
 
-sub01 = sub0[1].decompose([
+sub01 = decompose(sub0[1], [
   {
     "name": "Frame Material Selection",
     "description": "Choose the material for the frame considering factors such as strength, weight, durability, and cost. Common materials include steel, aluminum, carbon fiber, and titanium."
@@ -165,7 +165,7 @@ sub01 = sub0[1].decompose([
 ]
 )
 
-sub02 = sub0[2].decompose([
+sub02 = decompose(sub0[2], [
   {
     "name": "Load Analysis",
     "description": "Analyze the expected loads and stresses that the bicycle frame will undergo during typical use, considering factors such as rider weight, terrain, and riding style."
@@ -181,7 +181,7 @@ sub02 = sub0[2].decompose([
 ]
 )
 
-sub020 = sub02[0].decompose([
+sub020 = decompose(sub02[0], [
   {
     "name": "Static Load Analysis",
     "description": "Analyze the static loads acting on the bicycle frame, including the weight of the rider and any additional cargo, to determine the maximum stress points."
@@ -197,7 +197,7 @@ sub020 = sub02[0].decompose([
 ]
 )
 
-sub2020 = sub020[0].decompose([
+sub2020 = decompose(sub020[0], [
   {
     "name": "Rider Weight Analysis",
     "description": "Calculate the weight of the rider and any additional cargo carried on the bicycle to determine the overall static load exerted on the frame."
@@ -213,7 +213,7 @@ sub2020 = sub020[0].decompose([
 ]
 )
 
-sub20201 = sub2020[1].decompose([
+sub20201 = decompose(sub2020[1], [
   {
     "name": "Center of Mass Calculation",
     "description": "Calculate the center of mass of the rider and any cargo to determine how the load is distributed along the bicycle frame."
@@ -229,7 +229,7 @@ sub20201 = sub2020[1].decompose([
 ]
 )
 
-sub202010 = sub20201[0].decompose([
+sub202010 = decompose(sub20201[0], [
   {
     "name": "Rider Position Assessment",
     "description": "Assess the position of the rider on the bicycle, including factors such as height, weight distribution, and posture."
@@ -245,7 +245,7 @@ sub202010 = sub20201[0].decompose([
 ]
 )
 
-sub2020102 = sub202010[2].decompose([
+sub2020102 = decompose(sub202010[2], [
   {
     "name": "Individual Component Analysis",
     "description": "Calculate the center of mass for each individual component of the bicycle, such as the frame, wheels, and rider, considering their respective weights and positions."
@@ -257,7 +257,7 @@ sub2020102 = sub202010[2].decompose([
 ]
 )
 
-sub20201020 = sub2020102[0].decompose([
+sub20201020 = decompose(sub2020102[0], [
   {
     "name": "Frame Center of Mass Calculation",
     "description": "Calculate the center of mass for the bicycle frame, considering its geometry, material distribution, and weight."
@@ -273,7 +273,7 @@ sub20201020 = sub2020102[0].decompose([
 ]
 )
 
-sub202010200 = sub20201020[0].decompose([
+sub202010200 = decompose(sub20201020[0], [
   {
     "name": "Weight Distribution Assessment",
     "description": "Evaluate the distribution of the rider's weight between the upper body, lower body, and extremities, considering factors such as posture and riding position."
@@ -285,7 +285,7 @@ sub202010200 = sub20201020[0].decompose([
 ]
 )
 
-sub2020102000 = sub202010200[0].decompose([
+sub2020102000 = decompose(sub202010200[0], [
   {
     "name": "Body Segment Weight Analysis",
     "description": "Break down the rider's weight into segments such as torso, arms, legs, and head, considering the proportional contribution of each segment to the total weight."
@@ -297,7 +297,7 @@ sub2020102000 = sub202010200[0].decompose([
 ]
 )
 
-sub20201020000 = sub2020102000[0].decompose([
+sub20201020000 = decompose(sub2020102000[0], [
   {
     "name": "Anthropometric Data Utilization",
     "description": "Utilize anthropometric data to estimate the weight distribution of different body segments based on typical ratios and proportions."
@@ -309,7 +309,7 @@ sub20201020000 = sub2020102000[0].decompose([
 ]
 )
 
-sub202010200001 = sub20201020000[1].decompose([
+sub202010200001 = decompose(sub20201020000[1], [
   {
     "name": "Biomechanical Analysis",
     "description": "Analyze the rider's biomechanics to understand how their unique body composition and muscle distribution affect weight distribution while cycling."
