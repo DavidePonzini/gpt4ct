@@ -1,7 +1,10 @@
-import json
 from dav_tools import text_format
 
 class Task:
+    '''
+    Represents a single task, and its decomposition in subtasks
+    '''
+
     def __init__(self, name, description, id='') -> None:
         self.id = id
         self.name = name
@@ -10,6 +13,7 @@ class Task:
         self.tasks = []
 
     def format_descr(self, size):
+        '''Format the description to have lines of a max given length'''
         words = self.description.split()
         current_line = words[0]
         result = ''
@@ -24,29 +28,30 @@ class Task:
         result += current_line
         return result
 
-    def decompose(self, *tasks):
-        for i, (name, descr) in enumerate(tasks):
-            subtask = Task(name, descr, f'{self.id}{i}')
-            self.tasks.append(subtask)
-        return self.tasks
+    def decompose(self, tasks: list[dict[str, str]]) -> list:
+        '''
+        Decompose the current task in subtasks
+        :param tasks: list of dictionaries, each containing "name" and "description"
 
-    def decompose_json(self, tasks: list):
+        :return: the list of subtasks
+        '''
         for i, task in enumerate(tasks):
             subtask = Task(task['name'], task['description'], f'{self.id}{i}')
             self.tasks.append(subtask)
         return self.tasks
 
-    def __str__(self) -> str:
+    def to_indented_list(self) -> str:
+        '''Convert current task and subtasks to an indented list'''
         result = text_format.format_text('|\t' * self.lvl + f'[{self.id}]', text_format.TextFormat.Style.DIM) + \
             f' {self.name}'
         
         for subtask in self.tasks:
-            result += '\n' + str(subtask)
+            result += '\n' + subtask.to_list()
 
         return result
 
-    # textual decomposition format - does not work very well
-    def get_decomposition(self) -> str:
+    def to_text_decomposition(self) -> str:
+        '''Textual decomposition format - does not work very well'''
         result = self.name + '('
 
         for i, subtask in enumerate(self.tasks):
@@ -57,8 +62,10 @@ class Task:
         result += ')'
         return result
 
-    # used to convert to JSON
     def to_dict(self) -> str:
+        '''
+        Convert current task and subtasks to a dictionary, ready for JSON format conversion
+        '''
         return {
             'name': self.name,
             # 'description': self.description,
