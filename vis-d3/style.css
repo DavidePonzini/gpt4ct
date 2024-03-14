@@ -18,6 +18,7 @@ body {
     height: 100%;
 }
 
+/* ---------- Nodes ---------- */
 .node * {
     transition: .1s ease-in-out;
 }
@@ -27,33 +28,53 @@ body {
     text-anchor: start;
 }
 
-.link {
-    fill: none;
-    stroke: #aaa;
-    stroke-width: 1.5px;
-}
-
-.node.node-solved circle {
-    stroke: green;
-    fill: yellowgreen;
-}
-
-.node.node-unexplored circle {
-    stroke: orange;
-    fill: white;
-}
-
-.node.node-explored circle {
-    stroke: steelblue;
-    fill: steelblue;
-}
-
-
 .node.node-internal circle {
     stroke: steelblue;
     fill: steelblue;
 }
 
+/* ---------- Links ---------- */
+.link {
+    fill: none;
+    stroke-width: 1.5px;
+}
+
+.link-leaf {
+    stroke: #aaa;
+    stroke-dasharray: 3, 3;
+}
+
+.link-internal {
+    stroke: steelblue;
+}
+
+/* ---------- Node status ---------- */
+.unexplored circle {
+    stroke: orange;
+    fill: white;
+}
+
+.unexplored.link {
+    /* stroke: orange; */
+}
+
+.explored circle {
+    stroke: orange;
+    fill: orange;
+}
+
+.explored.link {
+    stroke: orange;
+}
+
+.solved circle {
+    stroke: green;
+    fill: yellowgreen;
+}
+
+.solved.link {
+    stroke: green;
+}
 
 
 /* ---------- Hover ---------- */
