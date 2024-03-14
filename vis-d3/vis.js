@@ -16,15 +16,6 @@ let zoom = d3.zoom()
 svg.call(zoom);
 
 
-function show_children(node) {
-    node.children = node.subtasks;
-}
-
-function hide_children(node) {
-    node.children = undefined;
-}
-
-
 $(document).ready(function() {
     init_tree(movies);
 })
@@ -160,15 +151,43 @@ function isLeaf(node) {
 }
 
 function onNodeClick(event, item) {
-    if(item.data.children)
-        hide_children(item.data)
+    $('#task-description').text(item.data.description);
+    $('#task-implementation').text(item.data.implementation);
+
+    $('#buttons')
+        .css('left', event.x - 150)
+        .css('top', event.y + 20)
+        .show();
+
+    $('#decompose').unbind().on('click', () => decompose(item));
+    $('#solve').unbind().on('click', () => solve(item));
+    $('#debug').unbind().on('click', () => debug_node(item));
+}
+
+function decompose(item) {
+    $('#buttons').hide();
+
+    if(isLeaf(item))
+        item.data.children = item.data.subtasks;
     else
-        show_children(item.data)
+        item.data.children = undefined;
 
     update();
 }
 
+function solve(item) {
+    $('#buttons').hide();
 
-window.show_children = show_children;
-window.hide_children = hide_children;
+    item.data.solved = !item.data.solved;
+
+    update();
+}
+
+function debug_node(item) {
+    $('#buttons').hide();
+    
+    console.log(item);
+}
+
+
 window.update = update;

@@ -18,6 +18,24 @@ body {
     height: 100%;
 }
 
+#buttons {
+    display: none;
+    position: absolute;
+    padding: 20px;
+    border-radius: 12px;
+    background-color: lightblue;
+}
+
+#buttons button {
+    width: 150px;
+}
+
+#task-description, #task-implementation {
+    max-width: 600px;
+    max-height: 500px;
+    margin-bottom: 20px;
+}
+
 /* ---------- Nodes ---------- */
 .node * {
     transition: .1s ease-in-out;
@@ -54,9 +72,9 @@ body {
     fill: white;
 }
 
-.unexplored.link {
-    /* stroke: orange; */
-}
+/* .unexplored.link {
+    stroke: orange;
+} */
 
 .explored circle {
     stroke: orange;
