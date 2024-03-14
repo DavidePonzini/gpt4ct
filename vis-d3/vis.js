@@ -1,7 +1,19 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
+// Main components
+let data = movies;
+
+const svg = d3.select('#tree');
+const g = svg.append('g');
 
 let current_node = movies;
+
+// Handle zoom
+let zoom = d3.zoom()
+    .on('zoom', function(e) {
+        g.attr('transform', e.transform);
+    });
+svg.call(zoom);
 
 
 function show_children(node) {
@@ -9,56 +21,125 @@ function show_children(node) {
 }
 
 function hide_children(node) {
-    node.children = [];
+    node.children = undefined;
 }
 
-window.show_children = show_children;
-window.hide_children = hide_children;
 
 $(document).ready(function() {
     init_tree(movies);
 })
 
-function init_tree(data) {
-    const svg = d3.select('#tree');
-    svg.append('g');
-
-    update(data);
+function init_tree() {
+    update();
 }
 
-function update(data) {
-    const g = d3.select('#tree > g');
+function update() {
+    const svg_width = $('#tree').innerWidth();
+    const svg_heigth = $('#tree').innerHeight();
 
+    const margin = {
+        left: 200,
+        right: 200,
+        top: 200,
+        bottom: 200
+    };
 
-    const width = $('#tree').width();
-    const heigth = $('#tree').height();
+    const level_height = 200;
 
-    let treeLayout = d3.tree();
-    let treeData = treeLayout(d3.hierarchy(data, d => d.children));
+    const width = svg_width - margin.left - margin.right;
+    const heigth = svg_heigth - margin.top - margin.bottom;
 
+    const treeLayout = d3.tree();
+    const treeData = treeLayout(d3.hierarchy(data, d => d.children));
+
+    // -------------------------------------------------------------------------------------------------------------
     // Nodes
+    // -------------------------------------------------------------------------------------------------------------
     let nodes = g.selectAll('.node')
         .data(treeData.descendants())
 
-    let nodesG = nodes.enter().append('g')
-        .attr('class', d => d.children ? 'node node-internal' : 'node node-leaf')
-        .attr('transform', d => `translate(${d.y * width + 30}, ${d.x * heigth})`);
-    nodesG.append('circle')
+    // Nodes - Enter
+    let nodesG_enter = nodes.enter().append('g')
+        .classed('node', true)
+        .classed('node-internal', d => d.children)
+        .classed('node-leaf', d => !d.children)
+        .classed('node-unexplored', d => !d.subtasks && !d.solved)
+        .classed('node-explored', d => d.subtasks && !d.solved)
+        .classed('node-solved', d => d.solved)
+        .attr('transform', d => `translate(${d.x * width + margin.left}, ${d.y * heigth + margin.top})`)
+        .on('click', onNodeClick);
+    nodesG_enter.append('circle')
         .attr('r', 10);
-    nodesG.append('text')
-        .text(d => d.name);
+    nodesG_enter.append('text')
+        .attr('dx', 18)
+        .attr('dy', '.31em')
+        .text(d => d.data.name);
+
+    // Nodes - Update
+    let nodesG_update = nodes
+        .classed('node', true)
+        .classed('node-internal', d => d.children)
+        .classed('node-leaf', d => !d.children)
+        .classed('node-unexplored', d => !d.subtasks && !d.solved)
+        .classed('node-explored', d => d.subtasks && !d.solved)
+        .classed('node-solved', d => d.solved)
+        .attr('transform', d => `translate(${d.x * width + margin.left}, ${d.y * heigth + margin.top})`)
+        .on('click', onNodeClick);
+    nodesG_update.select('text')
+        .text(d => d.data.name);
+
+    // Nodes - Exit
+    nodes.exit().remove('g');
+
+    // -------------------------------------------------------------------------------------------------------------
+    // Links
+    // -------------------------------------------------------------------------------------------------------------
+    let links = g.selectAll('.link')
+        .data(treeData.links());
+
+    // Links - Enter
+    let links_enter = links.enter().append('path')
+        .classed('link', true)
+        .attr('d', d3.linkVertical()
+        .source(d => [
+            d.source.x * width + margin.left,
+            d.source.y * heigth + margin.top + 10.5
+        ])
+        .target(d => [
+            d.target.x * width + margin.left,
+            d.target.y * heigth + margin.top - 10.5   // 10 = circle radius; .5 = stroke width / 2
+        ])
+        )
+
+    // Links - Update
+    let links_update = links;
+    links_update
+        .attr('d', d3.linkVertical()
+        .source(d => [
+            d.source.x * width + margin.left,
+            d.source.y * heigth + margin.top + 10.5
+        ])
+        .target(d => [
+            d.target.x * width + margin.left,
+            d.target.y * heigth + margin.top - 10.5   // 10 = circle radius; .5 = stroke width / 2
+        ])
+    )
+
+    // Links - Exit
+    links.exit().remove('path');
 
 }
 
+function onNodeClick(event, item) {
+    if(item.data.children)
+        hide_children(item.data)
+    else
+        show_children(item.data)
+
+    update();
+}
+
+
+window.show_children = show_children;
+window.hide_children = hide_children;
 window.update = update;
-
-
-let zoom = d3.zoom()
-    .on('zoom', function(e) {
-        // console.log(e.transform)
-        d3.select('#tree > g')
-            .attr('transform', e.transform);
-    });
-
-d3.select('svg')
-    .call(zoom);
