@@ -69,8 +69,10 @@ class Task:
         '''
         return {
             'name': self.name,
-            # 'description': self.description,
-            'subtasks': [ task.to_dict() for task in self.tasks ]
+            'description': self.description,
+            'id': self.id,
+            'subtasks': [ task.to_dict() for task in self.tasks ],
+            'implementation': self.implementation
         }
     
 def decompose(task: Task, decomposition: list[dict[str, str]]) -> list[Task]:
