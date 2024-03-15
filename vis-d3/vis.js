@@ -149,8 +149,18 @@ function isLeaf(node) {
 function onNodeClick(event, item) {
     $('#task-name').text(item.data.name);
     $('#task-description').text(item.data.description);
-    $('#task-implementation').text(item.data.implementation ? item.data.implementation : 'Not yet implemented');
+    
+    let impl = $('#task-implementation');
+    if (item.data.implementation) {
+        impl.text(item.data.implementation);
+        impl.attr('class', `language-python`);
 
+        // highligth element (since the same html elem will be used, we need to unset data-highlighted)
+        impl.removeAttr('data-highlighted');
+        hljs.highlightElement(impl[0]);
+    } else
+        impl.text('Not yet implemented');
+    
     $('#buttons')
         .css('left', event.x - 300)
         .css('top', event.y + 20)
