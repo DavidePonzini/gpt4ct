@@ -23,16 +23,17 @@ body {
     position: absolute;
     padding: 20px;
     border-radius: 12px;
-    background-color: lightblue;
+    border: 1px solid rgba(0, 0, 0, .2);
+    background-color: white;
 }
 
 #buttons button {
     width: 150px;
 }
 
-#task-description, #task-implementation {
+#task-name, #task-description, #task-implementation {
     max-width: 600px;
-    max-height: 500px;
+    max-height: 300px;
     margin-bottom: 20px;
 }
 

@@ -6,13 +6,11 @@ let data = movies;
 const svg = d3.select('#tree');
 const g = svg.append('g');
 
-let current_node = movies;
-
 // Handle zoom
-let zoom = d3.zoom()
-    .on('zoom', function(e) {
-        g.attr('transform', e.transform);
-    });
+let zoom = d3.zoom().on('zoom', function(e) {
+    $('#buttons').hide();
+    g.attr('transform', e.transform);
+});
 svg.call(zoom);
 
 
@@ -29,18 +27,16 @@ function update() {
     const svg_height = $('#tree').innerHeight();
 
     const margin = {
-        left: 200,
+        left: 50,
         right: 200,
-        top: 200,
+        top: 50,
         bottom: 200
     };
-
-    const level_height = 200;
 
     const width = svg_width - margin.left - margin.right;
     const height = svg_height - margin.top - margin.bottom;
 
-    const treeLayout = d3.tree();
+    const treeLayout = d3.tree(null).nodeSize([200, 200]);
     const treeData = treeLayout(d3.hierarchy(data, d => d.children));
 
     // -------------------------------------------------------------------------------------------------------------
@@ -57,7 +53,7 @@ function update() {
         .classed('unexplored', isUnexplored)
         .classed('explored', isExplored)
         .classed('solved', isSolved)
-        .attr('transform', d => `translate(${d.x * width + margin.left}, ${d.depth * level_height + margin.top})`)
+        .attr('transform', d => `translate(${d.x + width/2 + margin.left}, ${d.y + margin.top})`)
         .on('click', onNodeClick);
     nodesG_enter.append('circle')
         .attr('r', 10);
@@ -73,7 +69,7 @@ function update() {
         .classed('unexplored', isUnexplored)
         .classed('explored', isExplored)
         .classed('solved', isSolved)
-        .attr('transform', d => `translate(${d.x * width + margin.left}, ${d.depth * level_height + margin.top})`)
+        .attr('transform', d => `translate(${d.x + width/2 + margin.left}, ${d.y + margin.top})`)
         .on('click', onNodeClick);
     nodesG_update.select('text')
         .text(d => d.data.name);
@@ -97,14 +93,14 @@ function update() {
         .classed('solved', d => isSolved(d.target))
         .attr('d', d3.linkVertical()
         .source(d => [
-            d.source.x * width + margin.left,
-            d.source.depth * level_height + margin.top + 10.5
+            d.source.x + width/2 + margin.left,
+            d.source.y + margin.top + 10.5
         ])
         .target(d => [
-            d.target.x * width + margin.left,
-            d.target.depth * level_height + margin.top - 10.5   // 10 = circle radius; .5 = stroke width / 2
+            d.target.x + width/2 + margin.left,
+            d.target.y + margin.top - 10.5   // 10 = circle radius; .5 = stroke width / 2
         ])
-        )
+    )
 
     // Links - Update
     let links_update = links;
@@ -116,12 +112,12 @@ function update() {
         .classed('solved', d => isSolved(d.target))
         .attr('d', d3.linkVertical()
         .source(d => [
-            d.source.x * width + margin.left,
-            d.source.depth * level_height + margin.top + 10.5
+            d.source.x + width/2 + margin.left,
+            d.source.y + margin.top + 10.5
         ])
         .target(d => [
-            d.target.x * width + margin.left,
-            d.target.depth * level_height + margin.top - 10.5   // 10 = circle radius; .5 = stroke width / 2
+            d.target.x + width/2 + margin.left,
+            d.target.y + margin.top - 10.5   // 10 = circle radius; .5 = stroke width / 2
         ])
     )
 
@@ -151,11 +147,12 @@ function isLeaf(node) {
 }
 
 function onNodeClick(event, item) {
+    $('#task-name').text(item.data.name);
     $('#task-description').text(item.data.description);
-    $('#task-implementation').text(item.data.implementation);
+    $('#task-implementation').text(item.data.implementation ? item.data.implementation : 'Not yet implemented');
 
     $('#buttons')
-        .css('left', event.x - 150)
+        .css('left', event.x - 300)
         .css('top', event.y + 20)
         .show();
 

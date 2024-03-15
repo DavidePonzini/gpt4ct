@@ -10,7 +10,7 @@ let movies = {
 			// "subtasks":[
 				
 			// ],
-			"implementation":null
+			// "implementation":null
 		},
 		{
 			"name":"Parse CSV data",
@@ -19,7 +19,7 @@ let movies = {
 			// "subtasks":[
 				
 			// ],
-			"implementation":null
+			// "implementation":null
 		},
 		{
 			"name":"Calculate trending score",
@@ -64,7 +64,7 @@ let movies = {
 							// "subtasks":[
 								
 							// ],
-							"implementation":null
+							// "implementation":null
 						},
 						{
 							"name":"Apply time decay function",
@@ -73,10 +73,10 @@ let movies = {
 							// "subtasks":[
 								
 							// ],
-							"implementation":null
+							// "implementation":null
 						}
 					],
-					"implementation":null
+					// "implementation":null
 				},
 				{
 					"name":"Combine factors into trending score",
@@ -85,10 +85,10 @@ let movies = {
 					// "subtasks":[
 						
 					// ],
-					"implementation":null
+					// "implementation":null
 				}
 			],
-			"implementation":null
+			// "implementation":null
 		},
 		{
 			"name":"Sort videos by trending score",
@@ -97,7 +97,7 @@ let movies = {
 			// "subtasks":[
 				
 			// ],
-			"implementation":null
+			// "implementation":null
 		},
 		{
 			"name":"Retrieve top trending videos",
@@ -106,8 +106,8 @@ let movies = {
 			// "subtasks":[
 				
 			// ],
-			"implementation":null
+			// "implementation":null
 		}
 	],
-	"implementation":null
+	// "implementation":null
 }
