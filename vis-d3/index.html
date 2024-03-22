@@ -16,8 +16,13 @@
 
     <!-- Only on this page -->
     <style>
+        .container {
+            margin-top: 12px;
+            margin-bottom: 12px;
+        }
+
         .row {
-            height: 100vh;
+            min-height: calc(100vh - 24px);
         }
     </style>
 </head>
@@ -32,6 +37,17 @@
                         <textarea class="form-control" id="problem" name="problem" placeholder="Describe your problem">Create a program that finds the most trending videos</textarea>
                         <button class="btn btn-primary mt-3 mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#description" aria-expanded="false" aria-controls="description">
                             Refine problem description
+<!-- 
+given the following problem, help the user formulate their question more accurately.
+
+--- instruction ---
+- ask the user several question to help them refine their query. focus on unclear parts of the problem. the questions should engage critical thinking in the user. the questions should be sorted in order of relevance
+- unless the user has already specified them and unless the problem is too broad, ask about which tools are going to be used 
+- return the results in json format, as a list of strings
+
+--- problem ---
+create a program that finds the most trending videos 
+ -->
                         </button>
                         <div class="collapse" id="description">
                             <ul class="list-group">
@@ -52,6 +68,12 @@
                         <p><em class="text-muted">(Write a python program to find the most trending videos, given a csv file containing each visualization)</em></p>
                         <button class="btn btn-primary mt-3 mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#requirements1" aria-expanded="false" aria-controls="requirements1">
                             Suggest requirements
+<!--
+given the following problem, help the user identify any technological requirements. Provide the answer in json format, as a list of strings
+
+--- problem ---
+Write a python program to find the most trending videos, given a csv file containing each visualization
+-->
                         </button>
                         <div class="collapse" id="requirements1">
                             <ul class="list-group">
@@ -67,7 +89,7 @@
                     <a href="decompose.html" type="button" class="btn btn-primary mt-3 mb-3">Decompose problem</a>
                 </form>
             </div>
-            <div class="col"></div>
+            <!-- <div class="col"></div> -->
         </div>
     </div>
 
