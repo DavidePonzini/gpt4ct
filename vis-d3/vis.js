@@ -53,7 +53,7 @@ function update() {
         .classed('unexplored', isUnexplored)
         .classed('explored', isExplored)
         .classed('solved', isSolved)
-        .attr('transform', d => `translate(${d.x + width/2 + margin.left}, ${d.y + margin.top})`)
+        .attr('transform', d => `translate(${d.y + margin.left}, ${d.x + height/2 + margin.top})`)
         .on('click', onNodeClick);
     nodesG_enter.append('circle')
         .attr('r', 10);
@@ -69,7 +69,7 @@ function update() {
         .classed('unexplored', isUnexplored)
         .classed('explored', isExplored)
         .classed('solved', isSolved)
-        .attr('transform', d => `translate(${d.x + width/2 + margin.left}, ${d.y + margin.top})`)
+        .attr('transform', d => `translate(${d.y + margin.left}, ${d.x + height/2 + margin.top})`)
         .on('click', onNodeClick);
     nodesG_update.select('text')
         .text(d => d.data.name);
@@ -93,12 +93,12 @@ function update() {
         .classed('solved', d => isSolved(d.target))
         .attr('d', d3.linkVertical()
         .source(d => [
-            d.source.x + width/2 + margin.left,
-            d.source.y + margin.top + 10.5
+            d.source.y + margin.left + 10.5,
+            d.source.x + height/2 + margin.top
         ])
         .target(d => [
-            d.target.x + width/2 + margin.left,
-            d.target.y + margin.top - 10.5   // 10 = circle radius; .5 = stroke width / 2
+            d.target.y + margin.left - 10.5,
+            d.target.x + height/2 + margin.top   // 10 = circle radius; .5 = stroke width / 2
         ])
     )
 
@@ -110,14 +110,14 @@ function update() {
         .classed('unexplored', d => isUnexplored(d.target))
         .classed('explored', d => isExplored(d.target))
         .classed('solved', d => isSolved(d.target))
-        .attr('d', d3.linkVertical()
+        .attr('d', d3.linkHorizontal()
         .source(d => [
-            d.source.x + width/2 + margin.left,
-            d.source.y + margin.top + 10.5
+            d.source.y + margin.left + 10.5,
+            d.source.x + height/2 + margin.top
         ])
         .target(d => [
-            d.target.x + width/2 + margin.left,
-            d.target.y + margin.top - 10.5   // 10 = circle radius; .5 = stroke width / 2
+            d.target.y + margin.left - 10.5,
+            d.target.x + height/2 + margin.top   // 10 = circle radius; .5 = stroke width / 2
         ])
     )
 
