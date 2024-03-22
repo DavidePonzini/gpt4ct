@@ -53,14 +53,14 @@ function update() {
         .classed('unexplored', isUnexplored)
         .classed('explored', isExplored)
         .classed('solved', isSolved)
-        .attr('transform', d => `translate(${d.x + width/2 + margin.left}, ${d.y + margin.top})`)
+        .attr("transform", d => `rotate(${d.x * 180 / Math.PI - 90}) translate(${d.y},0)`)
         .on('click', onNodeClick);
     nodesG_enter.append('circle')
         .attr('r', 10);
-    nodesG_enter.append('text')
-        .attr('dx', 18)
-        .attr('dy', '.31em')
-        .text(d => d.data.name);
+    // nodesG_enter.append('text')
+    //     .attr('dx', 18)
+    //     .attr('dy', '.31em')
+    //     .text(d => d.data.name);
 
     // Nodes - Update
     let nodesG_update = nodes
@@ -69,10 +69,10 @@ function update() {
         .classed('unexplored', isUnexplored)
         .classed('explored', isExplored)
         .classed('solved', isSolved)
-        .attr('transform', d => `translate(${d.x + width/2 + margin.left}, ${d.y + margin.top})`)
+        .attr("transform", d => `rotate(${d.x * 180 / Math.PI - 90}) translate(${d.y},0)`)
         .on('click', onNodeClick);
-    nodesG_update.select('text')
-        .text(d => d.data.name);
+    // nodesG_update.select('text')
+    //     .text(d => d.data.name);
 
     // Nodes - Exit
     nodes.exit().remove('g');
@@ -91,15 +91,17 @@ function update() {
         .classed('unexplored', d => isUnexplored(d.target))
         .classed('explored', d => isExplored(d.target))
         .classed('solved', d => isSolved(d.target))
-        .attr('d', d3.linkVertical()
-        .source(d => [
-            d.source.x + width/2 + margin.left,
-            d.source.y + margin.top + 10.5
-        ])
-        .target(d => [
-            d.target.x + width/2 + margin.left,
-            d.target.y + margin.top - 10.5   // 10 = circle radius; .5 = stroke width / 2
-        ])
+        .attr('d', d3.linkRadial()
+        .angle(d => d.x)
+        .radius(d => d.y)
+        // .source(d => [
+        //     d.source.x + width/2 + margin.left,
+        //     d.source.y + margin.top + 10.5   // 10 = circle radius; .5 = stroke width / 2
+        // ])
+        // .target(d => [
+        //     d.target.x + width/2 + margin.left,
+        //     d.source.y + height/2 + margin.top + 10.5   // 10 = circle radius; .5 = stroke width / 2
+        // ])
     )
 
     // Links - Update
@@ -110,15 +112,9 @@ function update() {
         .classed('unexplored', d => isUnexplored(d.target))
         .classed('explored', d => isExplored(d.target))
         .classed('solved', d => isSolved(d.target))
-        .attr('d', d3.linkVertical()
-        .source(d => [
-            d.source.x + width/2 + margin.left,
-            d.source.y + margin.top + 10.5
-        ])
-        .target(d => [
-            d.target.x + width/2 + margin.left,
-            d.target.y + margin.top - 10.5   // 10 = circle radius; .5 = stroke width / 2
-        ])
+        .attr('d', d3.linkRadial()
+        .angle(d => d.x)
+        .radius(d => d.y)
     )
 
     // Links - Exit
