@@ -91,7 +91,7 @@ function update() {
         .classed('unexplored', d => isUnexplored(d.target))
         .classed('explored', d => isExplored(d.target))
         .classed('solved', d => isSolved(d.target))
-        .attr('d', d3.linkVertical()
+        .attr('d', d3.linkHorizontal()
         .source(d => [
             d.source.y + margin.left + 10.5,
             d.source.x + height/2 + margin.top
