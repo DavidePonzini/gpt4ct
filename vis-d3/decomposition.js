@@ -172,7 +172,7 @@ function onNodeClick(event, item) {
 
     // show/hide decomposition only available on decomposed tasks
     button_decompose.text(isLeaf(item) ? 'Show decomp.' : 'Hide decomp.');
-    if (isExplored(item)) {
+    if (isExplored(item) || isSolved(item)) {
         button_decompose.show().unbind().on('click', () => decompose(item));
     } else {
         button_decompose.hide();
