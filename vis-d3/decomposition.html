@@ -32,9 +32,13 @@
         <h5>Description:</h5>
         <div id="task-description"></div>
 
-        <button id="decompose" type="button" class="btn btn-primary">Decompose</button>
+        <button id="decompose" type="button" class="btn btn-secondary">Show/hide decomposition</button>
+        <button id="add-subtask" type="button" class="btn btn-primary">Add subtask</button>
         <button id="solve" type="button" class="btn btn-success">Mark as solved</button>
-        <button id="debug" type="button" class="btn btn-danger">Debug</button>
+        <button id="unsolve" type="button" class="btn btn-warning">Mark as unsolved</button>
+        <button id="edit" type="button" class="btn btn-warning">Edit</button>
+        <button id="delete" type="button" class="btn btn-danger">Delete</button>
+        <button id="debug" type="button" class="btn btn-dark">Debug</button>
 
         <hr>
         <h5>Implementation:</h5>
@@ -51,10 +55,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 
     <!-- Data -->
+    <script src="task.js"></script>
     <script src="movies.js"></script>
 
     <!-- d3 + visualization -->
-    <script type="module" src="vis.js"></script>
+    <script type="module" src="decomposition.js"></script>
 
     
 </body>

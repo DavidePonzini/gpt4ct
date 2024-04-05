@@ -128,12 +128,12 @@ function update() {
 
 // Node has neither been explored (decomposed) or marked as solved
 function isUnexplored(node) {
-    return !node.data.subtasks && !node.data.solved;
+    return !node.data.subtasks.length && !node.data.solved;
 }
 
 // Node has been explored (decomposed) but not marked as solved
 function isExplored(node) {
-    return node.data.subtasks && !node.data.solved;
+    return node.data.subtasks.length && !node.data.solved;
 }
 
 // Node has been marked as solved
@@ -160,15 +160,55 @@ function onNodeClick(event, item) {
         hljs.highlightElement(impl[0]);
     } else
         impl.text('Not yet implemented');
-    
+
+
+    let button_decompose = $('#decompose');
+    let button_addsubtask = $('#add-subtask');
+    let button_solve = $('#solve');
+    let button_unsolve = $('#unsolve');
+    let button_edit = $('#edit');
+    let button_delete = $('#delete');
+    let button_debug = $('#debug');
+
+    // show/hide decomposition only available on decomposed tasks
+    button_decompose.text(isLeaf(item) ? 'Show decomp.' : 'Hide decomp.');
+    if (isExplored(item)) {
+        button_decompose.show().unbind().on('click', () => decompose(item));
+    } else {
+        button_decompose.hide();
+    }
+
+    // add_subtask, edit, solve only available on unsolved tasks
+    // unsolve only available for solved tasks
+    if (isSolved(item)) {
+        button_addsubtask.hide();
+        button_edit.hide();
+        button_solve.hide();
+
+        button_unsolve.show().unbind().on('click', () => unsolve(item));
+    } else {
+        button_unsolve.hide();
+
+        button_addsubtask.show().unbind().on('click', () => add_subtask(item));
+        button_edit.show().unbind().on('click', () => edit_task(item));
+        button_solve.show().unbind().on('click', () => solve(item));
+    }
+
+    // delete not available on root
+    if (item.depth == 0) {
+        button_delete.hide();
+    } else {
+        button_delete.show().unbind().on('click', () => delete_subtask(item));
+    }
+
+    // always avaiable
+    button_debug.show().unbind().on('click', () => debug_node(item));
+
+
     $('#buttons')
         .css('left', event.x - 300)
         .css('top', event.y + 20)
         .show();
-
-    $('#decompose').unbind().on('click', () => decompose(item));
-    $('#solve').unbind().on('click', () => solve(item));
-    $('#debug').unbind().on('click', () => debug_node(item));
 }
 
 function decompose(item) {
@@ -182,10 +222,48 @@ function decompose(item) {
     update();
 }
 
+function add_subtask(item) {
+    $('#buttons').hide();
+
+    let task = item.data;
+
+    let subtask_name = prompt('subtask name');
+    let subtask_description = prompt('subtask description');
+
+    task.add_subtask(subtask_name, subtask_description);
+    update()
+}
+
+function delete_subtask(item) {
+    $('#buttons').hide();
+
+    let parent = item.data.parent;
+    if (parent)
+        parent.remove_subtask(item.data.name);
+    
+    update();
+}
+
 function solve(item) {
     $('#buttons').hide();
 
-    item.data.solved = !item.data.solved;
+    item.data.solve();
+
+    update();
+}
+
+function unsolve(item) {
+    $('#buttons').hide();
+
+    item.data.unsolve();
+
+    update();
+}
+
+function edit_task(item) {
+    let new_name = prompt('new name');
+    
+    item.data.name = new_name;
 
     update();
 }
