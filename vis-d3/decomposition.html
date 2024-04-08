@@ -21,28 +21,55 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
 </head>
 <body>
-    <div id="container">
-        <svg id="tree"></svg>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Problem Decomposition</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <div class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <button class="btn btn-outline-success" type="button" onclick="load_tree()">Load</button>
+                    <button class="btn btn-outline-success" type="button" onclick="save_tree('tree.json')">Save</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Modal -->
+    <div class="modal fade" id="buttons" tabindex="-1" aria-labelledby="task-name" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="task-name"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h5>Description:</h5>
+                    <div id="task-description"></div>
+                    <div id="task-implementation">
+                        <hr>
+                        <h5>Implementation:</h5>
+                        <pre><code id="task-implementation-text"></code></pre>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="decompose">Show/hide decomposition</button>
+                    <button type="button" class="btn btn-primary" id="add-subtask">Add subtask</button>
+                    <button type="button" class="btn btn-success" id="solve">Mark solved</button>
+                    <button type="button" class="btn btn-warning" id="unsolve">Mark unsolved</button>
+                    <button type="button" class="btn btn-warning" id="edit">Edit</button>
+                    <button type="button" class="btn btn-danger" id="delete">Delete</button>
+                    <!-- <button type="button" class="btn btn-dark" id="debug">Debug</button> -->
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div id="buttons">
-        <h5 id="task-name"></h5>
-
-        <hr>
-        <h5>Description:</h5>
-        <div id="task-description"></div>
-
-        <button id="decompose" type="button" class="btn btn-secondary">Show/hide decomposition</button>
-        <button id="add-subtask" type="button" class="btn btn-primary">Add subtask</button>
-        <button id="solve" type="button" class="btn btn-success">Mark solved</button>
-        <button id="unsolve" type="button" class="btn btn-warning">Mark unsolved</button>
-        <button id="edit" type="button" class="btn btn-warning">Edit</button>
-        <button id="delete" type="button" class="btn btn-danger">Delete</button>
-        <button id="debug" type="button" class="btn btn-dark">Debug</button>
-
-        <hr>
-        <h5>Implementation:</h5>
-        <pre><code id="task-implementation"></code></pre>
+    <div id="container">
+        <svg id="tree"></svg>
     </div>
 
     <!-- Boostrap -->
@@ -56,7 +83,7 @@
 
     <!-- Data -->
     <script src="task.js"></script>
-    <script src="movies.js"></script>
+    <!-- <script src="movies.js"></script> -->
 
     <!-- d3 + visualization -->
     <script type="module" src="decomposition.js"></script>

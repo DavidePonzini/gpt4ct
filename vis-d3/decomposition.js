@@ -1,7 +1,7 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
 // Main components
-let data = movies;
+let tree_data = null;
 
 const svg = d3.select('#tree');
 const g = svg.append('g');
@@ -14,11 +14,27 @@ let zoom = d3.zoom().on('zoom', function(e) {
 svg.call(zoom);
 
 
+// load
 $(document).ready(function() {
-    init_tree(movies);
+    // Make dummy tree
+    let data = new Task('Load a task', 'Load an existing task');
+    data.add_subtask('Click on "Load" button', 'Click on the "Load" button using the bar on top');
+    data.add_subtask('Select a file', 'Select a file to be loaded');
+    data.add_subtask('Load the file', 'Load a file by clicking on "OK"');
+
+    init_tree(data);
 })
 
-function init_tree() {
+function load_tree() {
+    Task.load(init_tree)
+}
+
+function save_tree(filename) {
+    tree_data.save(filename);
+}
+
+function init_tree(data) {
+    tree_data = data;
     update();
 }
 
@@ -37,7 +53,7 @@ function update() {
     const height = svg_height - margin.top - margin.bottom;
 
     const treeLayout = d3.tree(null).nodeSize([200, 200]);
-    const treeData = treeLayout(d3.hierarchy(data, d => d.children));
+    const treeData = treeLayout(d3.hierarchy(tree_data, d => d.children));
 
     // -------------------------------------------------------------------------------------------------------------
     // Nodes
@@ -152,14 +168,17 @@ function onNodeClick(event, item) {
     
     let impl = $('#task-implementation');
     if (item.data.implementation) {
-        impl.text(item.data.implementation);
-        impl.attr('class', `language-python`);
+        impl.show();
+        let impl_text = $('#task-implementation-text');
+        impl_text.text(item.data.implementation);
+        impl_text.attr('class', `language-python`);
 
         // highligth element (since the same html elem will be used, we need to unset data-highlighted)
-        impl.removeAttr('data-highlighted');
-        hljs.highlightElement(impl[0]);
+        impl_text.removeAttr('data-highlighted');
+        hljs.highlightElement(impl_text[0]);
     } else
-        impl.text('Not yet implemented');
+        impl.hide()
+        // text('Not yet implemented');
 
 
     let button_decompose = $('#decompose');
@@ -171,9 +190,9 @@ function onNodeClick(event, item) {
     let button_debug = $('#debug');
 
     // show/hide decomposition only available on decomposed tasks
-    button_decompose.text(isLeaf(item) ? 'Show decomp.' : 'Hide decomp.');
+    button_decompose.text(isLeaf(item) ? 'Show decomposition' : 'Hide decomposition');
     if (isExplored(item) || isSolved(item)) {
-        button_decompose.show().unbind().on('click', () => decompose(item));
+        button_decompose.show().unbind().on('click', () => isLeaf(item) ? show_children(item) : hide_children(item));
     } else {
         button_decompose.hide();
     }
@@ -205,25 +224,37 @@ function onNodeClick(event, item) {
     button_debug.show().unbind().on('click', () => debug_node(item));
 
 
-    $('#buttons')
-        .css('left', event.x - 300)
-        .css('top', event.y + 20)
-        .show();
+    show_buttons();
+    // $('#buttons')
+    //     .css('left', event.x - 300)
+    //     .css('top', event.y + 20)
+    //     .show();
 }
 
-function decompose(item) {
-    $('#buttons').hide();
+function show_buttons() {
+    $('#buttons').modal('show');
+}
 
-    if(isLeaf(item))
-        item.data.children = item.data.subtasks;
-    else
-        item.data.children = undefined;
+function hide_buttons() {
+    $('#buttons').modal('hide');
+}
 
+function show_children(item) {
+    hide_buttons();
+
+    item.data.children = item.data.subtasks;
+    update();
+}
+
+function hide_children(item) {
+    hide_buttons();
+
+    item.data.children = undefined;
     update();
 }
 
 function add_subtask(item) {
-    $('#buttons').hide();
+    hide_buttons();
 
     let task = item.data;
 
@@ -231,11 +262,11 @@ function add_subtask(item) {
     let subtask_description = prompt('subtask description');
 
     task.add_subtask(subtask_name, subtask_description);
-    update()
+    show_children(item);
 }
 
 function delete_subtask(item) {
-    $('#buttons').hide();
+    hide_buttons();
 
     let parent = item.data.parent;
     if (parent)
@@ -245,7 +276,7 @@ function delete_subtask(item) {
 }
 
 function solve(item) {
-    $('#buttons').hide();
+    hide_buttons();
 
     item.data.solve();
 
@@ -253,7 +284,7 @@ function solve(item) {
 }
 
 function unsolve(item) {
-    $('#buttons').hide();
+    hide_buttons();
 
     item.data.unsolve();
 
@@ -261,18 +292,21 @@ function unsolve(item) {
 }
 
 function edit_task(item) {
+    hide_buttons();
+
     let new_name = prompt('new name');
-    
     item.data.name = new_name;
 
     update();
 }
 
 function debug_node(item) {
-    $('#buttons').hide();
+    hide_buttons();
     
     console.log(item);
 }
 
 
 window.update = update;
+window.load_tree = load_tree;
+window.save_tree = save_tree;

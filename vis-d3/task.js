@@ -48,13 +48,14 @@ class Task {
         a.click();
     }
 
-    static load() {
-        let input = $('<input type="file" id="inputfile" accept=".json,text/plain" />');
+    static load(cb) {
+        let input = $('<input type="file" accept=".json,text/plain" />');
         input.unbind().bind('change', function(e) {
             let reader = new FileReader();
             reader.addEventListener('load', function(e) {
-                x = e
-                console.log(e.target.result)
+                let json = e.target.result;
+                let task = Task.fromJSON(json);
+                cb(task);
             });
             reader.readAsText(e.target.files[0]);
         });

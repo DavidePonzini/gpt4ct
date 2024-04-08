@@ -4,13 +4,12 @@ body {
 
 #container {
     position: absolute;
-    width: calc(100vw - 0px * 2);
-    height: calc(100vh - 0px * 2);
-    top: 0;
+    width: calc(100vw - 0px);
+    height: calc(100vh - 56px);
+    top: 56;
     left: 0;
     margin: 0;
     overflow: hidden;
-    /* padding: 20px; */
 }
 
 #tree {
@@ -18,22 +17,8 @@ body {
     height: 100%;
 }
 
-#buttons {
-    display: none;
-    position: absolute;
-    padding: 20px;
-    border-radius: 12px;
-    border: 1px solid rgba(0, 0, 0, .2);
-    background-color: white;
-}
-
-#buttons button {
-    width: 150px;
-}
-
-#task-name, #task-description, #task-implementation {
-    max-width: 600px;
-    /* max-height: 300px; */
+.navbar button {
+    margin-right: .5rem;
 }
 
 /* ---------- Nodes ---------- */
@@ -71,10 +56,6 @@ body {
     stroke: orange;
     fill: white;
 }
-
-/* .unexplored.link {
-    stroke: orange;
-} */
 
 .explored circle {
     stroke: orange;
