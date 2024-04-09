@@ -9,6 +9,45 @@ class Task {
         this.parent = null;
         this.solved = false;
         this.implementation = null;
+        this.children = null;
+    }
+
+    isRoot() {
+        return this.parent == null;
+    }
+
+    isLeaf() {
+        // Node has no visible children
+        return this.children == null;
+    }
+
+    isSolved() {
+        // Node has been marked as solved
+        return this.solved;
+    }
+
+    isExplored() {
+        // Node has been explored (decomposed) but not marked as solved
+        return this.subtasks.length && !this.isSolved();
+    }
+
+    isUnexplored() {
+        // Node has neither been explored (decomposed) or marked as solved
+        return !this.subtasks.length && !this.isSolved();
+    }
+
+    has_children() {
+        return this.subtasks.length;
+    }
+
+    show_children() {
+        this.children = this.subtasks;
+        return this;
+    }
+
+    hide_children() {
+        this.children = null;
+        return this;
     }
 
     toJSON() {
@@ -19,6 +58,7 @@ class Task {
             subtasks: this.subtasks,
             solved: this.solved,
             implementation: this.implementation,
+            children: !!this.subtasks.length,
         };
     }
 
@@ -32,6 +72,10 @@ class Task {
             subtask.parent = task;
             task.subtasks.push(subtask);
         });
+
+        // Automatically show children if they were shown
+        if (data.children)
+            task.show_children();
 
         // Set other properties
         task.solved = data.solved;
@@ -61,14 +105,6 @@ class Task {
         });
         input.click();
     }
-
-    // add_subtasks(children) {
-    //     for (let child in children) {
-    //         console.log(this.add_subtask(child.name, child.description))//.add_subtasks(child.subtasks);
-    //     }
-
-    //     return this.subtasks
-    // }
 
     add_subtask(name, description) {
         let child = new Task(name, description);

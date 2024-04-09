@@ -35,10 +35,10 @@ body {
     text-anchor: start;
 }
 
-.node.node-internal circle {
+/* .node.node-internal circle {
     stroke: steelblue;
     fill: steelblue;
-}
+} */
 
 /* ---------- Links ---------- */
 .link {
