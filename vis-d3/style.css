@@ -21,6 +21,10 @@ body {
     margin-right: .5rem;
 }
 
+.navbar {
+    border-bottom: 1px solid gray;
+}
+
 /* ---------- Nodes ---------- */
 .node * {
     transition: .1s ease-in-out;

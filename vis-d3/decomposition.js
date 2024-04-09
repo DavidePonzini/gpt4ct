@@ -142,6 +142,10 @@ function update() {
 
 }
 
+function hasChildren(node) {
+    return node.data.subtasks.length > 0;
+}
+
 // Node has neither been explored (decomposed) or marked as solved
 function isUnexplored(node) {
     return !node.data.subtasks.length && !node.data.solved;
@@ -191,7 +195,7 @@ function onNodeClick(event, item) {
 
     // show/hide decomposition only available on decomposed tasks
     button_decompose.text(isLeaf(item) ? 'Show decomposition' : 'Hide decomposition');
-    if (isExplored(item) || isSolved(item)) {
+    if (hasChildren(item)) {
         button_decompose.show().unbind().on('click', () => isLeaf(item) ? show_children(item) : hide_children(item));
     } else {
         button_decompose.hide();
