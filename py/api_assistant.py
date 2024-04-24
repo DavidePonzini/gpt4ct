@@ -31,10 +31,17 @@ def create_first_message(thread, problem):
 def create_followup_message(thread, task):
     create_message(thread, 'user', f'Using the same approach, decompose the task "{task}"')
 
+def print_price(usage):
+    cost_in = usage.prompt_tokens / 1_000_000 * 0.50
+    cost_out = usage.completion_tokens / 1_000_000 * 1.50
+    messages.message(f'Cost: {(cost_in + cost_out):.5f} $ (in={usage.prompt_tokens}, out={usage.completion_tokens})',
+                     icon='$', icon_options=[messages.TextFormat.Color.BLUE])
+    
+
 def run_thread(thread, assistant):
     messages.progress('Running thread...')
     run = client.beta.threads.runs.create_and_poll(thread_id=thread.id, assistant_id=assistant.id)
-    messages.message(f'Cost: {run.usage}', icon='$', icon_options=[messages.TextFormat.Color.BLUE])
+    print_price(run.usage)
 
     if run.status == 'completed': 
         messages.success('Run completed')

@@ -4,15 +4,15 @@ from openai import OpenAI
 client = OpenAI()
 
 
-assistant_instructions = '''Decompose the current task into the smallest possible number of smaller subtasks (usually two or three). You must produce at least two subtasks.
+assistant_instructions = '''Decompose the current task into the smallest possible number of subtasks (usually two or three). You must produce at least two subtasks.
 
 For each subtask, provide a name as well as a description, similar to the one provided for the main problem.
 
-Each subtask must be simpler to solve than the main task. A subtask of a given task, should not include any elements of other tasks at the same level of decomposition.
-
+Each subtask must be simpler to solve than the main task.
+A subtask of a given task, should not include any elements of other tasks at the same level of decomposition.
 Ensure that there are no missing steps: i.e. the sum of all subtasks solves the entire task.
 
-Format the results as a JSON list of objects, each one containing the fields "name" and "description".
+Format the result in JSON: provide a list of objects such as this: {"result": [{"name":"subtask 1 name", "description": "subtask 1 description"}, ...]}
 '''
 
 # Create assistant

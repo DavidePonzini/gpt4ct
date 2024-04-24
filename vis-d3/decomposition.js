@@ -2,6 +2,7 @@ import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
 // Main components
 let tree_data = null;
+let thread_id = null;
 
 const svg = d3.select('#tree');
 const g = svg.append('g');
