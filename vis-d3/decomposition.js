@@ -23,18 +23,43 @@ $(document).ready(function() {
     data.add_subtask('Select a file', 'Select a file to be loaded');
     data.add_subtask('Load the file', 'Load a file by clicking on "OK"');
 
-    init_tree(data);
+    init(data);
 })
 
 function load_tree() {
-    Task.load(init_tree)
+    let input = $('<input type="file" accept=".json,text/plain" />');
+    input.unbind().bind('change', function(e) {
+        let reader = new FileReader();
+        reader.addEventListener('load', function(e) {
+            let json = e.target.result;
+            
+            thread_id = json.thread_id;
+
+            let tree = json.tree;
+            let task = Task.fromJSON(tree);
+
+            init(task);
+        });
+        reader.readAsText(e.target.files[0]);
+    });
+    input.click();
 }
 
 function save_tree(filename) {
-    tree_data.save(filename);
+    var a = document.createElement("a");
+
+    let data = {
+        'tree': tree_data,
+        'thread_id': thread_id
+    }
+
+    var file = new Blob([JSON.stringify(data)], {type: 'text/plain'});
+    a.href = URL.createObjectURL(file);
+    a.download = filename;
+    a.click();
 }
 
-function init_tree(data) {
+function init(data) {
     tree_data = data;
     update();
 }

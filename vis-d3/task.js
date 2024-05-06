@@ -84,28 +84,6 @@ class Task {
         return task; // Return the constructed Task instance
     }
 
-    save(filename) {
-        var a = document.createElement("a");
-        var file = new Blob([JSON.stringify(this)], {type: 'text/plain'});
-        a.href = URL.createObjectURL(file);
-        a.download = filename;
-        a.click();
-    }
-
-    static load(cb) {
-        let input = $('<input type="file" accept=".json,text/plain" />');
-        input.unbind().bind('change', function(e) {
-            let reader = new FileReader();
-            reader.addEventListener('load', function(e) {
-                let json = e.target.result;
-                let task = Task.fromJSON(json);
-                cb(task);
-            });
-            reader.readAsText(e.target.files[0]);
-        });
-        input.click();
-    }
-
     add_subtask(name, description) {
         let child = new Task(name, description);
         child.parent = this;
