@@ -62,10 +62,11 @@ def print_thread(thread_id):
                          ])
 
 if __name__ == '__main__':
+    thread_id = 'thread_0QKYAFnS7bIU3RZutHEeSO9Y'
     assistant = get_decomposition_assistant('asst_nDAssQVwXvOXK4RPeaLlncIn')
-    thread = get_thread('thread_0QKYAFnS7bIU3RZutHEeSO9Y')
+    # thread = get_thread(thread_id)
     # thread = create_thread()
     # message = create_first_message(thread, 'Write a python program to find the most trending videos, given a csv file containing each visualization')
     # run = run_thread(thread, assistant)
-    print_thread(thread)
+    print_thread(thread_id)
 
