@@ -50,8 +50,10 @@ def run_thread(thread, assistant):
 
     return run
 
-def print_thread(thread):
-    msgs = client.beta.threads.messages.list(thread.id)
+def print_thread(thread_id):
+    messages.progress('Retrieving messages...')
+    msgs = client.beta.threads.messages.list(thread_id)
+    messages.info('Retrieved messages')
    
     for msg in msgs.data:
         messages.message(msg.content[0].text.value, icon=msg.role[0],
@@ -59,11 +61,11 @@ def print_thread(thread):
                              messages.TextFormat.Color.PURPLE if msg.role == 'user' else messages.TextFormat.Color.YELLOW
                          ])
 
-
-assistant = get_decomposition_assistant('asst_nDAssQVwXvOXK4RPeaLlncIn')
-thread = get_thread('thread_0QKYAFnS7bIU3RZutHEeSO9Y')
-# thread = create_thread()
-# message = create_first_message(thread, 'Write a python program to find the most trending videos, given a csv file containing each visualization')
-# run = run_thread(thread, assistant)
-print_thread(thread)
+if __name__ == '__main__':
+    assistant = get_decomposition_assistant('asst_nDAssQVwXvOXK4RPeaLlncIn')
+    thread = get_thread('thread_0QKYAFnS7bIU3RZutHEeSO9Y')
+    # thread = create_thread()
+    # message = create_first_message(thread, 'Write a python program to find the most trending videos, given a csv file containing each visualization')
+    # run = run_thread(thread, assistant)
+    print_thread(thread)
 
