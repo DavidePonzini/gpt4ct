@@ -18,14 +18,14 @@ Format the result in JSON: provide a list of objects such as this: {"result": [{
 # Create assistant
 # assistant = client.beta.assistants.create(
 #   model="gpt-3.5-turbo",
-#   instructions=system_instructions,
+#   instructions=assistant_instructions,
 #   name='Problem Decomposer',
 #   response_format={'type': 'json_object'}
 # )
-
+# messages.success('Created assistant', assistant.id)
 
 # Modify assistant
-assistant = client.beta.assistants.update(
-    assistant_id='asst_nDAssQVwXvOXK4RPeaLlncIn',
-    instructions=assistant_instructions
-)
+# assistant = client.beta.assistants.update(
+#     assistant_id='asst_FTCjLwGwVPksSPGLPTGgvQ66',
+#     instructions=assistant_instructions
+# )
