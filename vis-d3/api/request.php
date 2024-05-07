@@ -1,7 +1,7 @@
 <?php
     include('SECRET.php');
 
-    function make_request($method, $url, $data) {
+    function make_request($method, $url, $data = null) {
         $curl = curl_init();
 
         // Set request method
@@ -25,10 +25,29 @@
         $result = curl_exec($curl);
         curl_close($curl);
 
+        $result = json_decode($result);
+
         return $result;
     }
 
-    // $p = 'https://ponzidav.altervista.org/utils/request.php';
-    // $res = make_request('GET', $p, null);
-    // print_r($res);
+    function check_error($result) {
+        if (isset($result->error)) {
+            invalid_request($result->error->message);
+        }
+
+        return $result;
+    }
+
+    function invalid_request($message) {
+        echo json_encode(array(
+            'status' => 'invalid_request',
+            'message' => $message 
+        ));
+
+        die();
+    }
+
+    function print_json($data) {
+        echo json_encode($data);
+    }
 ?>

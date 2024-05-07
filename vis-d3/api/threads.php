@@ -1,18 +1,37 @@
 <?php
     include('request.php');
 
+    function get_run($thread_id, $run_id) {
+        $url = 'https://api.openai.com/v1/threads/' . $thread_id . '/runs/' . $run_id;
+        $result = make_request('GET', $url);
+
+        return check_error($result);
+    }
+
+    function wait_for_run($thread_id, $run_id) {
+        while(true) {
+            $run = get_run($thread_id, $run_id);
+            $status = $run->status;
+            
+            if ($status == 'completed') {
+                return;
+            }
+        }
+    }
+
     function create_thread() {
         $result = make_request('POST', 'https://api.openai.com/v1/threads', null);
-        $result = json_decode($result);
         $result = $result->id;
 
-        return $result;
+        return check_error($result);
     }
 
     function get_messages($thread_id) {
         $url = 'https://api.openai.com/v1/threads/' . $thread_id . '/messages';
 
-        return make_request('GET', $url, null);
+        $result = make_request('GET', $url);
+
+        return check_error($result);
     }
 
     function create_message($thread_id, $role, $content) {
@@ -25,7 +44,7 @@
             )
         ));
 
-        return $result;
+        return check_error($result);
     }
 
     function create_first_message($thread_id, $problem, $description) {
@@ -43,21 +62,16 @@
         return create_message($thread_id, 'user', $text);
     }
 
-    // todo: fare richiesta da curl e guardare il valore di usage
     function run_thread($thread_id, $assistant_id) {
         $url = 'https://api.openai.com/v1/threads/' . $thread_id . '/runs';
 
         $result = make_request('POST', $url, json_encode(
             array(
-                'assistant_id' => ASSISTANT_ID, // TO BE CHANGED
+                'assistant_id' => $assistant_id,
                 'response_format' => array('type' => 'json_object')
             )
         ));
 
-        $result = json_decode($result);
-        // $result = $result->result;
-
-        return $result;
-
+        return check_error($result);
     }
 ?>

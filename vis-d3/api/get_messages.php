@@ -1,11 +1,13 @@
 <?php
-    if (!isset($_GET['id'])) {
-        echo 'Missing id';
-        die();
-    }
-
     include('threads.php');
 
-    print_r(get_messages($_GET['id']));
+    if (!isset($_GET['id'])) {
+        invalid_request('Missing id');
+    }
 
+    $result = get_messages($_GET['id']);
+
+    print_json(array(
+        'result' => $result
+    ));
 ?>
