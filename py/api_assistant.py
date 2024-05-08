@@ -50,16 +50,27 @@ def run_thread(thread, assistant):
 
     return run
 
-def print_thread(thread_id):
-    messages.progress('Retrieving messages...')
-    msgs = client.beta.threads.messages.list(thread_id)
-    messages.info('Retrieved messages')
-   
+def _print_messages(msgs: list):
     for msg in msgs.data:
         messages.message(msg.content[0].text.value, icon=msg.role[0],
-                         icon_options=[
-                             messages.TextFormat.Color.PURPLE if msg.role == 'user' else messages.TextFormat.Color.YELLOW
-                         ])
+                        icon_options=[
+                            messages.TextFormat.Color.YELLOW if msg.role == 'user' else messages.TextFormat.Color.PURPLE
+                        ], default_text_options=[
+                            messages.TextFormat.Color.YELLOW if msg.role == 'user' else messages.TextFormat.Color.PURPLE,
+                            None if msg.role == 'user' else messages.TextFormat.Style.ITALIC
+                        ])
+
+
+def print_thread(thread_id, limit=20):
+    messages.progress('Retrieving messages...')
+    msgs = client.beta.threads.messages.list(thread_id, limit=limit)
+    _print_messages(msgs)
+        
+    while msgs.has_next_page():
+        msgs = client.beta.threads.messages.list(thread_id, limit=limit, after=msgs.last_id)
+        _print_messages(msgs)
+    
+
 
 if __name__ == '__main__':
     thread_id = 'thread_0QKYAFnS7bIU3RZutHEeSO9Y'
