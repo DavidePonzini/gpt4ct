@@ -35,6 +35,7 @@ function new_tree() {
 
     let data = new Task(name, description);
 
+    thread_id = null;
     init(data);
     $('#new-tree-modal').modal('hide');
 }
@@ -183,6 +184,11 @@ function update() {
 }
 
 function onNodeClick(event, item) {
+    // Prevent any action if API is generating output
+    if ($('.running').length > 0) {
+        return;
+    }
+
     $('#task-name').text(item.data.name);
     $('#task-description').text(item.data.description);
     
@@ -203,6 +209,7 @@ function onNodeClick(event, item) {
     let button_show_decomposition = $('#show-decomposition');
     let button_decompose = $('#decompose');
     let button_add_subtask = $('#add-subtask');
+    let button_implement = $('#implement');
     let button_solve = $('#solve');
     let button_unsolve = $('#unsolve');
     let button_edit = $('#edit');
@@ -240,8 +247,8 @@ function onNodeClick(event, item) {
         button_decompose.hide();
     }
 
-    // delete not available on root
-    if (item.depth == 0) {
+    // delete not available on root or solved nodes
+    if (item.depth == 0 || item.data.isSolved()) {
         button_delete.hide();
     } else {
         button_delete.show().unbind().on('click', () => delete_subtask(item));
@@ -268,6 +275,7 @@ function generate_decomposition(item) {
                 'description': task.description
             },
             success: function(d) {
+                console.log(d);
                 let data = JSON.parse(d);
                 thread_id = data.thread_id;
 

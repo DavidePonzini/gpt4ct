@@ -1,5 +1,6 @@
 <?php
     include('request.php');
+    include('database.php');
 
     function get_run($thread_id, $run_id) {
         $url = 'https://api.openai.com/v1/threads/' . $thread_id . '/runs/' . $run_id;
@@ -13,8 +14,24 @@
             $run = get_run($thread_id, $run_id);
             $status = $run->status;
             
-            if ($status == 'completed') {
+            if ($status == 'queued' || $status == 'in_progress') {
+                continue;
+            } elseif ($status == 'completed') {
+                $usage = $run->usage;
+
+                execute_query(
+                    'INSERT INTO decomposition_runs(thread_id, run_id, prompt_tokens, completion_tokens) VALUES(?, ?, ?, ?)',
+                    array(
+                        $thread_id,
+                        $run_id,
+                        $usage->prompt_tokens,
+                        $usage->completion_tokens
+                    )
+                );
                 return;
+            } else {
+                invalid_request(print_r($run, true));
+                die();
             }
         }
     }
