@@ -30,6 +30,7 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <div class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <button class="btn btn-outline-success" type="button" data-bs-toggle="modal" data-bs-target="#new-tree-modal">New</button>
                     <button class="btn btn-outline-success" type="button" onclick="load_tree()">Load</button>
                     <button class="btn btn-outline-success" type="button" onclick="save_tree('tree.json')">Save</button>
                 </div>
@@ -37,7 +38,7 @@
         </div>
     </nav>
 
-    <!-- Modal -->
+    <!-- Modal - buttons -->
     <div class="modal fade" id="buttons" tabindex="-1" aria-labelledby="task-name" aria-hidden="true">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
@@ -55,7 +56,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" id="decompose">Show/hide decomposition</button>
+                    <button type="button" class="btn btn-secondary" id="show-decomposition">Show/hide decomposition</button>
+                    <button type="button" class="btn btn-primary" id="decompose">Generate decomposition</button>
                     <button type="button" class="btn btn-primary" id="add-subtask">Add subtask</button>
                     <button type="button" class="btn btn-success" id="solve">Mark solved</button>
                     <button type="button" class="btn btn-warning" id="unsolve">Mark unsolved</button>
@@ -67,6 +69,35 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal - new tree -->
+    <div class="modal fade" id="new-tree-modal" tabindex="-1" aria-labelledby="new-task-header" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="new-task-header">Create new task</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="new-task-name">Task name:</label>
+                            <input type="text" id="new-task-name" class="form-control" placeholder="Calculate Fibonacci's Sequence" value="Download and store a webpage">
+                        </div>
+                        <div class="mb-3">
+                            <label for="new-task-description">Task description:</label>
+                            <textarea id="new-task-description" class="form-control" rows="10" placeholder="Write a python program to calculate the nth value of Fibonacci's sequence. The number n is specified by the user.">Write a python program to download and store a webpage</textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="new-task">Create</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <div id="container">
         <svg id="tree"></svg>

@@ -1,11 +1,13 @@
 <?php
     include('threads.php');
 
-    if(!isset($_GET['task'])) {
-        invalid_request('Missing task');
+    if ($_SERVER["REQUEST_METHOD"] != "POST" || !isset($_POST['task']) || !isset($_POST['thread_id'])) {
+        invalid_request('Missing parameters');
     }
 
-    $message = create_followup_message($thread_id, $_GET['task']);
+    $thread_id = $_POST['thread_id'];
+
+    $message = create_followup_message($thread_id, $_POST['task']);
     $run = run_thread($thread_id, ASSISTANT_ID);
     wait_for_run($thread_id, $run->id);
 

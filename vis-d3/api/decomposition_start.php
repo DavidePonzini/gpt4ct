@@ -1,13 +1,13 @@
 <?php
     include('threads.php');
 
-    // if (!isset($_GET['problem']) || !isset($_GET['description'])) {
-    //     invalid_request('Missing parameters');
-    // }
+    if ($_SERVER["REQUEST_METHOD"] != "POST" || !isset($_POST['name']) || !isset($_POST['description'])) {
+        invalid_request('Missing parameters');
+    }
 
 
     $thread_id = create_thread();
-    $message = create_first_message($thread_id, 'Write a python program to download and store a webpage', 'Create the whole program');
+    $message = create_first_message($thread_id, $_POST['name'], $_POST['description']);
     
     $run = run_thread($thread_id, ASSISTANT_ID);
     wait_for_run($thread_id, $run->id);
@@ -27,10 +27,6 @@
         'thread_id' => $thread_id,
         'decomposition' => $message_content->result
     ));
-    
-    // print_json(array(
-    //     'thread_id' => $thread_id,
-    //     'run_id' => $run->id,
-    //     'status' => $run->status
-    // ));
+
+    // TODO: ritornare anche id messaggio, implementare modifica e cancellazione messaggi (quanto si cancellano foglie, cancellare sia messaggio user che assistant)
 ?>

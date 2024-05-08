@@ -93,3 +93,20 @@ body {
 .center {
     text-align: center;
 }
+
+.running circle {
+    animation: loading_circle 1s ease-in 0s infinite alternate;
+    fill: red!important;
+    stroke: #f4f4f4!important;
+}
+
+@keyframes loading_circle {
+    0% {
+        stroke-width: 1px;
+    }
+
+    100% {
+        stroke-width: 15px;
+    }
+    
+}

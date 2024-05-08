@@ -24,7 +24,20 @@ $(document).ready(function() {
     data.add_subtask('Load the file', 'Load a file by clicking on "OK"');
 
     init(data);
+    show_children(data);
+
+    $('#new-task').on('click', new_tree);
 })
+
+function new_tree() {
+    let name = $('#new-task-name').val();
+    let description = $('#new-task-description').val();
+
+    let data = new Task(name, description);
+
+    init(data);
+    $('#new-tree-modal').modal('hide');
+}
 
 function load_tree() {
     let input = $('<input type="file" accept=".json,text/plain" />');
@@ -95,6 +108,7 @@ function update() {
         .classed('unexplored', d => d.data.isUnexplored())
         .classed('explored', d => d.data.isExplored())
         .classed('solved', d => d.data.isSolved())
+        .classed('running', d => d.data.running)
         .attr('transform', d => `translate(${d.x + width/2 + margin.left}, ${d.y + margin.top})`)
         .on('click', onNodeClick);
     nodesG_enter.append('circle')
@@ -111,6 +125,7 @@ function update() {
         .classed('unexplored', d => d.data.isUnexplored())
         .classed('explored', d => d.data.isExplored())
         .classed('solved', d => d.data.isSolved())
+        .classed('running', d => d.data.running)
         .attr('transform', d => `translate(${d.x + width/2 + margin.left}, ${d.y + margin.top})`)
         .on('click', onNodeClick);
     nodesG_update.select('text')
@@ -185,7 +200,7 @@ function onNodeClick(event, item) {
         impl.hide()
         // text('Not yet implemented');
 
-
+    let button_show_decomposition = $('#show-decomposition');
     let button_decompose = $('#decompose');
     let button_add_subtask = $('#add-subtask');
     let button_solve = $('#solve');
@@ -195,11 +210,11 @@ function onNodeClick(event, item) {
     let button_debug = $('#debug');
 
     // show/hide decomposition only available on decomposed tasks
-    button_decompose.text(item.data.isLeaf() ? 'Show decomposition' : 'Hide decomposition');
+    button_show_decomposition.text(item.data.isLeaf() ? 'Show decomposition' : 'Hide decomposition');
     if (item.data.has_children()) {
-        button_decompose.show().unbind().on('click', () => item.data.isLeaf() ? show_children(item.data) : hide_children(item.data));
+        button_show_decomposition.show().unbind().on('click', () => item.data.isLeaf() ? show_children(item.data) : hide_children(item.data));
     } else {
-        button_decompose.hide();
+        button_show_decomposition.hide();
     }
 
     // add_subtask, edit, solve only available on unsolved tasks
@@ -218,6 +233,13 @@ function onNodeClick(event, item) {
         button_solve.show().unbind().on('click', () => solve(item));
     }
 
+    // generate decomposition only available on unsolved leaf nodes
+    if (!item.data.isSolved() && !item.data.has_children()) {
+        button_decompose.show().unbind().on('click', () => generate_decomposition(item));
+    } else {
+        button_decompose.hide();
+    }
+
     // delete not available on root
     if (item.depth == 0) {
         button_delete.hide();
@@ -230,6 +252,64 @@ function onNodeClick(event, item) {
 
 
     show_buttons();
+}
+
+function generate_decomposition(item) {
+    hide_buttons();
+
+    let task = item.data;
+
+    if (!thread_id) {    // new task
+        $.ajax({
+            type: 'POST',
+            url: 'api/decomposition_start.php',
+            data: {
+                'name': task.name,
+                'description': task.description
+            },
+            success: function(d) {
+                let data = JSON.parse(d);
+                thread_id = data.thread_id;
+
+                for (let subtask of data.decomposition) {
+                    task.add_subtask(subtask.name, subtask.description);
+                }
+
+                item.data.running = false;
+                console.log(data);
+
+                show_children(task);
+            },
+            error: console.error
+        });
+    } else {    // decompose subtask
+        $.ajax({
+            type: 'POST',
+            url: 'api/decomposition_subtask.php',
+            data: {
+                'task': task.name,
+                'thread_id': thread_id
+            },
+            success: function(d) {
+                console.log(d);
+                let data = JSON.parse(d);
+                thread_id = data.thread_id;
+
+                for (let subtask of data.decomposition) {
+                    task.add_subtask(subtask.name, subtask.description);
+                }
+
+                item.data.running = false;
+                console.log(data);
+
+                show_children(task);
+            },
+            error: console.error
+        });
+    }
+
+    item.data.running = true;
+    update();
 }
 
 function show_buttons() {
