@@ -45,12 +45,12 @@ function load_tree() {
     input.unbind().bind('change', function(e) {
         let reader = new FileReader();
         reader.addEventListener('load', function(e) {
-            let json = e.target.result;
+            let json = JSON.parse(e.target.result);
             
             thread_id = json.thread_id;
 
             let tree = json.tree;
-            let task = Task.fromJSON(tree);
+            let task = Task.load_tree(tree);
 
             init(task);
         });
