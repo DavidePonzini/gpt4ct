@@ -62,13 +62,12 @@ class Task {
         };
     }
 
-    static fromJSON(json_str) {
-        const data = JSON.parse(json_str);
+    static load_tree(data) {
         const task = new Task(data.name, data.description);
 
         // If 'subtasks' array is present in JSON, add each subtask to the task
         data.subtasks.forEach(subtaskData => {
-            const subtask = Task.fromJSON(JSON.stringify(subtaskData)); // Recursively create subtasks
+            const subtask = Task.load_tree(subtaskData); // Recursively create subtasks
             subtask.parent = task;
             task.subtasks.push(subtask);
         });
@@ -82,6 +81,7 @@ class Task {
         task.implementation = data.implementation;
 
         return task; // Return the constructed Task instance
+
     }
 
     add_subtask(name, description) {
