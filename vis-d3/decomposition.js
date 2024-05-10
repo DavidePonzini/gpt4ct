@@ -2,7 +2,6 @@ import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
 // Main components
 let tree_data = null;
-let thread_id = null;
 
 const svg = d3.select('#tree');
 const g = svg.append('g');
@@ -19,12 +18,17 @@ svg.call(zoom);
 $(document).ready(function() {
     // Make dummy tree
     let data = new Task('Load a task', 'Load an existing task');
-    data.add_subtask('Click on "Load" button', 'Click on the "Load" button using the bar on top');
-    data.add_subtask('Select a file', 'Select a file to be loaded');
-    data.add_subtask('Load the file', 'Load a file by clicking on "OK"');
+
+    let sub1 = data.add_subtask('Click on "Load" button', 'Click on the "Load" button using the bar on top');
+    sub1.add_subtask('Locate the top bar', 'Locate the top bar where the "Load" button is located');
+    sub1.add_subtask('Click on the button', 'Click on the "Load" button by selecting it with the cursor');
+    
+    let sub2 = data.add_subtask('Select a file', 'Select a file to be loaded');
+    let sub3 = data.add_subtask('Load the file', 'Load a file by clicking on "OK"');
 
     init(data);
     show_children(data);
+    show_children(sub1);
 })
 
 function new_tree() {
@@ -33,7 +37,6 @@ function new_tree() {
 
     let data = new Task(name, description);
 
-    thread_id = null;
     init(data);
     $('#new-tree-modal').modal('hide');
 }
@@ -45,8 +48,6 @@ function load_tree() {
         reader.addEventListener('load', function(e) {
             let json = JSON.parse(e.target.result);
             
-            thread_id = json.thread_id;
-
             let tree = json.tree;
             let task = Task.load_tree(tree);
 
@@ -62,7 +63,6 @@ function save_tree(filename) {
 
     let data = {
         'tree': tree_data,
-        'thread_id': thread_id
     }
 
     var file = new Blob([JSON.stringify(data)], {type: 'text/plain'});
@@ -74,8 +74,9 @@ function save_tree(filename) {
 function init(data) {
     tree_data = data;
     update();
-    window.data = tree_data;
 
+    // Useful for debugging, should be eventually removed
+    window.data = tree_data;
 }
 
 function update() {
@@ -266,64 +267,10 @@ function generate_decomposition(item) {
 
     let task = item.data;
 
-    if (!thread_id) {    // new task
-        $.ajax({
-            type: 'POST',
-            url: 'api/decomposition_start.php',
-            data: {
-                'name': task.name,
-                'description': task.description
-            },
-            success: function(d) {
-                try {
-                    let data = JSON.parse(d);
-                    thread_id = data.thread_id;
-    
-                    for (let subtask of data.decomposition) {
-                        task.add_subtask(subtask.name, subtask.description);
-                    }
-    
-                    item.data.running = false;
-    
-                    show_children(task);
-                } catch (e) {
-                    console.error(d);
-                    throw e;
-                }
-                
-            },
-            error: console.error
-        });
-    } else {    // decompose subtask
-        $.ajax({
-            type: 'POST',
-            url: 'api/decomposition_subtask.php',
-            data: {
-                'task': task.name,
-                'thread_id': thread_id
-            },
-            success: function(d) {
-                try {
-                    console.log(d);
-                    let data = JSON.parse(d);
-                    thread_id = data.thread_id;
-
-                    for (let subtask of data.decomposition) {
-                        task.add_subtask(subtask.name, subtask.description);
-                    }
-
-                    item.data.running = false;
-                    console.log(data);
-
-                    show_children(task);
-                } catch (e) {
-                    console.error(d);
-                    throw e;
-                }
-            },
-            error: console.error
-        });
-    }
+    task.generate_decomposition(function(data) {
+        task.running = false;
+        show_children(task);
+    });
 
     item.data.running = true;
     update();

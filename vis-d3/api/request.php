@@ -27,7 +27,7 @@
 
         $result = json_decode($result);
 
-        return $result;
+        return check_error($result);
     }
 
     function check_error($result) {

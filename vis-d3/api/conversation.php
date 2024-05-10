@@ -2,93 +2,95 @@
     include('request.php');
     include('database.php');
 
-    function get_run($thread_id, $run_id) {
-        $url = 'https://api.openai.com/v1/threads/' . $thread_id . '/runs/' . $run_id;
-        $result = make_request('GET', $url);
+    // Model instructions
+    define('DECOMPOSE_INSTRUCTIONS', 
+'Decompose the current task into the smallest possible number of subtasks (usually two or three). You must produce at least two subtasks and you can produce up to five subtasks.
 
-        return check_error($result);
+For each subtask, provide a name as well as a description, similar to the one provided for the main problem.
+
+Each subtask must be simpler to solve than the main task.
+A subtask of a given task, should not include any elements of other tasks at the same level of decomposition.
+Ensure that there are no missing steps: i.e. the sum of all subtasks solves the entire task.
+
+Format the result in JSON: provide a list of objects such as this: {"result": [{"name":"subtask 1 name", "description": "subtask 1 description"}, ...]}
+');
+    function log_usage($usage) {
+        execute_query(
+            'INSERT INTO decomposition_runs(prompt_tokens, completion_tokens) VALUES(?, ?)',
+            array(
+                $usage->prompt_tokens,
+                $usage->completion_tokens
+            )
+        );
     }
 
-    function wait_for_run($thread_id, $run_id) {
-        while(true) {
-            $run = get_run($thread_id, $run_id);
-            $status = $run->status;
-            
-            if ($status == 'queued' || $status == 'in_progress') {
-                continue;
-            } elseif ($status == 'completed') {
-                $usage = $run->usage;
+    function decompose_task($task) {
+        $messages = task_to_messages($task);
 
-                execute_query(
-                    'INSERT INTO decomposition_runs(thread_id, run_id, prompt_tokens, completion_tokens) VALUES(?, ?, ?, ?)',
-                    array(
-                        $thread_id,
-                        $run_id,
-                        $usage->prompt_tokens,
-                        $usage->completion_tokens
-                    )
-                );
-                return;
-            } else {
-                invalid_request(print_r($run, true));
-                die();
-            }
-        }
-    }
+        $url = 'https://api.openai.com/v1/chat/completions';
+        $data = array(
+            'model' => 'gpt-3.5-turbo',
+            'messages' => $messages,
+            'response_format' => array(
+                'type' => 'json_object'
+            )
+        );
 
-    function create_thread() {
-        $result = make_request('POST', 'https://api.openai.com/v1/threads', null);
-        $result = $result->id;
+        $result = make_request('POST', $url, json_encode($data));
+        check_error($result);
 
-        return check_error($result);
-    }
-
-    function get_messages($thread_id) {
-        $url = 'https://api.openai.com/v1/threads/' . $thread_id . '/messages';
-
-        $result = make_request('GET', $url);
-
-        return check_error($result);
-    }
-
-    function create_message($thread_id, $role, $content) {
-        $url = 'https://api.openai.com/v1/threads/' . $thread_id . '/messages';
+        // Log usage to DB
+        log_usage($result->usage);
         
-        $result = make_request('POST', $url, json_encode(
-            array(
-                'role' => $role,
-                'content' => $content
-            )
-        ));
-
-        return check_error($result);
+        return $result;
     }
 
-    function create_first_message($thread_id, $problem, $description) {
-        $text = '-- Problem description --\n' . json_encode(array(
-            'name' => $problem,
-            'description' => $description
-        ));
-    
-        return create_message($thread_id, 'user', $text);
+    function task_to_messages($task) {
+        $messages = array();
+
+        $t = $task;
+
+        while($t->parent != null) {
+            // Add message and prompt
+            add_user_message($messages, 'Using the same approach, decompose the task "' . $t->name . '"');
+            add_assistant_message($messages, $t->tasks);
+
+            // Move to parent task
+            $t = $t->parent;
+        }
+
+        // Add message for initial task
+        add_user_message($messages, '-- Problem description --\n' . json_encode(array(
+            'name' => $t->name,
+            'description' => $t->description
+        )));
+
+        // Add model instructions
+        add_system_message($messages, DECOMPOSE_INSTRUCTIONS);
+        
+        return $messages;
     }
-  
-    function create_followup_message($thread_id, $problem) {
-        $text = 'Using the same approach, decompose the task "' . $problem . '"';
-  
-        return create_message($thread_id, 'user', $text);
+
+    function add_message(&$messages, $role, $content) {
+        array_unshift($messages, array(
+            'role' => $role,
+            'content' => ($content)
+        ));
     }
 
-    function run_thread($thread_id, $assistant_id) {
-        $url = 'https://api.openai.com/v1/threads/' . $thread_id . '/runs';
+    function add_assistant_message(&$messages, $tasks) {
+        $content = json_encode($tasks);
 
-        $result = make_request('POST', $url, json_encode(
-            array(
-                'assistant_id' => $assistant_id,
-                'response_format' => array('type' => 'json_object')
-            )
-        ));
+        add_message($messages, 'assistant', $content);
+    }
 
-        return check_error($result);
+    function add_user_message(&$messages, $text) {
+        add_message($messages, 'user', $text);
+    }
+
+    function add_system_message(&$messages, $text) {
+        add_message($messages, 'system', $text);
     }
 ?>
+
+

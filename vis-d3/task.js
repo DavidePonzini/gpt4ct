@@ -62,7 +62,7 @@ class Task {
         };
     }
 
-    encode() {
+    get_decomposition_path() {
         // Handle root task
         if (!this.parent) {
             return {
@@ -84,8 +84,39 @@ class Task {
         return {
             'tasks': tasks,
             'name': this.name,
-            'parent': this.parent.encode()
+            'parent': this.parent.get_decomposition_path()
         };
+    }
+
+    generate_decomposition(cb) {
+        let this_task = this;
+
+        $.ajax({
+            type: 'POST',
+            url: 'api/decompose_task.php',
+            data: {
+                'task': JSON.stringify(this.get_decomposition_path())
+            },
+            success: function(d) {
+                try {
+                    let data = JSON.parse(d);
+                    
+                    if (data.status && data.status == 'invalid_request') {
+                        throw Error(data.message);
+                    }
+                    
+                    for (let subtask of data.decomposition) {
+                        this_task.add_subtask(subtask.name, subtask.description);
+                    }
+
+                    cb(data);
+                } catch (e) {
+                    console.error(d);
+                    throw e;
+                }
+            },
+            error: console.error
+        });
     }
 
 

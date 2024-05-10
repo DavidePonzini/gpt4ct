@@ -95,18 +95,18 @@ body {
 }
 
 .running circle {
-    animation: loading_circle 1s ease-in 0s infinite alternate;
-    fill: red!important;
-    stroke: #f4f4f4!important;
+    animation: loading_circle 1s ease-in-out 0s infinite alternate;
+    stroke: red;
+    stroke-width: 2px;
 }
 
 @keyframes loading_circle {
     0% {
-        stroke-width: 1px;
+        r: 9px;
     }
 
     100% {
-        stroke-width: 15px;
+        r: 3px;
     }
     
 }
