@@ -74,6 +74,8 @@ function save_tree(filename) {
 function init(data) {
     tree_data = data;
     update();
+    window.data = tree_data;
+
 }
 
 function update() {

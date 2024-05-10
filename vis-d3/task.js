@@ -62,6 +62,33 @@ class Task {
         };
     }
 
+    encode() {
+        // Handle root task
+        if (!this.parent) {
+            return {
+                'name': this.name,
+                'description': this.description,
+                'parent': null
+            }
+        }
+
+        // Handle subtasks
+        let tasks = [];
+        for (let task of this.parent.subtasks) {
+            tasks.push({
+                'name': task.name,
+                'description': task.description
+            })
+        }
+
+        return {
+            'tasks': tasks,
+            'name': this.name,
+            'parent': this.parent.encode()
+        };
+    }
+
+
     static load_tree(data) {
         const task = new Task(data.name, data.description);
 
