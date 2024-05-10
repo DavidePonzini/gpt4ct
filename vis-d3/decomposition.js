@@ -25,8 +25,6 @@ $(document).ready(function() {
 
     init(data);
     show_children(data);
-
-    $('#new-task').on('click', new_tree);
 })
 
 function new_tree() {
@@ -275,18 +273,22 @@ function generate_decomposition(item) {
                 'description': task.description
             },
             success: function(d) {
-                console.log(d);
-                let data = JSON.parse(d);
-                thread_id = data.thread_id;
-
-                for (let subtask of data.decomposition) {
-                    task.add_subtask(subtask.name, subtask.description);
+                try {
+                    let data = JSON.parse(d);
+                    thread_id = data.thread_id;
+    
+                    for (let subtask of data.decomposition) {
+                        task.add_subtask(subtask.name, subtask.description);
+                    }
+    
+                    item.data.running = false;
+    
+                    show_children(task);
+                } catch (e) {
+                    console.error(d);
+                    throw e;
                 }
-
-                item.data.running = false;
-                console.log(data);
-
-                show_children(task);
+                
             },
             error: console.error
         });
@@ -299,18 +301,23 @@ function generate_decomposition(item) {
                 'thread_id': thread_id
             },
             success: function(d) {
-                console.log(d);
-                let data = JSON.parse(d);
-                thread_id = data.thread_id;
+                try {
+                    console.log(d);
+                    let data = JSON.parse(d);
+                    thread_id = data.thread_id;
 
-                for (let subtask of data.decomposition) {
-                    task.add_subtask(subtask.name, subtask.description);
+                    for (let subtask of data.decomposition) {
+                        task.add_subtask(subtask.name, subtask.description);
+                    }
+
+                    item.data.running = false;
+                    console.log(data);
+
+                    show_children(task);
+                } catch (e) {
+                    console.error(d);
+                    throw e;
                 }
-
-                item.data.running = false;
-                console.log(data);
-
-                show_children(task);
             },
             error: console.error
         });
@@ -397,5 +404,6 @@ function debug_node(item) {
 
 
 window.update = update;
+window.new_tree = new_tree;
 window.load_tree = load_tree;
 window.save_tree = save_tree;
