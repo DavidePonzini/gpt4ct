@@ -95,7 +95,10 @@ class Task {
             type: 'POST',
             url: 'api/decompose_task.php',
             data: {
-                'task': JSON.stringify(this.get_decomposition_path())
+                'task': JSON.stringify(this.get_decomposition_path()),
+                'level': this.level,
+                'name': 'name',
+                'description': 'description'
             },
             success: function(d) {
                 try {

@@ -4,7 +4,8 @@
 
     // Model instructions
     define('DECOMPOSE_INSTRUCTIONS', 
-'Decompose the current task into the smallest possible number of subtasks (usually two or three). You must produce at least two subtasks and you can produce up to five subtasks.
+'Decompose the current task into the smallest possible number of subtasks (usually two or three).
+You must produce at least two subtasks and you can produce up to five subtasks.
 
 For each subtask, provide a name as well as a description, similar to the one provided for the main problem.
 
