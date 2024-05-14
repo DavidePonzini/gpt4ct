@@ -10,6 +10,7 @@ class Task {
         this.solved = false;
         this.implementation = null;
         this.children = null;
+        this.level = 0;
     }
 
     isRoot() {
@@ -84,6 +85,7 @@ class Task {
         return {
             'tasks': tasks,
             'name': this.name,
+            'description': this.description,
             'parent': this.parent.get_decomposition_path()
         };
     }
@@ -93,6 +95,7 @@ class Task {
 
         $.ajax({
             type: 'POST',
+            // url: 'https://ponzidav.altervista.org/utils/request.php',
             url: 'api/decompose_task.php',
             data: {
                 'task': JSON.stringify(this.get_decomposition_path()),
@@ -148,6 +151,7 @@ class Task {
     add_subtask(name, description) {
         let child = new Task(name, description);
         child.parent = this;
+        child.level = this.level + 1;
 
         this.subtasks.push(child);
         

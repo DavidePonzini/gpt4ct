@@ -15,17 +15,32 @@ Ensure that there are no missing steps: i.e. the sum of all subtasks solves the 
 
 Format the result in JSON: provide a list of objects such as this: {"result": [{"name":"subtask 1 name", "description": "subtask 1 description"}, ...]}
 ');
-    function log_usage($usage) {
+    function log_usage($root_task, $task, $level, $usage) {
         execute_query(
-            'INSERT INTO decomposition_runs(prompt_tokens, completion_tokens) VALUES(?, ?)',
+            'INSERT INTO decomposition_runs
+                (
+                    user_id,
+                    root_task_name,
+                    root_task_description,
+                    task_name, task_description,
+                    task_level,
+                    prompt_tokens,
+                    completion_tokens
+                ) VALUES(?, ?, ?, ?, ?, ?, ?, ?)',
             array(
+                $_SERVER['REMOTE_ADDR'],    // To be changed
+                $root_task->name,
+                $root_task->description,
+                $task->name,
+                $task->description,
+                $level,
                 $usage->prompt_tokens,
                 $usage->completion_tokens
             )
         );
     }
 
-    function decompose_task($task) {
+    function decompose_task($name, $description, $level, $task) {
         $messages = task_to_messages($task);
 
         $url = 'https://api.openai.com/v1/chat/completions';
@@ -37,11 +52,17 @@ Format the result in JSON: provide a list of objects such as this: {"result": [{
             )
         );
 
+        // Get root task data
+        $root_task = $task;
+        while($root_task->parent != null) {
+            $root_task = $root_task->parent;
+        }
+
         $result = make_request('POST', $url, json_encode($data));
         check_error($result);
 
         // Log usage to DB
-        log_usage($result->usage);
+        log_usage($root_task, $task, $level, $result->usage);
         
         return $result;
     }
