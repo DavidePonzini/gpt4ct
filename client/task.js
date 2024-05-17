@@ -82,116 +82,6 @@ class Task {
         };
     }
 
-    get_decomposition_path() {
-        // Handle root task
-        if (!this.parent) {
-            return {
-                'name': this.name,
-                'description': this.description,
-                'parent': null
-            }
-        }
-
-        // Handle subtasks
-        let tasks = [];
-        for (let task of this.parent.subtasks) {
-            tasks.push({
-                'name': task.name,
-                'description': task.description
-            })
-        }
-
-        return {
-            'tasks': tasks,
-            'name': this.name,
-            'description': this.description,
-            'parent': this.parent.get_decomposition_path()
-        };
-    }
-
-    get_implementation_path() {
-        if (!this.can_be_implemented()) {
-            throw Error('This task cannot be implemented');
-        }
-
-        // Return all decomposition, both parent (& siblings) and all its children
-        // Return implementation of all its children
-
-        return {
-            'decomposition': this.get_decomposition_path(),
-            'implementation': this._get_implementation_path_implementation(),
-            'name': this.name,
-            'description': this.description,
-            'level': this.level
-        }
-    }
-
-    /**
-     * Return the decomposition of both parent & siblings and of all this node's children
-     */
-    _get_implementation_path_decomposition() {
-        let result = [];
-        let task = this;
-
-        while(task) {
-            for(let subtask of task.subtasks) {
-                result.push({
-                    'name': subtask.name,
-                    'decomposition': subtask.subtasks
-                });
-            }
-
-            task = task.parent;
-        }
-
-        return result;
-    }
-
-    _get_implementation_path_decomposition_rec_children(result) {
-        for (let subtask of this.subtasks) {
-            result.push({
-                'name': subtask.name,
-                'description': subtask.description
-            });
-
-            subtask._get_implementation_path_decomposition_rec_children(result);
-        }
-
-        return result;
-    }
-
-
-    _get_implementation_path_implementation() {
-        if (!this.has_children())
-            return;
-
-        let result = [];
-        for (let subtask of this.subtasks)
-            subtask._get_implementation_path_implementation_rec(result);
-
-        return result;
-    }
-
-    _get_implementation_path_implementation_rec(result) {
-        result.unshift({
-            'name': this.name,
-            'implementation': this.implementation
-        })
- 
-        for (let subtask of this.subtasks)
-            subtask._get_implementation_path_implementation_rec(result);
- 
-    }
-
-    generate_implementation() {
-        if (!this.can_be_implemented()) {
-            throw Error('This task cannot be implemented');
-        }
-
-        console.warn('fake implemenation');
-        this.implementation = 'print("fake implementation")';
-    }
-
     generate_decomposition(cb) {
         let this_task = this;
 
@@ -217,6 +107,44 @@ class Task {
                     for (let subtask of data.result) {
                         this_task.add_subtask(subtask.name, subtask.description);
                     }
+
+                    cb(data);
+                } catch (e) {
+                    console.error(d);
+                    throw e;
+                }
+            },
+            error: console.error
+        });
+    }
+
+    generate_implementation(cb) {
+        if (!this.can_be_implemented()) {
+            throw Error('This task cannot be implemented');
+        }
+        
+        let this_task = this;
+
+        let root_task = this;
+        while(!root_task.is_root())
+            root_task = root_task.parent;
+
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:5000/implement',
+            data: {
+                'tree': JSON.stringify(root_task),
+                'task_id': JSON.stringify(this_task.id())
+            },
+            success: function(d) {
+                try {
+                    let data = JSON.parse(d);
+                    
+                    if (data.status && data.status == 'invalid_request') {
+                        throw Error(data.message);
+                    }
+                    
+                    this_task.implementation = data.implementation;
 
                     cb(data);
                 } catch (e) {

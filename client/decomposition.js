@@ -360,7 +360,7 @@ function unsolve(item) {
 function implement_task(item) {
     hide_buttons();
     
-    item.data.generate_implementation();
+    item.data.generate_implementation(() => {});
 }
 
 
