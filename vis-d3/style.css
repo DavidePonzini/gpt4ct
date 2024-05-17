@@ -96,8 +96,9 @@ body {
 
 .running circle {
     animation: loading_circle 1s ease-in-out 0s infinite alternate;
-    stroke: red;
+    stroke: #0d6efd;
     stroke-width: 2px;
+    fill: #f4f4f4;
 }
 
 @keyframes loading_circle {

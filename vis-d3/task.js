@@ -13,28 +13,28 @@ class Task {
         this.level = 0;
     }
 
-    isRoot() {
+    is_root() {
         return this.parent == null;
     }
 
-    isLeaf() {
+    is_leaf() {
         // Node has no visible children
         return this.children == null;
     }
 
-    isSolved() {
+    is_solved() {
         // Node has been marked as solved
         return this.solved;
     }
 
-    isExplored() {
+    is_explored() {
         // Node has been explored (decomposed) but not marked as solved
-        return this.subtasks.length && !this.isSolved();
+        return this.subtasks.length && !this.is_solved();
     }
 
-    isUnexplored() {
+    is_unexplored() {
         // Node has neither been explored (decomposed) or marked as solved
-        return !this.subtasks.length && !this.isSolved();
+        return !this.subtasks.length && !this.is_solved();
     }
 
     has_children() {
@@ -49,6 +49,16 @@ class Task {
     hide_children() {
         this.children = null;
         return this;
+    }
+
+    can_be_implemented() {
+        // Only leaves and nodes with all theirs children already implemented can be implemented
+        for (let child of this.subtasks) {
+            if (!child.implementation || !child.can_be_implemented())
+                return false;
+        }
+
+        return true;
     }
 
     toJSON() {
@@ -88,6 +98,89 @@ class Task {
             'description': this.description,
             'parent': this.parent.get_decomposition_path()
         };
+    }
+
+    get_implementation_path() {
+        if (!this.can_be_implemented()) {
+            throw Error('This task cannot be implemented');
+        }
+
+        // Return all decomposition, both parent (& siblings) and all its children
+        // Return implementation of all its children
+
+        return {
+            'decomposition': this.get_decomposition_path(),
+            'implementation': this._get_implementation_path_implementation(),
+            'name': this.name,
+            'description': this.description,
+            'level': this.level
+        }
+    }
+
+    /**
+     * Return the decomposition of both parent & siblings and of all this node's children
+     */
+    _get_implementation_path_decomposition() {
+        let result = [];
+        let task = this;
+
+        while(task) {
+            for(let subtask of task.subtasks) {
+                result.push({
+                    'name': subtask.name,
+                    'decomposition': subtask.subtasks
+                });
+            }
+
+            task = task.parent;
+        }
+
+        return result;
+    }
+
+    _get_implementation_path_decomposition_rec_children(result) {
+        for (let subtask of this.subtasks) {
+            result.push({
+                'name': subtask.name,
+                'description': subtask.description
+            });
+
+            subtask._get_implementation_path_decomposition_rec_children(result);
+        }
+
+        return result;
+    }
+
+
+    _get_implementation_path_implementation() {
+        if (!this.has_children())
+            return;
+
+        let result = [];
+        for (let subtask of this.subtasks)
+            subtask._get_implementation_path_implementation_rec(result);
+
+        return result;
+    }
+
+    _get_implementation_path_implementation_rec(result) {
+        result.unshift({
+            'name': this.name,
+            'implementation': this.implementation
+        })
+ 
+        for (let subtask of this.subtasks)
+            subtask._get_implementation_path_implementation_rec(result);
+ 
+    }
+
+    generate_implementation() {
+        if (!this.can_be_implemented()) {
+            throw Error('This task cannot be implemented');
+        }
+
+        console.warn('fake implemenation');
+        this.implementation = 'print("fake implementation")';
     }
 
     generate_decomposition(cb) {

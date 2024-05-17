@@ -39,16 +39,16 @@
     </nav>
 
     <!-- Modal - buttons -->
-    <div class="modal fade" id="buttons" tabindex="-1" aria-labelledby="task-name" aria-hidden="true">
+    <div class="modal fade" id="task-data" tabindex="-1" aria-labelledby="task-name" aria-hidden="true">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="task-name"></h5>
+                    <h5 class="modal-title" id="task-name" contenteditable="true"></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <h5>Description:</h5>
-                    <div id="task-description"></div>
+                    <div id="task-description" contenteditable="true"></div>
                     <div id="task-implementation">
                         <hr>
                         <h5>Implementation:</h5>
@@ -59,11 +59,10 @@
                     <button type="button" class="btn btn-secondary" id="show-decomposition">Show/hide decomposition</button>
                     <button type="button" class="btn btn-primary" id="decompose">Generate decomposition</button>
                     <button type="button" class="btn btn-primary" id="add-subtask">Add subtask</button>
-                    <button type="button" class="btn btn-success" id="solve">Mark solved</button>
-                    <button type="button" class="btn btn-warning" id="unsolve">Mark unsolved</button>
-                    <button type="button" class="btn btn-warning" id="edit">Edit</button>
+                    <button type="button" class="btn btn-success" id="solve">Complete decomposition</button>
                     <button type="button" class="btn btn-danger" id="delete">Delete</button>
-                    <!-- <button type="button" class="btn btn-dark" id="debug">Debug</button> -->
+                    <button type="button" class="btn btn-primary" id="implement">Generate implementation</button>
+                    <button type="button" class="btn btn-warning" id="unsolve">Continue decomposition</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>

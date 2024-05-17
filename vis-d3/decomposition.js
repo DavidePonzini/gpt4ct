@@ -8,7 +8,7 @@ const g = svg.append('g');
 
 // Handle zoom
 let zoom = d3.zoom().on('zoom', function(e) {
-    $('#buttons').hide();
+    $('#task-data').hide();
     g.attr('transform', e.transform);
 });
 svg.call(zoom);
@@ -105,11 +105,11 @@ function update() {
     // Nodes - Enter
     let nodesG_enter = nodes.enter().append('g')
         .classed('node', true)
-        .classed('node-internal', d => !d.data.isLeaf())
-        .classed('node-leaf', d => d.data.isLeaf())
-        .classed('unexplored', d => d.data.isUnexplored())
-        .classed('explored', d => d.data.isExplored())
-        .classed('solved', d => d.data.isSolved())
+        .classed('node-internal', d => !d.data.is_leaf())
+        .classed('node-leaf', d => d.data.is_leaf())
+        .classed('unexplored', d => d.data.is_unexplored())
+        .classed('explored', d => d.data.is_explored())
+        .classed('solved', d => d.data.is_solved())
         .classed('running', d => d.data.running)
         .attr('transform', d => `translate(${d.x + width/2 + margin.left}, ${d.y + margin.top})`)
         .on('click', onNodeClick);
@@ -122,11 +122,11 @@ function update() {
 
     // Nodes - Update
     let nodesG_update = nodes
-        .classed('node-internal', d => !d.data.isLeaf())
-        .classed('node-leaf', d => d.data.isLeaf())
-        .classed('unexplored', d => d.data.isUnexplored())
-        .classed('explored', d => d.data.isExplored())
-        .classed('solved', d => d.data.isSolved())
+        .classed('node-internal', d => !d.data.is_leaf())
+        .classed('node-leaf', d => d.data.is_leaf())
+        .classed('unexplored', d => d.data.is_unexplored())
+        .classed('explored', d => d.data.is_explored())
+        .classed('solved', d => d.data.is_solved())
         .classed('running', d => d.data.running)
         .attr('transform', d => `translate(${d.x + width/2 + margin.left}, ${d.y + margin.top})`)
         .on('click', onNodeClick);
@@ -145,11 +145,11 @@ function update() {
     // Links - Enter
     let links_enter = links.enter().append('path')
         .classed('link', true)
-        .classed('link-internal', d => !d.target.data.isLeaf())
-        .classed('link-leaf', d => d.target.data.isLeaf())
-        .classed('unexplored', d => d.target.data.isUnexplored())
-        .classed('explored', d => d.target.data.isExplored())
-        .classed('solved', d => d.target.data.isSolved())
+        .classed('link-internal', d => !d.target.data.is_leaf())
+        .classed('link-leaf', d => d.target.data.is_leaf())
+        .classed('unexplored', d => d.target.data.is_unexplored())
+        .classed('explored', d => d.target.data.is_explored())
+        .classed('solved', d => d.target.data.is_solved())
         .attr('d', d3.linkVertical()
         .source(d => [
             d.source.x + width/2 + margin.left,
@@ -164,11 +164,11 @@ function update() {
     // Links - Update
     let links_update = links;
     links_update
-        .classed('link-internal', d => !d.target.data.isLeaf())
-        .classed('link-leaf', d => d.target.data.isLeaf())
-        .classed('unexplored', d => d.target.data.isUnexplored())
-        .classed('explored', d => d.target.data.isExplored())
-        .classed('solved', d => d.target.data.isSolved())
+        .classed('link-internal', d => !d.target.data.is_leaf())
+        .classed('link-leaf', d => d.target.data.is_leaf())
+        .classed('unexplored', d => d.target.data.is_unexplored())
+        .classed('explored', d => d.target.data.is_explored())
+        .classed('solved', d => d.target.data.is_solved())
         .attr('d', d3.linkVertical()
         .source(d => [
             d.source.x + width/2 + margin.left,
@@ -190,9 +190,20 @@ function onNodeClick(event, item) {
         return;
     }
 
-    $('#task-name').text(item.data.name);
-    $('#task-description').text(item.data.description);
+    // Set name
+    let name = $('#task-name');
+    name.text(item.data.name);
+    name.unbind().on('input', function() {
+        item.data.name = name.text();
+        update();   // Reflect name changes in UI
+    });
+
+    // Set description
+    let description = $('#task-description');
+    description.text(item.data.description);
+    description.unbind().on('input', () => item.data.description = description.text());
     
+    // Set implementation, if available
     let impl = $('#task-implementation');
     if (item.data.implementation) {
         impl.show();
@@ -203,63 +214,73 @@ function onNodeClick(event, item) {
         // highligth element (since the same html elem will be used, we need to unset data-highlighted)
         impl_text.removeAttr('data-highlighted');
         hljs.highlightElement(impl_text[0]);
-    } else
+    } else {
         impl.hide()
-        // text('Not yet implemented');
+    }
 
+    // Show appropriate buttons for current task
+    show_buttons(item);
+
+    // Make the modal visible
+    show_task_data_modal();
+}
+
+/**
+ * Show the appropriate buttons for the given task
+ * @param {*} item 
+ */
+function show_buttons(item) {
+    // Show/hide decomposition: only available on decomposed tasks
     let button_show_decomposition = $('#show-decomposition');
-    let button_decompose = $('#decompose');
-    let button_add_subtask = $('#add-subtask');
-    let button_implement = $('#implement');
-    let button_solve = $('#solve');
-    let button_unsolve = $('#unsolve');
-    let button_edit = $('#edit');
-    let button_delete = $('#delete');
-    let button_debug = $('#debug');
-
-    // show/hide decomposition only available on decomposed tasks
-    button_show_decomposition.text(item.data.isLeaf() ? 'Show decomposition' : 'Hide decomposition');
+    button_show_decomposition.text(item.data.is_leaf() ? 'Show decomposition' : 'Hide decomposition');
     if (item.data.has_children()) {
-        button_show_decomposition.show().unbind().on('click', () => item.data.isLeaf() ? show_children(item.data) : hide_children(item.data));
+        button_show_decomposition.show().unbind().on('click', () => item.data.is_leaf() ? show_children(item.data) : hide_children(item.data));
     } else {
         button_show_decomposition.hide();
     }
 
-    // add_subtask, edit, solve only available on unsolved tasks
-    // unsolve only available for solved tasks
-    if (item.data.isSolved()) {
-        button_add_subtask.hide();
-        button_edit.hide();
-        button_solve.hide();
-
-        button_unsolve.show().unbind().on('click', () => unsolve(item));
-    } else {
-        button_unsolve.hide();
-
-        button_add_subtask.show().unbind().on('click', () => add_subtask(item));
-        button_edit.show().unbind().on('click', () => edit_task(item));
-        button_solve.show().unbind().on('click', () => solve(item));
-    }
-
-    // generate decomposition only available on unsolved leaf nodes
-    if (!item.data.isSolved() && !item.data.has_children()) {
+    // Decompose: only available for unsolved tasks with no children
+    let button_decompose = $('#decompose');
+    if (!item.data.is_solved() && !item.data.has_children()) {
         button_decompose.show().unbind().on('click', () => generate_decomposition(item));
     } else {
         button_decompose.hide();
     }
 
-    // delete not available on root or solved nodes
-    if (item.depth == 0 || item.data.isSolved()) {
+    // Add subtask: only available on unsolved tasks
+    let button_add_subtask = $('#add-subtask');
+    if (!item.data.is_solved()) {
+        button_add_subtask.show().unbind().on('click', () => add_subtask(item));
+    } else {
+        button_add_subtask.hide();
+    }
+
+    // Implement: only available on unsolved tasks with no children, or tasks with all children already implemented
+    let button_implement = $('#implement');
+    if (item.data.is_solved() && item.data.can_be_implemented()) {
+        button_implement.show().unbind().on('click', () => implement_task(item));
+    } else {
+        button_implement.hide();
+    }
+
+    // Solve/unsolve: available on all tasks, depending on whether they've been solved
+    let button_solve = $('#solve');
+    let button_unsolve = $('#unsolve');
+    if (item.data.is_solved()) {
+        button_solve.hide();
+        button_unsolve.show().unbind().on('click', () => unsolve(item));
+    } else {
+        button_solve.show().unbind().on('click', () => solve(item));
+        button_unsolve.hide();
+    }
+
+    // Delete: not available on root or solved nodes
+    let button_delete = $('#delete');
+    if (item.depth == 0 || item.data.is_solved()) {
         button_delete.hide();
     } else {
         button_delete.show().unbind().on('click', () => delete_subtask(item));
     }
-
-    // always avaiable
-    button_debug.show().unbind().on('click', () => debug_node(item));
-
-
-    show_buttons();
 }
 
 function generate_decomposition(item) {
@@ -276,12 +297,12 @@ function generate_decomposition(item) {
     update();
 }
 
-function show_buttons() {
-    $('#buttons').modal('show');
+function show_task_data_modal() {
+    $('#task-data').modal('show');
 }
 
 function hide_buttons() {
-    $('#buttons').modal('hide');
+    $('#task-data').modal('hide');
 }
 
 function show_children(task) {
@@ -336,19 +357,10 @@ function unsolve(item) {
     update();
 }
 
-function edit_task(item) {
-    hide_buttons();
-
-    let new_name = prompt('new name');
-    item.data.name = new_name;
-
-    update();
-}
-
-function debug_node(item) {
+function implement_task(item) {
     hide_buttons();
     
-    console.log(item);
+    item.data.generate_implementation();
 }
 
 
