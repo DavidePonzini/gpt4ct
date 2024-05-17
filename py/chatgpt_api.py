@@ -5,7 +5,9 @@ import json
 client = OpenAI()
 
 
-instructions = '''Decompose the current task into the smallest possible number of subtasks (usually two or three). You must produce at least two subtasks.
+decompose_instructions = '''
+Decompose the current task into the smallest possible number of subtasks (usually two or three).
+You must produce at least two subtasks and you can produce up to five subtasks.
 
 For each subtask, provide a name as well as a description, similar to the one provided for the main problem.
 
@@ -19,7 +21,7 @@ Format the result in JSON: provide a list of objects such as this: {"result": [{
 class Message:
     def __init__(self) -> None:
         self.messages = []
-        self.add_message('system', instructions)
+        self.add_message('system', decompose_instructions)
 
     def add_message(self, role: str, message):
         self.messages.append({
@@ -28,7 +30,7 @@ class Message:
         })
 
     def generate_answer(self):
-        messages.progress('Generating answer')
+        messages.progress('Generating answer...')
         completion = client.chat.completions.create(
             model='gpt-3.5-turbo',
             messages=self.messages,
@@ -42,11 +44,15 @@ class Message:
 
         self.add_response(completion.choices[0].message.content)
 
-    def add_first_message(self, name, description):
+    def add_decomposition_first_message(self, name, description):
         self.add_message('user', f'-- Problem description --\n{json.dumps({"name": name, "description": description})}')
 
-    def add_followup_message(self, task):
+    def add_decomposition_followup_message(self, task):
         self.add_message('user', f'Using the same approach, decompose the task "{task}"')
+
+    def add_implementation_first_message(self, task):
+        # self.add_message('system', f'')
+        self.add_message('user', f'Implement, using python, the task "{task}". If possible, use the functions you developed. You don\'t need to write their implementation again')
 
     def add_response(self, response):
         self.add_message('assistant', response)
@@ -57,11 +63,11 @@ class Message:
 
             role = message['role']
             if role == 'system':
-                color = messages.TextFormat.Color.BLUE
+                color = messages.TextFormat.Color.RED
             elif role == 'assistant':
-                color = messages.TextFormat.Color.PURPLE
-            else:
                 color = messages.TextFormat.Color.YELLOW
+            else:
+                color = messages.TextFormat.Color.CYAN
 
             messages.message(message['content'], icon=message['role'][0],
                             icon_options=[color], default_text_options=[
@@ -79,5 +85,5 @@ def print_price(usage):
 
 if __name__ == '__main__':
     message = Message()
-    message.add_first_message('Download and store a webpage', 'Write a python program to download and store a webpage')
+    message.add_decomposition_first_message('Download and store a webpage', 'Write a python program to download and store a webpage')
     message.generate_answer()
