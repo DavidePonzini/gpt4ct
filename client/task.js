@@ -13,6 +13,15 @@ class Task {
         this.level = 0;
     }
 
+    id() {
+        if (this.is_root())
+            return []
+
+        let my_id = this.parent.subtasks.findIndex(d => d === this);
+        
+        return this.parent.id().concat(my_id);
+    }
+
     is_root() {
         return this.parent == null;
     }
@@ -186,15 +195,16 @@ class Task {
     generate_decomposition(cb) {
         let this_task = this;
 
+        let root_task = this;
+        while(!root_task.is_root())
+            root_task = root_task.parent;
+
         $.ajax({
             type: 'POST',
-            // url: 'https://ponzidav.altervista.org/utils/request.php',
-            url: 'api/decompose_task.php',
+            url: 'http://localhost:5000/decompose',
             data: {
-                'task': JSON.stringify(this.get_decomposition_path()),
-                'level': this.level,
-                'name': 'name',
-                'description': 'description'
+                'tree': JSON.stringify(root_task),
+                'task_id': JSON.stringify(this_task.id())
             },
             success: function(d) {
                 try {
@@ -204,7 +214,7 @@ class Task {
                         throw Error(data.message);
                     }
                     
-                    for (let subtask of data.decomposition) {
+                    for (let subtask of data.result) {
                         this_task.add_subtask(subtask.name, subtask.description);
                     }
 

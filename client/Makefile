@@ -1,4 +1,4 @@
-DIR=/var/www/html/vis-d3
+DIR=/var/www/html/problem-decomposition
 
 link-vis:
 	rm -rf $(DIR)/*
