@@ -13,11 +13,9 @@ def decompose(task: Task):
     
     # Add request for next task
     message.add_message('user', prompts.Decomposition.prompt(task))
+    message.print()
 
     answer = message.generate_answer()
-
-    message.add_message('assistant', answer)
-    message.print()
     
     return answer
 
@@ -37,12 +35,10 @@ def implement(task: Task):
 
     # Ask for final implemenation
     message.add_message('user', prompts.Implementation.prompt(task))
+    message.print()
 
     # Get the result
     answer = message.generate_answer(require_json=False)
-
-    message.add_message('assistant', answer)
-    message.print()
 
     return json.dumps({
         'implementation': answer
