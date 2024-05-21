@@ -6,7 +6,7 @@ class Task:
     def __init__(self, name, description) -> None:
         self.name = name
         self.description = description
-        self.lvl = 0
+        self.level = 0
         self.subtasks = []
         self.implementation = None
         self.parent = None
@@ -30,13 +30,13 @@ class Task:
             'name': self.name,
             'description': self.description,
             'subtasks': [ subtask.to_dict() for subtask in self.subtasks ],
-            'level': self.lvl,
+            'level': self.level,
             'implementation': self.implementation
         }
     
     def add_subtask(self, name, description, implementation=None):
         child = Task(name, description, implementation)
-        child.lvl = self.lvl + 1
+        child.level = self.level + 1
         child.parent = self
         
         self.subtasks.append(child)
@@ -83,6 +83,7 @@ def from_dict(data) -> Task:
         subtask = from_dict(subtask_data)  # Recursively create subtasks
         task.subtasks.append(subtask)
         subtask.parent = task
+        subtask.level = task.level + 1
 
     # Set other properties
     task.implementation = data['implementation']

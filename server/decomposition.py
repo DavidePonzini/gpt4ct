@@ -1,4 +1,5 @@
-from chatgpt import Message
+from chatgpt import Message, print_price
+from db import log_usage_decomposition
 from task import Task
 import json
 import prompts
@@ -15,7 +16,11 @@ def decompose(task: Task):
     message.add_message('user', prompts.Decomposition.prompt(task))
     message.print()
 
-    answer = message.generate_answer()
+    answer = message.generate_answer(require_json=True, add_to_messages=False)
+    
+    usage = message.usage[-1]
+    print_price(usage)
+    log_usage_decomposition(task, usage)
     
     return answer
 
@@ -38,7 +43,10 @@ def implement(task: Task):
     message.print()
 
     # Get the result
-    answer = message.generate_answer(require_json=False)
+    answer = message.generate_answer(require_json=False, add_to_messages=False)
+
+    usage = message.usage[-1]
+    print_price(usage)
 
     return json.dumps({
         'implementation': answer

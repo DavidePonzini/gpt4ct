@@ -5,7 +5,7 @@ CREATE SCHEMA problem_decomposition;
 
 DROP USER IF EXISTS problem_decomposition_admin;
 CREATE USER problem_decomposition_admin WITH PASSWORD 'decomp';
-GRANT ALL PRIVILEGES ON SCHEMA problem_decomposition TO problem_decomposition_admin;
+GRANT USAGE ON SCHEMA problem_decomposition TO problem_decomposition_admin;
 
 CREATE TABLE problem_decomposition.decomposition_runs (
   user_id VARCHAR(32) NOT NULL,
@@ -32,5 +32,6 @@ CREATE TABLE problem_decomposition.implementation_runs (
   completion_tokens DECIMAL(6) NOT NULL
 );
 
+GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA problem_decomposition TO problem_decomposition_admin;
 
 COMMIT;

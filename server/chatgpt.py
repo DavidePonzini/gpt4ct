@@ -1,6 +1,5 @@
 from dav_tools import messages
 from openai import OpenAI
-import json
 
 client = OpenAI()
 
@@ -8,6 +7,7 @@ client = OpenAI()
 class Message:
     def __init__(self) -> None:
         self.messages = []
+        self.usage = []
 
     def add_message(self, role: str, message):
         self.messages.append({
@@ -15,7 +15,7 @@ class Message:
             'content': message
         })
 
-    def generate_answer(self, require_json=True):
+    def generate_answer(self, require_json=False, add_to_messages=True):
         messages.progress('Generating answer...')
         completion = client.chat.completions.create(
             model='gpt-3.5-turbo',
@@ -26,10 +26,14 @@ class Message:
         )
 
         messages.info('Generated answer')
-        print_price(completion.usage)
+        self.usage.append(completion.usage)
+        # print_price(completion.usage)
 
         answer = completion.choices[0].message.content
-        # self.add_message('assistant', answer)
+    
+        # Add the answer to this conversation
+        if add_to_messages:
+            self.add_message('assistant', answer)
 
         return answer
 
@@ -53,6 +57,7 @@ class Message:
 def print_price(usage):
     cost_in = usage.prompt_tokens / 1_000_000 * 0.50
     cost_out = usage.completion_tokens / 1_000_000 * 1.50
+
     messages.message(f'Cost: {(cost_in + cost_out):.5f} $ (in={usage.prompt_tokens}, out={usage.completion_tokens})',
                      icon='$', icon_options=[messages.TextFormat.Color.BLUE])
 
