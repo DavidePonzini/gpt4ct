@@ -46,7 +46,7 @@ class Message:
             elif role == 'assistant':
                 color = messages.TextFormat.Color.YELLOW
             else:
-                color = messages.TextFormat.Color.CYAN
+                color = messages.TextFormat.Color.BLUE
 
             messages.message(message['content'], icon=message['role'],
                             icon_options=[color], default_text_options=[

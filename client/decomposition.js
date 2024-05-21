@@ -297,6 +297,20 @@ function generate_decomposition(item) {
     update();
 }
 
+
+function implement_task(item) {
+    hide_buttons();
+    
+    item.data.generate_implementation(function() {
+        item.data.running = false;
+
+        update();
+    });
+
+    item.data.running = true;
+    update();
+}
+
 function show_task_data_modal() {
     $('#task-data').modal('show');
 }
@@ -355,12 +369,6 @@ function unsolve(item) {
     item.data.unsolve();
 
     update();
-}
-
-function implement_task(item) {
-    hide_buttons();
-    
-    item.data.generate_implementation(() => {});
 }
 
 
