@@ -9,6 +9,7 @@ class Task {
         this.parent = null;
         this.solved = false;
         this.implementation = null;
+        this.implementation_language = null;
         this.children = null;
         this.level = 0;
     }
@@ -62,10 +63,10 @@ class Task {
 
     can_be_implemented() {
         // Only leaves and nodes with all theirs children already implemented can be implemented
-        for (let child of this.subtasks) {
-            if (!child.implementation || !child.can_be_implemented())
-                return false;
-        }
+        // for (let child of this.subtasks) {
+        //     if (!child.implementation || !child.can_be_implemented())
+        //         return false;
+        // }
 
         return true;
     }
@@ -118,7 +119,7 @@ class Task {
         });
     }
 
-    generate_implementation(cb) {
+    generate_implementation(language, cb) {
         if (!this.can_be_implemented()) {
             throw Error('This task cannot be implemented');
         }
@@ -134,6 +135,7 @@ class Task {
             url: 'http://localhost:5000/implement',
             data: {
                 'tree': JSON.stringify(root_task),
+                'language': JSON.stringify(language),
                 'task_id': JSON.stringify(this_task.id())
             },
             success: function(d) {
@@ -144,6 +146,7 @@ class Task {
                         throw Error(data.message);
                     }
                     
+                    this_task.implementation_language = language;
                     this_task.implementation = data.implementation;
 
                     cb(data);
@@ -193,10 +196,6 @@ class Task {
         let idx = this.subtasks.findIndex(subtask => subtask.name == name);
         if(idx !== -1)
             this.subtasks.splice(idx, 1);
-    }
-
-    set_implementation(implementation) {
-        this.implementation = implementation;
     }
 
     solve() {

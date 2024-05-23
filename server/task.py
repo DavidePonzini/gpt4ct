@@ -8,7 +8,8 @@ class Task:
         self.description = description
         self.level = 0
         self.subtasks = []
-        self.implementation = None      # None: not yet implemented; False: task doesn't need to be implemented
+        self.implementation = None              # None: not yet implemented; False: task doesn't need to be implemented
+        self.implementation_language = None
         self.parent = None
 
     def is_root(self):

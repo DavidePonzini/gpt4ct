@@ -32,12 +32,13 @@ def decompose_task():
 @app.route('/implement', methods=['POST'])
 def implement_task():
     tree = json.loads(request.form['tree'])
+    language = json.loads(request.form['language'])
     task_id = json.loads(request.form['task_id'])
 
     root_task = task.from_dict(tree)
     current_task = root_task.get_subtask_from_id(task_id)
 
-    return decomposition.implement(current_task)
+    return decomposition.implement(current_task, language)
 
 
 

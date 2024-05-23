@@ -24,7 +24,7 @@ def decompose(task: Task):
     
     return answer
 
-def implement(task: Task):
+def implement(task: Task, language: str):
     message = Message()
     message.add_message('system', prompts.Decomposition.instructions)
 
@@ -37,22 +37,22 @@ def implement(task: Task):
     message.add_message('system', prompts.Implementation.instructions)
 
     # Add siblings' implementations
-    task.for_each_sibling(lambda t: _add_implementation_step(message, t), 
+    task.for_each_sibling(lambda t: _add_implementation_step(message, t, t.implementation_language), 
                           where=lambda t: t.implementation is not None and t.implementation != False)
 
     # Add children implementations
-    task.for_each_child(lambda t: _add_implementation_step(message, t),
+    task.for_each_child(lambda t: _add_implementation_step(message, t, t.implementation_language),
                         where=lambda t: t.implementation != False)
 
     # Ask for final implemenation
-    message.add_message('user', prompts.Implementation.prompt(task))
+    message.add_message('user', prompts.Implementation.prompt(task, language))
     message.print()
 
     # Get the result
     answer = message.generate_answer(require_json=False, add_to_messages=False)
 
     usage = message.usage[-1]
-    database.log_usage_implementation(task, answer, usage)
+    database.log_usage_implementation(task, language, answer, usage)
     print_price(usage)
 
     return json.dumps({
@@ -76,7 +76,7 @@ def _add_decomposition_step(message: Message, t: Task):
     }))
 
 
-def _add_implementation_step(message: Message, t: Task):
+def _add_implementation_step(message: Message, t: Task, language: str):
     '''
     Add a two-message step for the decomposition of node `t`.
     Messages include both the user's prompt and the assistant's answer containing all `t`'s subtasks
@@ -85,5 +85,5 @@ def _add_implementation_step(message: Message, t: Task):
     if t.implementation == False:
         return        
 
-    message.add_message('user', prompts.Implementation.prompt(t))
+    message.add_message('user', prompts.Implementation.prompt(t, language))
     message.add_message('assistant', t.implementation)

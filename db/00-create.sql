@@ -30,6 +30,7 @@ CREATE TABLE problem_decomposition.implementation_runs (
   task_name VARCHAR(1000) NOT NULL,
   task_description VARCHAR(1000) NOT NULL,
   task_level DECIMAL(4) NOT NULL,
+  implementation_language VARCHAR(64),
   run_date TIMESTAMP NOT NULL DEFAULT NOW(),
   answer TEXT NOT NULL,
   prompt_tokens DECIMAL(6) NOT NULL,

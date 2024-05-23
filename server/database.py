@@ -24,7 +24,7 @@ def log_usage_decomposition(task: Task, answer, usage):
         'completion_tokens': usage.completion_tokens 
     })
 
-def log_usage_implementation(task: Task, answer, usage):
+def log_usage_implementation(task: Task, language, answer, usage):
     root_task = task.get_root()
 
     db.insert('problem_decomposition', 'implementation_runs', {
@@ -34,6 +34,7 @@ def log_usage_implementation(task: Task, answer, usage):
         'task_name': task.name,
         'task_description': task.description,
         'task_level': task.level,
+        'implementation_language': language,
         'answer': answer,
         'prompt_tokens': usage.prompt_tokens,
         'completion_tokens': usage.completion_tokens 

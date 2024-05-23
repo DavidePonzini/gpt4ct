@@ -212,8 +212,8 @@ function onNodeClick(event, item) {
     if (item.data.implementation) {
         impl.show();
         let impl_text = $('#task-implementation-text');
-        impl_text.text(item.data.implementation);
-        impl_text.attr('class', `language-python`);
+        impl_text.text(item.data.implementation.split('\n').slice(1, -1).join('\n'));       // remove first and last line (```python & ```)
+        impl_text.attr('class', `language-${item.data.implementation_language}`);
 
         // highligth element (since the same html elem will be used, we need to unset data-highlighted)
         impl_text.removeAttr('data-highlighted');
@@ -259,15 +259,16 @@ function show_buttons(item) {
         button_add_subtask.hide();
     }
 
-    // Implement: only available on unsolved tasks with no children, or tasks with all children already implemented
-    
-    // TEMPORARY: always available
+    // Implement: only available on unsolved tasks
     let button_implement = $('#implement');
-    // if (item.data.is_solved() && item.data.can_be_implemented()) {
-        button_implement.show().unbind().on('click', () => implement_task(item));
-    // } else {
-    //     button_implement.hide();
-    // }
+    if (!item.data.is_solved()) {
+        button_implement.show();
+        $('#implement-py').unbind().on('click', () => implement_task(item, 'python'));
+        $('#implement-js').unbind().on('click', () => implement_task(item, 'javascript'));
+        $('#implement-pseudocode').unbind().on('click', () => implement_task(item, 'pseudocode'));
+    } else {
+        button_implement.hide();
+    }
 
     // Solve/unsolve: available on all tasks, depending on whether they've been solved
     let button_solve = $('#solve');
@@ -304,10 +305,10 @@ function generate_decomposition(item) {
 }
 
 
-function implement_task(item) {
+function implement_task(item, language) {
     hide_buttons();
-    
-    item.data.generate_implementation(function() {
+
+    item.data.generate_implementation(language, function() {
         item.data.running = false;
 
         update();
