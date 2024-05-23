@@ -109,6 +109,7 @@ function update() {
         .classed('node-leaf', d => d.data.is_leaf())
         .classed('unexplored', d => d.data.is_unexplored())
         .classed('explored', d => d.data.is_explored())
+        .classed('implemented', d => d.data.implementation)
         .classed('solved', d => d.data.is_solved())
         .classed('running', d => d.data.running)
         .attr('transform', d => `translate(${d.x + width/2 + margin.left}, ${d.y + margin.top})`)
@@ -126,6 +127,7 @@ function update() {
         .classed('node-leaf', d => d.data.is_leaf())
         .classed('unexplored', d => d.data.is_unexplored())
         .classed('explored', d => d.data.is_explored())
+        .classed('implemented', d => d.data.implementation)
         .classed('solved', d => d.data.is_solved())
         .classed('running', d => d.data.running)
         .attr('transform', d => `translate(${d.x + width/2 + margin.left}, ${d.y + margin.top})`)
@@ -147,9 +149,10 @@ function update() {
         .classed('link', true)
         .classed('link-internal', d => !d.target.data.is_leaf())
         .classed('link-leaf', d => d.target.data.is_leaf())
-        .classed('unexplored', d => d.target.data.is_unexplored())
-        .classed('explored', d => d.target.data.is_explored())
-        .classed('solved', d => d.target.data.is_solved())
+        .classed('unexplored', d => d.source.data.is_unexplored())
+        .classed('explored', d => d.source.data.is_explored())
+        .classed('implemented', d => d.source.data.implementation)
+        .classed('solved', d => d.source.data.is_solved())
         .attr('d', d3.linkVertical()
         .source(d => [
             d.source.x + width/2 + margin.left,
@@ -166,9 +169,10 @@ function update() {
     links_update
         .classed('link-internal', d => !d.target.data.is_leaf())
         .classed('link-leaf', d => d.target.data.is_leaf())
-        .classed('unexplored', d => d.target.data.is_unexplored())
-        .classed('explored', d => d.target.data.is_explored())
-        .classed('solved', d => d.target.data.is_solved())
+        .classed('unexplored', d => d.source.data.is_unexplored())
+        .classed('explored', d => d.source.data.is_explored())
+        .classed('implemented', d => d.source.data.implementation)
+        .classed('solved', d => d.source.data.is_solved())
         .attr('d', d3.linkVertical()
         .source(d => [
             d.source.x + width/2 + margin.left,
@@ -256,12 +260,14 @@ function show_buttons(item) {
     }
 
     // Implement: only available on unsolved tasks with no children, or tasks with all children already implemented
+    
+    // TEMPORARY: always available
     let button_implement = $('#implement');
-    if (item.data.is_solved() && item.data.can_be_implemented()) {
+    // if (item.data.is_solved() && item.data.can_be_implemented()) {
         button_implement.show().unbind().on('click', () => implement_task(item));
-    } else {
-        button_implement.hide();
-    }
+    // } else {
+    //     button_implement.hide();
+    // }
 
     // Solve/unsolve: available on all tasks, depending on whether they've been solved
     let button_solve = $('#solve');

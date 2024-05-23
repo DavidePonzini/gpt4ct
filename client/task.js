@@ -202,6 +202,10 @@ class Task {
     solve() {
         this.solved = true;
 
+        // if the task is solved without an implementation, it means it doesn't need one
+        if (!this.implementation)
+            this.implementation = false;
+
         for (let subtask of this.subtasks)
             subtask.solve();
     }

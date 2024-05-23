@@ -30,13 +30,19 @@ def implement(task: Task):
 
     # Add all parents, up to root, and all childrens
     task.for_each_parent(lambda t: _add_decomposition_step(message, t))
-    task.for_each_child(lambda t: _add_decomposition_step(message, t))
+    task.for_each_child(lambda t: _add_decomposition_step(message, t),
+                        where=lambda t: len(t.subtasks) > 0)
 
     # Add implementation instructions
     message.add_message('system', prompts.Implementation.instructions)
 
-    # Add all children's implementations
-    task.for_each_child(lambda t: _add_implementation_step(message, t))
+    # Add siblings' implementations
+    task.for_each_sibling(lambda t: _add_implementation_step(message, t), 
+                          where=lambda t: t.implementation is not None and t.implementation != False)
+
+    # Add children implementations
+    task.for_each_child(lambda t: _add_implementation_step(message, t),
+                        where=lambda t: t.implementation != False)
 
     # Ask for final implemenation
     message.add_message('user', prompts.Implementation.prompt(task))
@@ -75,6 +81,9 @@ def _add_implementation_step(message: Message, t: Task):
     Add a two-message step for the decomposition of node `t`.
     Messages include both the user's prompt and the assistant's answer containing all `t`'s subtasks
     '''
+
+    if t.implementation == False:
+        return        
 
     message.add_message('user', prompts.Implementation.prompt(t))
     message.add_message('assistant', t.implementation)

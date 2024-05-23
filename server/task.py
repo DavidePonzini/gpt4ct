@@ -8,7 +8,7 @@ class Task:
         self.description = description
         self.level = 0
         self.subtasks = []
-        self.implementation = None
+        self.implementation = None      # None: not yet implemented; False: task doesn't need to be implemented
         self.parent = None
 
     def is_root(self):
@@ -67,13 +67,23 @@ class Task:
         cb(self.parent)
 
 
-    def for_each_child(self, cb):
+    def for_each_child(self, cb, where = lambda task: True):
         for child in self.subtasks:
-            if len(self.subtasks) == 0:
+            if not where(child):
                 return
 
-            child.for_each_child(cb)
+            # child.for_each_child(cb)
             cb(child)
+
+    def for_each_sibling(self, cb, where = lambda task: True):
+        if self.is_root():
+            return
+        
+        for sibling in self.parent.subtasks:
+            if sibling is self or not where(sibling):
+                return
+            
+            cb(sibling)
 
     
 def from_dict(data) -> Task:

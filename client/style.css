@@ -70,6 +70,19 @@ body {
     stroke: orange;
 }
 
+.implemented circle {
+    stroke: steelblue;
+}
+
+.implemented.explored circle {
+    stroke: steelblue;
+    fill: steelblue;
+}
+
+.implemented.link {
+    stroke: steelblue;
+}
+
 .solved circle {
     stroke: green;
     fill: yellowgreen;
