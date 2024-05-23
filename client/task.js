@@ -79,11 +79,12 @@ class Task {
             subtasks: this.subtasks,
             solved: this.solved,
             implementation: this.implementation,
+            implementation_language: this.implementation_language,
             children: !!this.subtasks.length,
         };
     }
 
-    generate_decomposition(cb) {
+    generate_decomposition(cb, cb_error = console.error) {
         let this_task = this;
 
         let root_task = this;
@@ -111,15 +112,15 @@ class Task {
 
                     cb(data);
                 } catch (e) {
-                    console.error(d);
+                    cb_error(d);
                     throw e;
                 }
             },
-            error: console.error
+            error: cb_error
         });
     }
 
-    generate_implementation(language, cb) {
+    generate_implementation(language, cb, cb_error = console.error) {
         if (!this.can_be_implemented()) {
             throw Error('This task cannot be implemented');
         }
@@ -151,11 +152,11 @@ class Task {
 
                     cb(data);
                 } catch (e) {
-                    console.error(d);
+                    cb_error(d);
                     throw e;
                 }
             },
-            error: console.error
+            error: cb_error
         });
     }
 
@@ -177,6 +178,7 @@ class Task {
         // Set other properties
         task.solved = data.solved;
         task.implementation = data.implementation;
+        task.implementation_language = data.implementation_language;
 
         return task; // Return the constructed Task instance
 

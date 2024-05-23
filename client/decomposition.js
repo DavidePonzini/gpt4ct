@@ -209,7 +209,7 @@ function onNodeClick(event, item) {
     
     // Set implementation, if available
     let impl = $('#task-implementation');
-    if (item.data.implementation) {
+    if (item.data.implementation && item.data.implementation_language) {
         impl.show();
         let impl_text = $('#task-implementation-text');
         impl_text.text(item.data.implementation.split('\n').slice(1, -1).join('\n'));       // remove first and last line (```python & ```)
@@ -265,7 +265,7 @@ function show_buttons(item) {
         button_implement.show();
         $('#implement-py').unbind().on('click', () => implement_task(item, 'python'));
         $('#implement-js').unbind().on('click', () => implement_task(item, 'javascript'));
-        $('#implement-pseudocode').unbind().on('click', () => implement_task(item, 'pseudocode'));
+        $('#implement-delete').unbind().on('click', () => delete_implementation(item));
     } else {
         button_implement.hide();
     }
@@ -298,9 +298,23 @@ function generate_decomposition(item) {
     task.generate_decomposition(function(data) {
         task.running = false;
         show_children(task);
+    }, function(e) {
+        console.error(e);
+        task.running = false;
+        alert('error, see console for info');
+        update();
     });
 
     item.data.running = true;
+    update();
+}
+
+
+function delete_implementation(item) {
+    item.data.implementation = null;
+    item.data.implementation_language = null;
+
+    hide_buttons();
     update();
 }
 
@@ -311,6 +325,11 @@ function implement_task(item, language) {
     item.data.generate_implementation(language, function() {
         item.data.running = false;
 
+        update();
+    }, function(e) {
+        console.error(e);
+        item.data.running = false;
+        alert('error, see console for info');
         update();
     });
 

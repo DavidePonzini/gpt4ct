@@ -32,7 +32,8 @@ class Task:
             'description': self.description,
             'subtasks': [ subtask.to_dict() for subtask in self.subtasks ],
             'level': self.level,
-            'implementation': self.implementation
+            'implementation': self.implementation,
+            'implementation_language': self.implementation_language,
         }
     
     def add_subtask(self, name, description, implementation=None):
@@ -88,6 +89,9 @@ class Task:
 
     
 def from_dict(data) -> Task:
+    from dav_tools import messages
+
+    messages.warning(data)
     task = Task(data['name'], data['description'])
 
     for subtask_data in data['subtasks']:
@@ -98,6 +102,7 @@ def from_dict(data) -> Task:
 
     # Set other properties
     task.implementation = data['implementation']
+    task.implementation_language = data['implementation_language']
 
 
     return task
