@@ -58,8 +58,9 @@ function load_tree() {
     input.click();
 }
 
-function save_tree(filename) {
+function save_tree() {
     var a = document.createElement("a");
+    let filename = `${tree_data.name.replace(/\s/g, '_')}.json`;
 
     let data = {
         'tree': tree_data,
