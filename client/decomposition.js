@@ -149,10 +149,10 @@ function update() {
         .classed('link', true)
         .classed('link-internal', d => !d.target.data.is_leaf())
         .classed('link-leaf', d => d.target.data.is_leaf())
-        .classed('unexplored', d => d.source.data.is_unexplored())
-        .classed('explored', d => d.source.data.is_explored())
-        .classed('implemented', d => d.source.data.implementation)
-        .classed('solved', d => d.source.data.is_solved())
+        .classed('unexplored', d => d.target.data.is_unexplored())
+        .classed('explored', d => d.target.data.is_explored())
+        .classed('implemented', d => d.target.data.implementation)
+        .classed('solved', d => d.target.data.is_solved())
         .attr('d', d3.linkVertical()
         .source(d => [
             d.source.x + width/2 + margin.left,
@@ -169,10 +169,10 @@ function update() {
     links_update
         .classed('link-internal', d => !d.target.data.is_leaf())
         .classed('link-leaf', d => d.target.data.is_leaf())
-        .classed('unexplored', d => d.source.data.is_unexplored())
-        .classed('explored', d => d.source.data.is_explored())
-        .classed('implemented', d => d.source.data.implementation)
-        .classed('solved', d => d.source.data.is_solved())
+        .classed('unexplored', d => d.target.data.is_unexplored())
+        .classed('explored', d => d.target.data.is_explored())
+        .classed('implemented', d => d.target.data.implementation)
+        .classed('solved', d => d.target.data.is_solved())
         .attr('d', d3.linkVertical()
         .source(d => [
             d.source.x + width/2 + margin.left,

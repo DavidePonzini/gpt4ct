@@ -61,6 +61,10 @@ body {
     fill: white;
 }
 
+.unexplored.link {
+    stroke: orange;
+}
+
 .explored circle {
     stroke: orange;
     fill: orange;
@@ -72,6 +76,7 @@ body {
 
 .implemented circle {
     stroke: steelblue;
+    fill: steelblue;
 }
 
 .implemented.explored circle {

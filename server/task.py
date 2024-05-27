@@ -89,9 +89,6 @@ class Task:
 
     
 def from_dict(data) -> Task:
-    from dav_tools import messages
-
-    messages.warning(data)
     task = Task(data['name'], data['description'])
 
     for subtask_data in data['subtasks']:
