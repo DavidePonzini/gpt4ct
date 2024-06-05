@@ -9,8 +9,14 @@ GRANT USAGE ON SCHEMA problem_decomposition TO problem_decomposition_admin;
 ALTER DEFAULT PRIVILEGES IN SCHEMA problem_decomposition GRANT ALL ON TABLES TO problem_decomposition_admin;
 
 
+CREATE TABLE problem_decomposition.users (
+  user_id CHAR(32) PRIMARY KEY
+);
+
+
 CREATE TABLE problem_decomposition.decomposition_runs (
-  user_id VARCHAR(32) NOT NULL,
+  creation_ts TIMESTAMP NOT NULL,
+  user_id CHAR(32) REFERENCES problem_decomposition.users(user_id) NOT NULL,
   root_task_name VARCHAR(1000) NOT NULL,
   root_task_description VARCHAR(1000) NOT NULL,
   task_name VARCHAR(1000) NOT NULL,
@@ -24,7 +30,8 @@ CREATE TABLE problem_decomposition.decomposition_runs (
 
 
 CREATE TABLE problem_decomposition.implementation_runs (
-  user_id VARCHAR(32) NOT NULL,
+  creation_ts TIMESTAMP NOT NULL,
+  user_id CHAR(32) REFERENCES problem_decomposition.users(user_id) NOT NULL,
   root_task_name VARCHAR(1000) NOT NULL,
   root_task_description VARCHAR(1000) NOT NULL,
   task_name VARCHAR(1000) NOT NULL,

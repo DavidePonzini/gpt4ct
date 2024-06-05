@@ -84,7 +84,7 @@ class Task {
         };
     }
 
-    generate_decomposition(cb, cb_error = console.error) {
+    generate_decomposition(user_id, creation_ts, cb, cb_error = console.error) {
         let this_task = this;
 
         let root_task = this;
@@ -96,7 +96,9 @@ class Task {
             url: 'http://localhost:5000/decompose',
             data: {
                 'tree': JSON.stringify(root_task),
-                'task_id': JSON.stringify(this_task.id())
+                'task_id': JSON.stringify(this_task.id()),
+                'creation_ts': JSON.stringify(creation_ts),
+                'user_id': JSON.stringify(user_id)
             },
             success: function(d) {
                 try {
@@ -120,7 +122,7 @@ class Task {
         });
     }
 
-    generate_implementation(language, cb, cb_error = console.error) {
+    generate_implementation(user_id, creation_ts, language, cb, cb_error = console.error) {
         if (!this.can_be_implemented()) {
             throw Error('This task cannot be implemented');
         }
@@ -137,7 +139,9 @@ class Task {
             data: {
                 'tree': JSON.stringify(root_task),
                 'language': JSON.stringify(language),
-                'task_id': JSON.stringify(this_task.id())
+                'task_id': JSON.stringify(this_task.id()),
+                'creation_ts': JSON.stringify(creation_ts),
+                'user_id': JSON.stringify(user_id)
             },
             success: function(d) {
                 try {

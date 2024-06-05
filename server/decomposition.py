@@ -5,7 +5,7 @@ import json
 import prompts
 
 
-def decompose(task: Task):
+def decompose(task: Task, creation_ts, user_id):
     message = Message()
     message.add_message('system', prompts.Decomposition.instructions)
     
@@ -19,12 +19,12 @@ def decompose(task: Task):
     answer = message.generate_answer(require_json=True, add_to_messages=False)
     
     usage = message.usage[-1]
-    database.log_usage_decomposition(task, answer, usage)
+    database.log_usage_decomposition(task, creation_ts, user_id, answer, usage)
     print_price(usage)
     
     return answer
 
-def implement(task: Task, language: str):
+def implement(task: Task, language: str, creation_ts, user_id):
     message = Message()
     message.add_message('system', prompts.Decomposition.instructions)
 
@@ -52,7 +52,7 @@ def implement(task: Task, language: str):
     answer = message.generate_answer(require_json=False, add_to_messages=False)
 
     usage = message.usage[-1]
-    database.log_usage_implementation(task, language, answer, usage)
+    database.log_usage_implementation(task, creation_ts, user_id, language, answer, usage)
     print_price(usage)
 
     return json.dumps({

@@ -9,11 +9,12 @@ db = database.PostgreSQL(database='postgres',
 
 
 # todo: add chatgpt's answer
-def log_usage_decomposition(task: Task, answer, usage):
+def log_usage_decomposition(task: Task, creation_ts, user_id, answer, usage):
     root_task = task.get_root()
 
     db.insert('problem_decomposition', 'decomposition_runs', {
-        'user_id': 'user',
+        'creation_ts': creation_ts,
+        'user_id': user_id,
         'root_task_name': root_task.name,
         'root_task_description': root_task.description,
         'task_name': task.name,
@@ -24,11 +25,12 @@ def log_usage_decomposition(task: Task, answer, usage):
         'completion_tokens': usage.completion_tokens 
     })
 
-def log_usage_implementation(task: Task, language, answer, usage):
+def log_usage_implementation(task: Task, creation_ts, user_id, language, answer, usage):
     root_task = task.get_root()
 
     db.insert('problem_decomposition', 'implementation_runs', {
-        'user_id': 'user',
+        'creation_ts': creation_ts,
+        'user_id': user_id,
         'root_task_name': root_task.name,
         'root_task_description': root_task.description,
         'task_name': task.name,
@@ -42,3 +44,28 @@ def log_usage_implementation(task: Task, language, answer, usage):
 
 def log_feedback():
     ...
+
+def check_user_exists(user_id: str):
+    base_query = 'SELECT COUNT(*) FROM {schema}.{table} WHERE {column} = {value}'
+
+    query = database._sql.SQL(base_query).format(
+        schema=database._sql.Identifier('problem_decomposition'),
+        table=database._sql.Identifier('users'),
+        column=database._sql.Identifier('user_id'),
+        value = database._sql.Placeholder('user_id')
+    )
+
+    data = {
+        'user_id': user_id
+    }
+
+    db._cursor.execute(query, data)
+    val = db._cursor.fetchone()
+
+    return {
+        'user': val[0] == 1
+    }
+
+    print(val)
+
+

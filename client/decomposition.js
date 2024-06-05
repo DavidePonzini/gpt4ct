@@ -2,6 +2,7 @@ import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
 // Main components
 let tree_data = null;
+let user_id = null;
 
 const svg = d3.select('#tree');
 const g = svg.append('g');
@@ -13,29 +14,84 @@ let zoom = d3.zoom().on('zoom', function(e) {
 });
 svg.call(zoom);
 
+function login() {
+    if (user_id)
+        return;
+
+    let uid = prompt('Insert user id:');
+    $.ajax({
+        type: 'POST',
+        url: 'http://localhost:5000/login',
+        data: {
+            'user_id': JSON.stringify(uid),
+        },
+        success: function(d) {
+            let data = d;
+            
+            if (data.status && data.status == 'invalid_request') {
+                throw Error(data.message);
+            }
+            
+            if (data.user) {
+                user_id = uid;
+
+                $('#user-id').text(user_id).removeClass('btn-outline-primary').addClass('btn-outline-secondary');
+                return;        
+            }
+
+            alert(`User "${uid}" does not exist. Try again.`);
+        },
+        error: console.error
+    });
+}
+
+function make_tree(name, description) {
+    if (!check_user_id())
+        return;    
+
+    return {
+        'tree': new Task(name, description),
+        'creation_ts': new Date(),
+        'user_id': user_id
+    };
+}
+
+function check_user_id(cb) {
+    if (!user_id) {
+        alert('You need to login first!');
+        return false;
+    }
+
+    return true;
+}
+
 
 // load
 $(document).ready(function() {
     // Make dummy tree
-    let data = new Task('Load a task', 'Load an existing task');
+    user_id = 'example_tree';   // quick fix for showing a tree withouth a user
+    let data = make_tree('Load a task', 'Load an existing task');
+    let tree = data.tree
 
-    let sub1 = data.add_subtask('Click on "Load" button', 'Click on the "Load" button using the bar on top');
+    let sub1 = tree.add_subtask('Click on "Load" button', 'Click on the "Load" button using the bar on top');
     sub1.add_subtask('Locate the top bar', 'Locate the top bar where the "Load" button is located');
     sub1.add_subtask('Click on the button', 'Click on the "Load" button by selecting it with the cursor');
     
-    let sub2 = data.add_subtask('Select a file', 'Select a file to be loaded');
-    let sub3 = data.add_subtask('Load the file', 'Load a file by clicking on "OK"');
+    let sub2 = tree.add_subtask('Select a file', 'Select a file to be loaded');
+    let sub3 = tree.add_subtask('Load the file', 'Load a file by clicking on "OK"');
 
     init(data);
-    show_children(data);
+    show_children(tree);
     show_children(sub1);
+    user_id = null;
+
 })
 
 function new_tree() {
     let name = $('#new-task-name').val();
     let description = $('#new-task-description').val();
 
-    let data = new Task(name, description);
+    let data = make_tree(name, description);
 
     init(data);
     $('#new-tree-modal').modal('hide');
@@ -48,10 +104,12 @@ function load_tree() {
         reader.addEventListener('load', function(e) {
             let json = JSON.parse(e.target.result);
             
-            let tree = json.tree;
-            let task = Task.load_tree(tree);
+            let data = {
+                'tree': Task.load_tree(json.tree),
+                'creation_ts': json.creation_ts
+            };
 
-            init(task);
+            init(data);
         });
         reader.readAsText(e.target.files[0]);
     });
@@ -60,10 +118,11 @@ function load_tree() {
 
 function save_tree() {
     var a = document.createElement("a");
-    let filename = `${tree_data.name.replace(/\s/g, '_')}.json`;
+    let filename = `${tree_data.tree.name.replace(/\s/g, '_')}.json`;
 
     let data = {
-        'tree': tree_data,
+        'tree': tree_data.tree,
+        'creation_ts': tree_data.creation_ts
     }
 
     var file = new Blob([JSON.stringify(data)], {type: 'text/plain'});
@@ -77,7 +136,7 @@ function init(data) {
     update();
 
     // Useful for debugging, should be eventually removed
-    window.data = tree_data;
+    window.tree = tree_data;
 }
 
 function update() {
@@ -95,7 +154,7 @@ function update() {
     const height = svg_height - margin.top - margin.bottom;
 
     const treeLayout = d3.tree(null).nodeSize([200, 200]);
-    const treeData = treeLayout(d3.hierarchy(tree_data, d => d.children));
+    const treeData = treeLayout(d3.hierarchy(tree_data.tree, d => d.children));
 
     // -------------------------------------------------------------------------------------------------------------
     // Nodes
@@ -294,9 +353,12 @@ function show_buttons(item) {
 function generate_decomposition(item) {
     hide_buttons();
 
+    if (!check_user_id())
+        return;    
+
     let task = item.data;
 
-    task.generate_decomposition(function(data) {
+    task.generate_decomposition(user_id, tree_data.creation_ts, function(data) {
         task.running = false;
         show_children(task);
     }, function(e) {
@@ -322,8 +384,11 @@ function delete_implementation(item) {
 
 function implement_task(item, language) {
     hide_buttons();
+    
+    if (!check_user_id())
+        return;    
 
-    item.data.generate_implementation(language, function() {
+    item.data.generate_implementation(user_id, tree_data.creation_ts, language, function() {
         item.data.running = false;
 
         update();
@@ -403,3 +468,4 @@ window.update = update;
 window.new_tree = new_tree;
 window.load_tree = load_tree;
 window.save_tree = save_tree;
+window.login = login;
