@@ -16,7 +16,7 @@ CREATE TABLE problem_decomposition.users (
 
 CREATE TABLE problem_decomposition.decomposition_runs (
   creation_ts TIMESTAMP NOT NULL,
-  user_id CHAR(32) REFERENCES problem_decomposition.users(user_id) NOT NULL,
+  user_id VARCHAR(32) REFERENCES problem_decomposition.users(user_id) NOT NULL,
   root_task_name VARCHAR(1000) NOT NULL,
   root_task_description VARCHAR(1000) NOT NULL,
   task_name VARCHAR(1000) NOT NULL,
@@ -31,7 +31,7 @@ CREATE TABLE problem_decomposition.decomposition_runs (
 
 CREATE TABLE problem_decomposition.implementation_runs (
   creation_ts TIMESTAMP NOT NULL,
-  user_id CHAR(32) REFERENCES problem_decomposition.users(user_id) NOT NULL,
+  user_id VARCHAR(32) REFERENCES problem_decomposition.users(user_id) NOT NULL,
   root_task_name VARCHAR(1000) NOT NULL,
   root_task_description VARCHAR(1000) NOT NULL,
   task_name VARCHAR(1000) NOT NULL,
@@ -42,32 +42,6 @@ CREATE TABLE problem_decomposition.implementation_runs (
   answer TEXT NOT NULL,
   prompt_tokens DECIMAL(6) NOT NULL,
   completion_tokens DECIMAL(6) NOT NULL
-);
-
-CREATE VIEW problem_decomposition.costs AS (
-  SELECT
-    'Decomposition' AS type,
-    prompt_tokens,
-    completion_tokens,
-    prompt_tokens / 1000000 * .50 + completion_tokens / 1000000 * 1.50 AS cost
-  FROM problem_decomposition.decomposition_runs
-  UNION
-  SELECT
-    'Implementation' AS type,
-    prompt_tokens,
-    completion_tokens,
-    prompt_tokens / 1000000 * .50 + completion_tokens / 1000000 * 1.50 AS cost
-  FROM problem_decomposition.implementation_runs
-);
-
-CREATE VIEW problem_decomposition.costs2 AS (
-  SELECT
-    type,
-    SUM(prompt_tokens) as prompt_tokens,
-    SUM(completion_tokens) as completion_tokens,
-    SUM(cost) as cost
-  FROM problem_decomposition.costs
-  GROUP BY type 
 );
 
 COMMIT;

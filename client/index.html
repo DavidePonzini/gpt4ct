@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Decomposition</title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
@@ -11,54 +11,133 @@
     <!-- Boostrap icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
     <!-- Custom -->
     <link rel="stylesheet" href="style.css">
 
-    <!-- Only on this page -->
-    <style>
-        .container {
-            margin-top: 12px;
-            margin-bottom: 12px;
-        }
+    <!-- d3 -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
 
-        .row {
-            min-height: calc(100vh - 24px);
-        }
-    </style>
+    <!-- highlight.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
 </head>
 <body>
-    <div class="container">
-        <div class="row align-items-center">
-            <!-- <div class="col"></div> -->
-            <div class="col-lg border border-primary">
-                <form action="#" method="get">
-                    <div class="mb-3 mt-3">
-                        <h4>Problem description</h4>
-                        <textarea class="form-control" id="problem" name="problem" placeholder="Describe your problem">Create a program that finds the most trending videos</textarea>
-                        <button class="btn btn-primary mt-3 mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#description" aria-expanded="false" aria-controls="description">
-                            Refine problem description
-                        </button>
-                        <div class="collapse" id="description">
-                            <ul class="list-group" id="description-list"></ul>
-                        </div>
-                    </div>
-                    <hr>
-                    <div class="mb-3">
-                        <h4>Requirements</h4>
-                        <p><em class="text-muted">(Write a python program to find the most trending videos, given a csv file containing each visualization)</em></p>
-                        <button class="btn btn-primary mt-3 mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#requirements" aria-expanded="false" aria-controls="requirements1">
-                            Suggest requirements
-                        </button>
-                        <div class="collapse" id="requirements">
-                            <ul class="list-group" id="requirements-list"></ul>
-                        </div>
-                    </div>
-                    <hr>
-                    <a href="decomposition.html" type="button" class="btn btn-primary mt-3 mb-3">Decompose problem</a>
-                </form>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Problem Decomposition</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <div class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <button class="btn btn-outline-success" type="button" data-bs-toggle="modal" data-bs-target="#new-tree-modal">New</button>
+                    <button class="btn btn-outline-success" type="button" onclick="load_tree()">Load</button>
+                    <button class="btn btn-outline-success" type="button" onclick="save_tree('tree.json')">Save</button>
+                </div>
+                <button class="btn btn-outline-primary" type="button" id="user-id" onclick="login()">Login</button>
             </div>
-            <!-- <div class="col"></div> -->
         </div>
+    </nav>
+
+    <!-- Modal - buttons -->
+    <div class="modal fade" id="task-data" tabindex="-1" aria-labelledby="task-name" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="task-name" contenteditable="true"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div>
+                        <h5>Description:</h5>
+                        <div id="task-description" contenteditable="true"></div>
+                    </div>
+
+                    <div id="task-feedback-decomposition">
+                        <hr>
+                        <h5>Feedback (decomposition):</h5>
+                            <div class="mb-3">
+                                <label for="rating-decomposition" class="form-label rating">Quality:</label>
+                                <select class="form-select">
+                                    <option selected>-- Select a value --</option>
+                                    <option value="1">1 (terrible)</option>
+                                    <option value="2">2 (bad)</option>
+                                    <option value="3">3 (acceptable)</option>
+                                    <option value="3">4 (good)</option>
+                                    <option value="3">5 (excellent)</option>
+                                  </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-check-label" for="task-feedback-comments">Comments (optional)</label>
+                                <textarea class="form-control" id="task-feedback-comments" rows="3" placeholder="Additional feedback"></textarea>
+                            </div>
+                            <button type="submit" id="submit" class="btn btn-primary" disabled>Submit</button>
+                    </div>
+
+                    <div id="task-implementation">
+                        <hr>
+                        <h5>Implementation:</h5>
+                        <pre><code id="task-implementation-text"></code></pre>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="show-decomposition">Show/hide decomposition</button>
+                    <button type="button" class="btn btn-primary" id="decompose">Generate decomposition</button>
+                    <button type="button" class="btn btn-primary" id="add-subtask">Add subtask</button>
+                    <button type="button" class="btn btn-success" id="solve">Complete decomposition</button>
+                    <button type="button" class="btn btn-danger" id="delete">Delete</button>
+                    <div class="btn-group" id="implement">
+                        <!-- <button type="button" class="btn btn-primary" id="implement">Generate implementation</button> -->
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Generate implementation</button>
+                        <ul class="dropdown-menu">
+                            <li><a href="#" class="dropdown-item" id="implement-py">Python</a></li>
+                            <li><a href="#" class="dropdown-item" id="implement-js">Javascript</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a href="#" class="dropdown-item" id="implement-delete">Delete implementation</a></li>
+                        </ul>
+                    </div>
+                    <button type="button" class="btn btn-warning" id="unsolve">Continue decomposition</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal - new tree -->
+    <div class="modal fade" id="new-tree-modal" tabindex="-1" aria-labelledby="new-task-header" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="new-task-header">Create new task</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="new-task-name">Task name:</label>
+                            <input type="text" id="new-task-name" class="form-control" placeholder="Calculate Fibonacci's Sequence" value="Find the most trending movies">
+                        </div>
+                        <div class="mb-3">
+                            <label for="new-task-description">Task description:</label>
+                            <textarea id="new-task-description" class="form-control" rows="10" placeholder="Write a python program to calculate the nth value of Fibonacci's sequence. The number n is specified by the user.">Write a python program to find the most trending movies, given a CSV containing each visualization.</textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="new_tree()">Create</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="container">
+        <svg id="tree"></svg>
     </div>
 
     <!-- Boostrap -->
@@ -67,29 +146,15 @@
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 
-    <!-- Custom -->
-    <script src="requirements.js"></script>
-    <script>
-        $(document).ready(function() {
-            show_requirements([
-                'Python programming language',
-                'CSV parsing library (e.g., pandas)',
-                'Algorithm for analyzing trends',
-                'Visualization library (e.g., matplotlib, seaborn)',
-                'Data processing techniques',
-            ]);
+    <!-- highlight.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 
-            show_refinement_questions([
-                'What criteria define "trending" in this context? Is it based on views, likes, shares, or a combination of factors?',
-                'Which platform or website are we targeting for finding these trending videos? (e.g., YouTube, TikTok, Twitter)',
-                'Are there any specific time constraints for determining what is considered "trending"? For instance, are we looking at videos trending over the past 24 hours, week, or month?',
-                'Do we need to consider geographical location or is this a global trend analysis?',
-                'Would you like the program to continuously monitor and update the trending videos or is a one-time analysis sufficient?',
-                'Are there any restrictions or limitations on the tools or programming languages that can be used to develop this program?',
-                'Should the program solely rely on publicly available APIs, or can it utilize web scraping techniques if necessary?',
-                'Is there a preference for any specific programming language or framework for developing this program?',
-            ]);
-        })
-    </script>
+    <!-- Data -->
+    <script src="task.js"></script>
+    <!-- <script src="movies.js"></script> -->
+
+    <!-- d3 + visualization -->
+    <script type="module" src="decomposition.js"></script>
+
 </body>
 </html>
