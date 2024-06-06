@@ -9,20 +9,21 @@ pk:
 decomposition:
     uid
     creation_ts
-    task_name
+    root_task_name
     tokens in+out
     lvl
-    subtask_name
+    task_name
     tree (blob)
     decomposition_ts
 
-<!-- implementation:
-    tokens in+out
-    language -->
+# implementation:
+#     tokens in+out
+#     language
 _
 feedback_decomposition:
     uid
     creation_ts
+    root_task_name
     task_name
     tree (blob)
     feedback eval (1-4)

@@ -11,7 +11,6 @@ db = database.PostgreSQL(database='postgres',
                          password='decomp')
 
 
-# todo: add chatgpt's answer
 def log_usage_decomposition(task: Task, creation_ts, user_id, answer, usage):
     root_task = task.get_root()
 
@@ -21,6 +20,7 @@ def log_usage_decomposition(task: Task, creation_ts, user_id, answer, usage):
         'root_task_name': root_task.name,
         'task_name': task.name,
         'task_level': task.level,
+        'tree': json.dumps(root_task.to_dict()),
         'answer': answer,
         'prompt_tokens': usage.prompt_tokens,
         'completion_tokens': usage.completion_tokens 
@@ -36,6 +36,7 @@ def log_usage_implementation(task: Task, creation_ts, user_id, language, answer,
         'task_name': task.name,
         'task_level': task.level,
         'implementation_language': language,
+        'tree': json.dumps(root_task.to_dict()),
         'answer': answer,
         'prompt_tokens': usage.prompt_tokens,
         'completion_tokens': usage.completion_tokens 

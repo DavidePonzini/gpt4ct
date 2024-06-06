@@ -20,6 +20,7 @@ CREATE TABLE problem_decomposition.decomposition (
   root_task_name VARCHAR(1000) NOT NULL,
   task_name VARCHAR(1000) NOT NULL,
   task_level DECIMAL(4) NOT NULL,
+  tree TEXT NOT NULL,
   answer TEXT NOT NULL,
   decomposition_ts TIMESTAMP NOT NULL DEFAULT NOW(),
   prompt_tokens DECIMAL(6) NOT NULL,
@@ -35,6 +36,7 @@ CREATE TABLE problem_decomposition.implementation_runs (
   task_level DECIMAL(4) NOT NULL,
   implementation_language VARCHAR(64),
   implementation_ts TIMESTAMP NOT NULL DEFAULT NOW(),
+  tree TEXT NOT NULL,
   answer TEXT NOT NULL,
   prompt_tokens DECIMAL(6) NOT NULL,
   completion_tokens DECIMAL(6) NOT NULL
