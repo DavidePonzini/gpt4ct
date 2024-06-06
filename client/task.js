@@ -125,6 +125,8 @@ class Task {
                         this_task.add_subtask(subtask.name, subtask.description);
                     }
 
+                    this_task.needs_feedback_decomposition = true;
+
                     cb(data);
                 } catch (e) {
                     cb_error(d);

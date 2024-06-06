@@ -329,6 +329,8 @@ function prepare_feedback_decomposition(item) {
 
             item.data.needs_feedback_decomposition = false;
             $('#task-feedback-decomposition').hide();
+
+            update();
         }
     });
 }
