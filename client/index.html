@@ -130,12 +130,23 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" id="show-decomposition">Show/hide decomposition</button>
-                    <button type="button" class="btn btn-primary" id="decompose-manual">Manual decomposition</button>
+                    <div class="btn-group" id="decompose">
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Decomposition</button>
+                        <ul class="dropdown-menu">
+                            <li><a href="#" class="dropdown-item" id="decompose-manual">Manual</a></li>
+                            <li><a href="#" class="dropdown-item" id="decompose-ai">(Re)generate</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a href="#" class="dropdown-item" id="solve">Complete</a></li>
+                            <li><a href="#" class="dropdown-item" id="delete-decomposition">Delete</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- <button type="button" class="btn btn-primary" id="">Manual decomposition</button>
                     <button type="button" class="btn btn-primary" id="decompose-ai">(Re)generate decomposition</button>
                     <button type="button" class="btn btn-success" id="solve">Complete decomposition</button>
-                    <button type="button" class="btn btn-danger" id="delete-decomposition">Delete decomposition</button>
+                    <button type="button" class="btn btn-danger" id="delete-decomposition">Delete decomposition</button> -->
                     <div class="btn-group" id="implement">
-                        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Generate implementation</button>
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Implementation</button>
                         <ul class="dropdown-menu">
                             <li><a href="#" class="dropdown-item" id="implement-py">Python</a></li>
                             <li><a href="#" class="dropdown-item" id="implement-js">Javascript</a></li>

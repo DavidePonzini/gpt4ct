@@ -347,14 +347,21 @@ function show_buttons(item) {
     }
 
     // Decompose: only available for unsolved tasks
-    let button_decompose_manual = $('#decompose-manual');
-    let button_decompose_ai = $('#decompose-ai');
+    let button_decompose = $('#decompose');
     if (!item.data.is_solved()) {
-        button_decompose_manual.show().unbind().on('click', () => manual_decomposition(item));
-        button_decompose_ai.show().unbind().on('click', () => generate_decomposition(item));
+        button_decompose.show();
+        $('#decompose-manual').unbind().on('click', () => manual_decomposition(item));
+        $('#decompose-ai').unbind().on('click', () => generate_decomposition(item));
+
+        // Delete decomposition: available on nodes that have children
+        let button_delete = $('#delete-decomposition');
+        if (item.data.has_children()) {
+            button_delete.show().unbind().on('click', () => delete_children(item));
+        } else {
+            button_delete.hide();
+        }
     } else {
-        button_decompose_manual.hide();
-        button_decompose_ai.hide();
+        button_decompose.hide();
     }
 
     // Add subtask: only available on unsolved tasks
@@ -385,14 +392,6 @@ function show_buttons(item) {
     } else {
         button_solve.show().unbind().on('click', () => solve(item));
         button_unsolve.hide();
-    }
-
-    // Delete decomposition: available on unsolved nodes that have children
-    let button_delete = $('#delete-decomposition');
-    if (!item.data.is_solved() && item.data.has_children()) {
-        button_delete.show().unbind().on('click', () => delete_children(item));
-    } else {
-        button_delete.hide();
     }
 }
 
