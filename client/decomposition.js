@@ -136,7 +136,7 @@ function init(data) {
     update();
 
     // Useful for debugging, should be eventually removed
-    window.tree = tree_data;
+    window.data = tree_data;
 }
 
 function update() {
@@ -172,6 +172,7 @@ function update() {
         .classed('implemented', d => d.data.implementation)
         .classed('solved', d => d.data.is_solved())
         .classed('running', d => d.data.running)
+        .classed('feedback-required', d => d.data.needs_feedback())
         .attr('transform', d => `translate(${d.x + width/2 + margin.left}, ${d.y + margin.top})`)
         .on('click', onNodeClick);
     nodesG_enter.append('circle')
@@ -190,6 +191,7 @@ function update() {
         .classed('implemented', d => d.data.implementation)
         .classed('solved', d => d.data.is_solved())
         .classed('running', d => d.data.running)
+        .classed('feedback-required', d => d.data.needs_feedback())
         .attr('transform', d => `translate(${d.x + width/2 + margin.left}, ${d.y + margin.top})`)
         .on('click', onNodeClick);
     nodesG_update.select('text')
@@ -282,6 +284,17 @@ function onNodeClick(event, item) {
         impl.hide()
     }
 
+    // Hide manual decomposition prompt
+    $('#task-decomposition-manual').hide();
+
+    // Show decomposition feedback, if needed
+    if (item.data.needs_feedback_decomposition) {
+        $('#task-feedback-decomposition').show();
+        prepare_feedback_decomposition(item);
+    } else {
+        $('#task-feedback-decomposition').hide();
+    }
+
     // Show appropriate buttons for current task
     show_buttons(item);
 
@@ -289,9 +302,39 @@ function onNodeClick(event, item) {
     show_task_data_modal();
 }
 
+function prepare_feedback_decomposition(item) {
+    // Reset all select options
+    let questions = $('#task-feedback-decomposition select');
+    questions.val(0);
+
+    $('#task-feedback-decomposition textarea').val('');
+    
+    $('#task-feedback-decomposition-submit').on('click', function() {
+        let missing_anwer = false;
+        
+        // Show feedback for missing answers
+        for (let question of questions) {
+            question = $(question);
+            if (question.val() == 0) {
+                question.addClass('is-invalid');
+                missing_anwer = true;
+            } else {
+                question.removeClass('is-invalid');
+            }
+        }
+
+        // if all answers have been provided, record the feedback and don't ask for it again
+        if (!missing_anwer) {
+            // TODO: send feedback
+
+            item.data.needs_feedback_decomposition = false;
+            $('#task-feedback-decomposition').hide();
+        }
+    });
+}
+
 /**
  * Show the appropriate buttons for the given task
- * @param {*} item 
  */
 function show_buttons(item) {
     // Show/hide decomposition: only available on decomposed tasks
@@ -303,12 +346,15 @@ function show_buttons(item) {
         button_show_decomposition.hide();
     }
 
-    // Decompose: only available for unsolved tasks with no children
-    let button_decompose = $('#decompose');
-    if (!item.data.is_solved() && !item.data.has_children()) {
-        button_decompose.show().unbind().on('click', () => generate_decomposition(item));
+    // Decompose: only available for unsolved tasks
+    let button_decompose_manual = $('#decompose-manual');
+    let button_decompose_ai = $('#decompose-ai');
+    if (!item.data.is_solved()) {
+        button_decompose_manual.show().unbind().on('click', () => manual_decomposition(item));
+        button_decompose_ai.show().unbind().on('click', () => generate_decomposition(item));
     } else {
-        button_decompose.hide();
+        button_decompose_manual.hide();
+        button_decompose_ai.hide();
     }
 
     // Add subtask: only available on unsolved tasks
@@ -341,12 +387,12 @@ function show_buttons(item) {
         button_unsolve.hide();
     }
 
-    // Delete: not available on root or solved nodes
-    let button_delete = $('#delete');
-    if (item.depth == 0 || item.data.is_solved()) {
-        button_delete.hide();
+    // Delete decomposition: available on unsolved nodes that have children
+    let button_delete = $('#delete-decomposition');
+    if (!item.data.is_solved() && item.data.has_children()) {
+        button_delete.show().unbind().on('click', () => delete_children(item));
     } else {
-        button_delete.show().unbind().on('click', () => delete_subtask(item));
+        button_delete.hide();
     }
 }
 
@@ -369,6 +415,60 @@ function generate_decomposition(item) {
     });
 
     item.data.running = true;
+    update();
+}
+
+function manual_decomposition(item) {
+    // Clear the list
+    $('#task-decomposition-manual-tasks > div').remove();
+    
+    for (let subtask of item.data.subtasks) {
+        manual_decomposition_add_button(subtask.name, subtask.description);
+    }
+
+    // Bind functionality to "add subtask" button
+    $('#task-decomposition-manual-add-subtask').unbind().on('click', () => manual_decomposition_add_button('', ''));
+
+    $('#task-decomposition-manual-submit').on('click', () => submit_manual_decomposition(item));
+    $('#task-decomposition-manual').show();
+}
+
+function manual_decomposition_add_button(name, description) {
+    let div = $('<div class="list-group-item list-group-item-action list-group-item-light"></div>');
+    
+    let div_title = $('<div style="display: flex"></div>');
+    let label1 = $('<label class="form-label"><b>Name:</b></label>');
+    let close = $('<button type="button" class="btn-close" aria-label="Close" style="margin: 0 0 0 auto;"></button>');
+    close.on('click', () => div.remove());
+
+    div_title.append(label1).append(close)
+
+    let input1 = $('<input type="text" class="form-control">');
+    input1.val(name);
+
+    let label2 = $('<label class="form-label mt-3"><b>Description:</b></label>');
+    let input2 = $('<textarea class="form-control" rows="3"></textarea>');
+    input2.val(description);
+
+    div.append(div_title).append(input1).append(label2).append(input2);
+    
+    let button = $('#task-decomposition-manual-add-subtask');
+    div.insertBefore(button);
+}
+
+function submit_manual_decomposition(item) {
+    item.data.clear_subtasks();
+
+    let elems = $('#task-decomposition-manual-tasks > div');
+    for (let elem of elems) {
+        let name = $(elem).find('input').val();
+        let description = $(elem).find('textarea').val();
+
+        item.data.add_subtask(name, description)
+    }    
+
+    hide_buttons();
+    show_children(item.data);
     update();
 }
 
@@ -425,24 +525,22 @@ function hide_children(task) {
     update();
 }
 
-function add_subtask(item) {
+// function add_subtask(item) {
+//     hide_buttons();
+
+//     let task = item.data;
+
+//     let subtask_name = prompt('subtask name');
+//     let subtask_description = prompt('subtask description');
+
+//     task.add_subtask(subtask_name, subtask_description);
+//     show_children(item.data);
+// }
+
+function delete_children(item) {
     hide_buttons();
 
-    let task = item.data;
-
-    let subtask_name = prompt('subtask name');
-    let subtask_description = prompt('subtask description');
-
-    task.add_subtask(subtask_name, subtask_description);
-    show_children(item.data);
-}
-
-function delete_subtask(item) {
-    hide_buttons();
-
-    let parent = item.data.parent;
-    if (parent)
-        parent.remove_subtask(item.data.name);
+    item.data.clear_subtasks();
     
     update();
 }

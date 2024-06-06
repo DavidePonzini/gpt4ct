@@ -12,6 +12,7 @@ class Task {
         this.implementation_language = null;
         this.children = null;
         this.level = 0;
+        this.needs_feedback_decomposition = false;
     }
 
     id() {
@@ -21,6 +22,10 @@ class Task {
         let my_id = this.parent.subtasks.findIndex(d => d === this);
         
         return this.parent.id().concat(my_id);
+    }
+
+    needs_feedback() {
+        return this.needs_feedback_decomposition;
     }
 
     is_root() {
@@ -84,7 +89,15 @@ class Task {
         };
     }
 
+    clear_subtasks() {
+        this.subtasks = [];
+        this.children = [];
+    }
+
     generate_decomposition(user_id, creation_ts, cb, cb_error = console.error) {
+        // Clear previous decomposition, if exists
+        this.clear_subtasks();
+
         let this_task = this;
 
         let root_task = this;

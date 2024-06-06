@@ -57,25 +57,68 @@
                         <div id="task-description" contenteditable="true"></div>
                     </div>
 
+                    <div id="task-decomposition-manual">
+                        <hr>
+                        <div class="list-group mb-3" id="task-decomposition-manual-tasks">
+                            <button id="task-decomposition-manual-add-subtask" class="btn btn-primary mt-3">Add a subtask</button>
+                            <button type="submit" id="task-decomposition-manual-submit" class="btn btn-success mt-3">Create</button>
+                        </div>
+                    </div>
+
                     <div id="task-feedback-decomposition">
                         <hr>
-                        <h5>Feedback (decomposition):</h5>
+                        <div class="alert alert-info">
+                            <h5>Feedback (decomposition):</h5>
                             <div class="mb-3">
-                                <label for="rating-decomposition" class="form-label rating">Quality:</label>
+                                <label class="form-label rating">Quanto ti sembra corretta la decomposizione generata?</label>
                                 <select class="form-select">
-                                    <option selected>-- Select a value --</option>
-                                    <option value="1">1 (terrible)</option>
-                                    <option value="2">2 (bad)</option>
-                                    <option value="3">3 (acceptable)</option>
-                                    <option value="3">4 (good)</option>
-                                    <option value="3">5 (excellent)</option>
+                                    <option value="0" selected>-- Select a value --</option>
+                                    <option value="1">1 (per niente)</option>
+                                    <option value="2">2 (poco)</option>
+                                    <option value="3">3 (buona)</option>
+                                    <option value="4">4 (eccellente)</option>
                                   </select>
+                                  <div class="invalid-feedback">You need to select a value</div>
                             </div>
                             <div class="mb-3">
-                                <label class="form-check-label" for="task-feedback-comments">Comments (optional)</label>
-                                <textarea class="form-control" id="task-feedback-comments" rows="3" placeholder="Additional feedback"></textarea>
+                                <label class="form-label rating">I task generati risolvono il problema di partenza?</label>
+                                <select class="form-select">
+                                    <option value="0" selected>-- Select a value --</option>
+                                    <option value="1">1 (i task generati non sono coerenti col problema di partenza)</option>
+                                    <option value="2">2 (mancano numerosi passaggi)</option>
+                                    <option value="3">3 (risolvono la maggior parte, ma mancano alcuni passaggi)</option>
+                                    <option value="4">4 (completamente)</option>
+                                  </select>
+                                  <div class="invalid-feedback">You need to select a value</div>
                             </div>
-                            <button type="submit" id="submit" class="btn btn-primary" disabled>Submit</button>
+                            <div class="mb-3">
+                                <label class="form-label rating">Saresti riuscito ad effettuare questa decomposizione senza l'aiuto di questo strumento?</label>
+                                <select class="form-select">
+                                    <option value="0" selected>-- Select a value --</option>
+                                    <option value="1">1 (sicuramente no)</option>
+                                    <option value="2">2 (penso di no)</option>
+                                    <option value="3">3 (penso di si)</option>
+                                    <option value="4">4 (sicuramente si)</option>
+                                  </select>
+                                  <div class="invalid-feedback">You need to select a value</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label rating">Rispetto alla decomposizione generata, tu come l'avresti risolta?</label>
+                                <select class="form-select">
+                                    <option value="0" selected>-- Select a value --</option>
+                                    <option value="1">1 (in maniera completamente diversa)</option>
+                                    <option value="2">2 (con numerose differenze)</option>
+                                    <option value="3">3 (con delle piccole differenze)</option>
+                                    <option value="4">4 (esattemente in questo modo)</option>
+                                  </select>
+                                  <div class="invalid-feedback">You need to select a value</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-check-label" for="task-feedback-decomposition-comments">Comments (optional)</label>
+                                <textarea class="form-control" id="task-feedback-decomposition-comments" rows="3" placeholder="Additional feedback"></textarea>
+                            </div>
+                            <button type="submit" id="task-feedback-decomposition-submit" class="btn btn-primary">Submit</button>
+                        </div>
                     </div>
 
                     <div id="task-implementation">
@@ -87,12 +130,11 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" id="show-decomposition">Show/hide decomposition</button>
-                    <button type="button" class="btn btn-primary" id="decompose">Generate decomposition</button>
-                    <button type="button" class="btn btn-primary" id="add-subtask">Add subtask</button>
+                    <button type="button" class="btn btn-primary" id="decompose-manual">Manual decomposition</button>
+                    <button type="button" class="btn btn-primary" id="decompose-ai">(Re)generate decomposition</button>
                     <button type="button" class="btn btn-success" id="solve">Complete decomposition</button>
-                    <button type="button" class="btn btn-danger" id="delete">Delete</button>
+                    <button type="button" class="btn btn-danger" id="delete-decomposition">Delete decomposition</button>
                     <div class="btn-group" id="implement">
-                        <!-- <button type="button" class="btn btn-primary" id="implement">Generate implementation</button> -->
                         <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Generate implementation</button>
                         <ul class="dropdown-menu">
                             <li><a href="#" class="dropdown-item" id="implement-py">Python</a></li>
