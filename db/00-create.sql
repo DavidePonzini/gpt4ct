@@ -14,34 +14,45 @@ CREATE TABLE problem_decomposition.users (
 );
 
 
-CREATE TABLE problem_decomposition.decomposition_runs (
-  creation_ts TIMESTAMP NOT NULL,
+CREATE TABLE problem_decomposition.decomposition (
   user_id VARCHAR(32) REFERENCES problem_decomposition.users(user_id) NOT NULL,
+  creation_ts TIMESTAMP NOT NULL,
   root_task_name VARCHAR(1000) NOT NULL,
-  root_task_description VARCHAR(1000) NOT NULL,
   task_name VARCHAR(1000) NOT NULL,
-  task_description VARCHAR(1000) NOT NULL,
   task_level DECIMAL(4) NOT NULL,
   answer TEXT NOT NULL,
-  run_date TIMESTAMP NOT NULL DEFAULT NOW(),
+  decomposition_ts TIMESTAMP NOT NULL DEFAULT NOW(),
   prompt_tokens DECIMAL(6) NOT NULL,
   completion_tokens DECIMAL(6) NOT NULL
 );
 
 
 CREATE TABLE problem_decomposition.implementation_runs (
-  creation_ts TIMESTAMP NOT NULL,
   user_id VARCHAR(32) REFERENCES problem_decomposition.users(user_id) NOT NULL,
+  creation_ts TIMESTAMP NOT NULL,
   root_task_name VARCHAR(1000) NOT NULL,
-  root_task_description VARCHAR(1000) NOT NULL,
   task_name VARCHAR(1000) NOT NULL,
-  task_description VARCHAR(1000) NOT NULL,
   task_level DECIMAL(4) NOT NULL,
   implementation_language VARCHAR(64),
-  run_date TIMESTAMP NOT NULL DEFAULT NOW(),
+  implementation_ts TIMESTAMP NOT NULL DEFAULT NOW(),
   answer TEXT NOT NULL,
   prompt_tokens DECIMAL(6) NOT NULL,
   completion_tokens DECIMAL(6) NOT NULL
+);
+
+CREATE TABLE problem_decomposition.feedback_decomposition (
+  user_id VARCHAR(32) REFERENCES problem_decomposition.users(user_id) NOT NULL,
+  creation_ts TIMESTAMP NOT NULL,
+  root_task_name VARCHAR(1000) NOT NULL,
+  task_name VARCHAR(1000) NOT NULL,
+  task_level DECIMAL(4) NOT NULL,
+  tree TEXT NOT NULL,
+  q1 DECIMAL(1) NOT NULL,
+  q2 DECIMAL(1) NOT NULL,
+  q3 DECIMAL(1) NOT NULL,
+  q4 DECIMAL(1) NOT NULL,
+  comments VARCHAR(2000) NOT NULL,
+  feedback_ts TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 COMMIT;

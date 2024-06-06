@@ -1,6 +1,9 @@
 from dav_tools import database
 from task import Task
+import json
 
+
+schema = 'problem_decomposition'
 
 db = database.PostgreSQL(database='postgres',
                          host='127.0.0.1',
@@ -12,13 +15,11 @@ db = database.PostgreSQL(database='postgres',
 def log_usage_decomposition(task: Task, creation_ts, user_id, answer, usage):
     root_task = task.get_root()
 
-    db.insert('problem_decomposition', 'decomposition_runs', {
-        'creation_ts': creation_ts,
+    db.insert(schema, 'decomposition_runs', {
         'user_id': user_id,
+        'creation_ts': creation_ts,
         'root_task_name': root_task.name,
-        'root_task_description': root_task.description,
         'task_name': task.name,
-        'task_description': task.description,
         'task_level': task.level,
         'answer': answer,
         'prompt_tokens': usage.prompt_tokens,
@@ -28,13 +29,11 @@ def log_usage_decomposition(task: Task, creation_ts, user_id, answer, usage):
 def log_usage_implementation(task: Task, creation_ts, user_id, language, answer, usage):
     root_task = task.get_root()
 
-    db.insert('problem_decomposition', 'implementation_runs', {
-        'creation_ts': creation_ts,
+    db.insert(schema, 'implementation_runs', {
         'user_id': user_id,
+        'creation_ts': creation_ts,
         'root_task_name': root_task.name,
-        'root_task_description': root_task.description,
         'task_name': task.name,
-        'task_description': task.description,
         'task_level': task.level,
         'implementation_language': language,
         'answer': answer,
@@ -42,8 +41,22 @@ def log_usage_implementation(task: Task, creation_ts, user_id, language, answer,
         'completion_tokens': usage.completion_tokens 
     })
 
-def log_feedback():
-    ...
+def log_feedback(user_id, creation_ts, task: Task, q1, q2, q3, q4, comments):
+    root_task = task.get_root()
+
+    db.insert(schema, 'feedback_decomposition', {
+        'user_id': user_id,
+        'creation_ts': creation_ts,
+        'root_task_name': root_task.name,
+        'task_name': task.name,
+        'task_level': task.level,
+        'tree': json.dumps(root_task.to_dict()),
+        'q1': q1,
+        'q2': q2,
+        'q3': q3,
+        'q4': q4,
+        'comments': comments
+    })
 
 def check_user_exists(user_id: str):
     base_query = 'SELECT COUNT(*) FROM {schema}.{table} WHERE {column} = {value}'

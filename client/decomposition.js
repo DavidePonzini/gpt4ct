@@ -309,7 +309,7 @@ function prepare_feedback_decomposition(item) {
 
     $('#task-feedback-decomposition textarea').val('');
     
-    $('#task-feedback-decomposition-submit').on('click', function() {
+    $('#task-feedback-decomposition-submit').prop('disabled', false).on('click', function() {
         let missing_anwer = false;
         
         // Show feedback for missing answers
@@ -326,11 +326,38 @@ function prepare_feedback_decomposition(item) {
         // if all answers have been provided, record the feedback and don't ask for it again
         if (!missing_anwer) {
             // TODO: send feedback
+            let q1 = $('#task-feedback-decomposition-q1').val();
+            let q2 = $('#task-feedback-decomposition-q2').val();
+            let q3 = $('#task-feedback-decomposition-q3').val();
+            let q4 = $('#task-feedback-decomposition-q4').val();
+            let comments = $('#task-feedback-decomposition-comments').val();
 
-            item.data.needs_feedback_decomposition = false;
-            $('#task-feedback-decomposition').hide();
+            $.ajax({
+                type: 'POST',
+                url: 'http://localhost:5000/feedback-decomposition',
+                data: {
+                    'tree': JSON.stringify(tree_data.tree),
+                    'task_id': JSON.stringify(this_task.id()),
+                    'creation_ts': JSON.stringify(creation_ts),
+                    'user_id': JSON.stringify(user_id),
+                    'q1': JSON.stringify(q1),
+                    'q2': JSON.stringify(q2),
+                    'q3': JSON.stringify(q3),
+                    'q4': JSON.stringify(q4),
+                    'comments': JSON.stringify(comments)
+                },
+                success: function(d) {
+                    item.data.needs_feedback_decomposition = false;
+                    $('#task-feedback-decomposition').hide();
 
-            update();
+                    update();
+                },
+                error: console.error
+            });
+
+            // Request sent - disable submit button
+            $('#task-feedback-decomposition-submit').prop("disabled", true);
+            
         }
     });
 }

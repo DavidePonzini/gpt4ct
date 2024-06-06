@@ -71,7 +71,7 @@
                             <h5>Feedback (decomposition):</h5>
                             <div class="mb-3">
                                 <label class="form-label rating">Quanto ti sembra corretta la decomposizione generata?</label>
-                                <select class="form-select">
+                                <select class="form-select" id="task-feedback-decomposition-q1">
                                     <option value="0" selected>-- Select a value --</option>
                                     <option value="1">1 (per niente)</option>
                                     <option value="2">2 (poco)</option>
@@ -82,7 +82,7 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label rating">I task generati risolvono il problema di partenza?</label>
-                                <select class="form-select">
+                                <select class="form-select" id="task-feedback-decomposition-q2">
                                     <option value="0" selected>-- Select a value --</option>
                                     <option value="1">1 (i task generati non sono coerenti col problema di partenza)</option>
                                     <option value="2">2 (mancano numerosi passaggi)</option>
@@ -93,7 +93,7 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label rating">Saresti riuscito ad effettuare questa decomposizione senza l'aiuto di questo strumento?</label>
-                                <select class="form-select">
+                                <select class="form-select"  id="task-feedback-decomposition-q3">
                                     <option value="0" selected>-- Select a value --</option>
                                     <option value="1">1 (sicuramente no)</option>
                                     <option value="2">2 (penso di no)</option>
@@ -104,7 +104,7 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label rating">Rispetto alla decomposizione generata, tu come l'avresti risolta?</label>
-                                <select class="form-select">
+                                <select class="form-select"  id="task-feedback-decomposition-q4">
                                     <option value="0" selected>-- Select a value --</option>
                                     <option value="1">1 (in maniera completamente diversa)</option>
                                     <option value="2">2 (con numerose differenze)</option>
@@ -115,7 +115,7 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-check-label" for="task-feedback-decomposition-comments">Comments (optional)</label>
-                                <textarea class="form-control" id="task-feedback-decomposition-comments" rows="3" placeholder="Additional feedback"></textarea>
+                                <textarea class="form-control" id="task-feedback-decomposition-comments" rows="3" maxlength="2000" placeholder="Additional feedback"></textarea>
                             </div>
                             <button type="submit" id="task-feedback-decomposition-submit" class="btn btn-primary">Submit</button>
                         </div>
