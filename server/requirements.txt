@@ -1,5 +1,0 @@
-dav_tools
-Flask
-Flask_Cors
-openai
-psycopg2
