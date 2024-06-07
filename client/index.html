@@ -33,11 +33,19 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <div class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <button class="btn btn-outline-primary" type="button" id="user-id" onclick="login()">Login</button>
+                    <div class="vr"></div>
                     <button class="btn btn-outline-success" type="button" data-bs-toggle="modal" data-bs-target="#new-tree-modal">New</button>
                     <button class="btn btn-outline-success" type="button" onclick="load_tree()">Load</button>
                     <button class="btn btn-outline-success" type="button" onclick="save_tree('tree.json')">Save</button>
                 </div>
-                <button class="btn btn-outline-primary" type="button" id="user-id" onclick="login()">Login</button>
+                <div class="navbar-text">
+                    <i><small>
+                        Developed by Davide Ponzini
+                        <a href="mailto:davide.ponzini@edu.unige.it" class="bi bi-envelope-at social social-email"></a>
+                    </small></i>
+                    
+                </div>
             </div>
         </div>
     </nav>

@@ -35,8 +35,13 @@ function login() {
             if (data.user) {
                 user_id = uid;
 
-                $('#user-id').text(user_id).removeClass('btn-outline-primary').addClass('btn-outline-secondary');
-                return;        
+                $('#user-id')
+                    .text(`User: ${user_id}`)
+                    .removeClass('btn-outline-primary')
+                    .addClass('btn-outline-secondary')
+                    .prop('disabled', true);
+                
+                    return;
             }
 
             alert(`User "${uid}" does not exist. Try again.`);

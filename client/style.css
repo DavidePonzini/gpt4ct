@@ -132,3 +132,15 @@ body {
     }
     
 }
+
+/* Social */
+.social {
+    margin-left: 4px;
+    margin-right: 4px;
+    transition-timing-function: ease-in-out;
+    transition-duration: .1s;
+}
+
+.social-email {
+    color: #c71610!important;
+}
