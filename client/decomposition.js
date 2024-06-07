@@ -46,13 +46,9 @@ function login() {
 }
 
 function make_tree(name, description) {
-    if (!check_user_id())
-        return;    
-
     return {
         'tree': new Task(name, description),
-        'creation_ts': new Date(),
-        'user_id': user_id
+        'creation_ts': new Date()
     };
 }
 
@@ -69,7 +65,6 @@ function check_user_id(cb) {
 // load
 $(document).ready(function() {
     // Make dummy tree
-    user_id = 'example_tree';   // quick fix for showing a tree withouth a user
     let data = make_tree('Load a task', 'Load an existing task');
     let tree = data.tree
 
@@ -83,8 +78,6 @@ $(document).ready(function() {
     init(data);
     show_children(tree);
     show_children(sub1);
-    user_id = null;
-
 })
 
 function new_tree() {
@@ -309,7 +302,10 @@ function prepare_feedback_decomposition(item) {
 
     $('#task-feedback-decomposition textarea').val('');
     
-    $('#task-feedback-decomposition-submit').prop('disabled', false).on('click', function() {
+    $('#task-feedback-decomposition-submit').prop('disabled', false).unbind().on('click', function() {
+        if (!check_user_id())
+            return;
+
         let missing_anwer = false;
         
         // Show feedback for missing answers
@@ -325,7 +321,6 @@ function prepare_feedback_decomposition(item) {
 
         // if all answers have been provided, record the feedback and don't ask for it again
         if (!missing_anwer) {
-            // TODO: send feedback
             let q1 = $('#task-feedback-decomposition-q1').val();
             let q2 = $('#task-feedback-decomposition-q2').val();
             let q3 = $('#task-feedback-decomposition-q3').val();
@@ -337,8 +332,8 @@ function prepare_feedback_decomposition(item) {
                 url: 'http://localhost:5000/feedback-decomposition',
                 data: {
                     'tree': JSON.stringify(tree_data.tree),
-                    'task_id': JSON.stringify(this_task.id()),
-                    'creation_ts': JSON.stringify(creation_ts),
+                    'task_id': JSON.stringify(item.data.id()),
+                    'creation_ts': JSON.stringify(tree_data.creation_ts),
                     'user_id': JSON.stringify(user_id),
                     'q1': JSON.stringify(q1),
                     'q2': JSON.stringify(q2),

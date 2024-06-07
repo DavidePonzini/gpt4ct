@@ -28,7 +28,7 @@ CREATE TABLE problem_decomposition.decomposition (
 );
 
 
-CREATE TABLE problem_decomposition.implementation_runs (
+CREATE TABLE problem_decomposition.implementation (
   user_id VARCHAR(32) REFERENCES problem_decomposition.users(user_id) NOT NULL,
   creation_ts TIMESTAMP NOT NULL,
   root_task_name VARCHAR(1000) NOT NULL,
@@ -53,7 +53,7 @@ CREATE TABLE problem_decomposition.feedback_decomposition (
   q2 DECIMAL(1) NOT NULL,
   q3 DECIMAL(1) NOT NULL,
   q4 DECIMAL(1) NOT NULL,
-  comments VARCHAR(2000) NOT NULL,
+  comments VARCHAR(2000),
   feedback_ts TIMESTAMP NOT NULL DEFAULT NOW()
 );
 

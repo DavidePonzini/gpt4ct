@@ -14,7 +14,7 @@ db = database.PostgreSQL(database='postgres',
 def log_usage_decomposition(task: Task, creation_ts, user_id, answer, usage):
     root_task = task.get_root()
 
-    db.insert(schema, 'decomposition_runs', {
+    db.insert(schema, 'decomposition', {
         'user_id': user_id,
         'creation_ts': creation_ts,
         'root_task_name': root_task.name,
@@ -29,7 +29,7 @@ def log_usage_decomposition(task: Task, creation_ts, user_id, answer, usage):
 def log_usage_implementation(task: Task, creation_ts, user_id, language, answer, usage):
     root_task = task.get_root()
 
-    db.insert(schema, 'implementation_runs', {
+    db.insert(schema, 'implementation', {
         'user_id': user_id,
         'creation_ts': creation_ts,
         'root_task_name': root_task.name,
@@ -56,7 +56,7 @@ def log_feedback(user_id, creation_ts, task: Task, q1, q2, q3, q4, comments):
         'q2': q2,
         'q3': q3,
         'q4': q4,
-        'comments': comments
+        'comments': comments if len(comments) > 0 else None
     })
 
 def check_user_exists(user_id: str):

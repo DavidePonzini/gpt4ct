@@ -86,6 +86,7 @@ class Task {
             implementation: this.implementation,
             implementation_language: this.implementation_language,
             children: !!this.subtasks.length,
+            needs_feedback_decomposition: this.needs_feedback_decomposition 
         };
     }
 
@@ -198,6 +199,7 @@ class Task {
         task.solved = data.solved;
         task.implementation = data.implementation;
         task.implementation_language = data.implementation_language;
+        task.needs_feedback_decomposition = data.needs_feedback_decomposition;
 
         return task; // Return the constructed Task instance
 

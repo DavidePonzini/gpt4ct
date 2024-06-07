@@ -72,7 +72,7 @@ def feedback_decomposition():
     q2 = json.loads(request.form['q2'])
     q3 = json.loads(request.form['q3'])
     q4 = json.loads(request.form['q4'])
-    comments = json.load(request.form['comments'])
+    comments = json.loads(request.form['comments'])
 
     root_task = task.from_dict(tree)
     current_task = root_task.get_subtask_from_id(task_id)
@@ -87,6 +87,10 @@ def feedback_decomposition():
         q4=q4,
         comments=comments
     )
+
+    return {
+        'status': 'ok'
+    }
 
 
 if __name__ == '__main__':
