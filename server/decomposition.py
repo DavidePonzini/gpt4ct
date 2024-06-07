@@ -16,13 +16,23 @@ def decompose(task: Task, creation_ts, user_id):
     message.add_message('user', prompts.Decomposition.prompt(task))
     message.print()
 
-    answer = message.generate_answer(require_json=True, add_to_messages=False)
-    
+    answer_json = message.generate_answer(require_json=True, add_to_messages=False)
+    answer = json.loads(answer_json)
+    subtasks = answer['result']
+
     usage = message.usage[-1]
-    database.log_usage_decomposition(task, creation_ts, user_id, answer, usage)
+    database.log_usage_decomposition(
+        task=task,
+        creation_ts=creation_ts,
+        user_id=user_id,
+        subtasks_amount=len(subtasks),
+        answer=answer_json,
+        usage=usage
+    )
+
     print_price(usage)
-    
-    return answer
+
+    return answer_json
 
 def implement(task: Task, language: str, creation_ts, user_id):
     message = Message()
@@ -52,7 +62,14 @@ def implement(task: Task, language: str, creation_ts, user_id):
     answer = message.generate_answer(require_json=False, add_to_messages=False)
 
     usage = message.usage[-1]
-    database.log_usage_implementation(task, creation_ts, user_id, language, answer, usage)
+    database.log_usage_implementation(
+        task=task,
+        creation_ts=creation_ts,
+        user_id=user_id,
+        language=language,
+        answer=answer,
+        usage=usage)
+    
     print_price(usage)
 
     return json.dumps({

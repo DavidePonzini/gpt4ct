@@ -11,7 +11,7 @@ db = database.PostgreSQL(database='postgres',
                          password='decomp')
 
 
-def log_usage_decomposition(task: Task, creation_ts, user_id, answer, usage):
+def log_usage_decomposition(task: Task, creation_ts, user_id, subtasks_amount, answer, usage):
     root_task = task.get_root()
 
     db.insert(schema, 'decomposition', {
@@ -20,6 +20,7 @@ def log_usage_decomposition(task: Task, creation_ts, user_id, answer, usage):
         'root_task_name': root_task.name,
         'task_name': task.name,
         'task_level': task.level,
+        'subtasks_amount': subtasks_amount,
         'tree': json.dumps(root_task.to_dict()),
         'answer': answer,
         'prompt_tokens': usage.prompt_tokens,

@@ -20,6 +20,7 @@ CREATE TABLE problem_decomposition.decomposition (
   root_task_name VARCHAR(1000) NOT NULL,
   task_name VARCHAR(1000) NOT NULL,
   task_level DECIMAL(4) NOT NULL,
+  subtasks_amount DECIMAL(3) NOT NULl,
   tree TEXT NOT NULL,
   answer TEXT NOT NULL,
   decomposition_ts TIMESTAMP NOT NULL DEFAULT NOW(),
