@@ -569,6 +569,7 @@ function delete_children(item) {
     hide_buttons();
 
     item.data.clear_subtasks();
+    item.data.needs_feedback_decomposition = false;
     
     update();
 }

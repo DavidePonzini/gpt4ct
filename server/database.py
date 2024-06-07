@@ -20,6 +20,7 @@ def log_usage_decomposition(task: Task, creation_ts, user_id, subtasks_amount, a
         'root_task_name': root_task.name,
         'task_name': task.name,
         'task_level': task.level,
+        'task_id': task.id(),
         'subtasks_amount': subtasks_amount,
         'tree': json.dumps(root_task.to_dict()),
         'answer': answer,
