@@ -7,7 +7,7 @@ let user_id = null;
 const svg = d3.select('#tree');
 const g = svg.append('g');
 
-const SERVER_ADDR = '52.47.130.176:5000';
+const SERVER_ADDR = '15.188.47.61:5000';
 
 // Handle zoom
 let zoom = d3.zoom().on('zoom', function(e) {

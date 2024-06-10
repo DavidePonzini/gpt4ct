@@ -1,6 +1,6 @@
 var x = null;
 
-const SERVER_ADDR = '52.47.130.176:5000';
+const SERVER_ADDR = '15.188.47.61:5000';
 
 
 class Task {
