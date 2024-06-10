@@ -1,5 +1,7 @@
 var x = null;
 
+const SERVER_ADDR = '52.47.130.176:5000';
+
 
 class Task {
     constructor(name, description) {
@@ -107,7 +109,7 @@ class Task {
 
         $.ajax({
             type: 'POST',
-            url: 'http://localhost:5000/decompose',
+            url: `http://${SERVER_ADDR}/decompose`,
             data: {
                 'tree': JSON.stringify(root_task),
                 'task_id': JSON.stringify(this_task.id()),
@@ -151,7 +153,7 @@ class Task {
 
         $.ajax({
             type: 'POST',
-            url: 'http://localhost:5000/implement',
+            url: `http://${SERVER_ADDR}/implement`,
             data: {
                 'tree': JSON.stringify(root_task),
                 'language': JSON.stringify(language),

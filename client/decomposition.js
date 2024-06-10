@@ -7,6 +7,8 @@ let user_id = null;
 const svg = d3.select('#tree');
 const g = svg.append('g');
 
+const SERVER_ADDR = '52.47.130.176:5000';
+
 // Handle zoom
 let zoom = d3.zoom().on('zoom', function(e) {
     $('#task-data').hide();
@@ -21,7 +23,7 @@ function login() {
     let uid = prompt('Insert user id:');
     $.ajax({
         type: 'POST',
-        url: 'http://localhost:5000/login',
+        url: `http://${SERVER_ADDR}/login`,
         data: {
             'user_id': JSON.stringify(uid),
         },
@@ -334,7 +336,7 @@ function prepare_feedback_decomposition(item) {
 
             $.ajax({
                 type: 'POST',
-                url: 'http://localhost:5000/feedback-decomposition',
+                url: `http://${SERVER_ADDR}/feedback-decomposition`,
                 data: {
                     'tree': JSON.stringify(tree_data.tree),
                     'task_id': JSON.stringify(item.data.id()),
