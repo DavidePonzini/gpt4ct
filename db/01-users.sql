@@ -6,6 +6,7 @@ VALUES
     ('dev'),
     ('test'),
     ('giovanna'),
+    ('giorgio'),
     ('phd1'),
     ('phd2'),
     ('phd3'),
