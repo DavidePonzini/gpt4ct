@@ -49,7 +49,8 @@ CREATE VIEW problem_decomposition.feedback_decomposition_avg AS (
     AVG(q1) AS q1,
     AVG(q2) AS q2,
     AVG(q3) AS q3,
-    AVG(q4) AS q4
+    AVG(q4) AS q4,
+    COUNT(*) AS amount
   FROM problem_decomposition.feedback_decomposition
   GROUP BY
     user_id,

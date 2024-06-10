@@ -36,6 +36,7 @@ CREATE TABLE problem_decomposition.implementation (
   root_task_name VARCHAR(1000) NOT NULL,
   task_name VARCHAR(1000) NOT NULL,
   task_level DECIMAL(4) NOT NULL,
+  task_id DECIMAL(2)[] NOT NULL,
   implementation_language VARCHAR(64),
   implementation_ts TIMESTAMP NOT NULL DEFAULT NOW(),
   tree TEXT NOT NULL,
