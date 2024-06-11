@@ -6,7 +6,6 @@ class Task:
     def __init__(self, name, description) -> None:
         self.name = name
         self.description = description
-        self.level = 0
         self.subtasks = []
         self.implementation = None              # None: not yet implemented; False: task doesn't need to be implemented
         self.implementation_language = None
@@ -14,6 +13,9 @@ class Task:
 
     def is_root(self):
         return self.parent is None
+
+    def level(self):
+        return len(self.id())
 
     def id(self):
         if self.is_root():
@@ -31,14 +33,13 @@ class Task:
             'name': self.name,
             'description': self.description,
             'subtasks': [ subtask.to_dict() for subtask in self.subtasks ],
-            'level': self.level,
+            # 'id': self.id(),
             'implementation': self.implementation,
             'implementation_language': self.implementation_language,
         }
     
     def add_subtask(self, name, description, implementation=None):
         child = Task(name, description, implementation)
-        child.level = self.level + 1
         child.parent = self
         
         self.subtasks.append(child)
@@ -95,7 +96,6 @@ def from_dict(data) -> Task:
         subtask = from_dict(subtask_data)  # Recursively create subtasks
         task.subtasks.append(subtask)
         subtask.parent = task
-        subtask.level = task.level + 1
 
     # Set other properties
     task.implementation = data['implementation']
