@@ -1,6 +1,6 @@
 BEGIN TRANSACTION;
 
-CREATE VIEW problem_decomposition.costs AS (
+CREATE OR REPLACE VIEW problem_decomposition.costs AS (
   SELECT
     'Decomposition' AS type,
     user_id,
@@ -20,7 +20,7 @@ CREATE VIEW problem_decomposition.costs AS (
   FROM problem_decomposition.implementation
 );
 
-CREATE VIEW problem_decomposition.costs_per_type AS (
+CREATE OR REPLACE VIEW problem_decomposition.costs_per_type AS (
   SELECT
     type,
     SUM(prompt_tokens) as prompt_tokens,
@@ -30,7 +30,7 @@ CREATE VIEW problem_decomposition.costs_per_type AS (
   GROUP BY type 
 );
 
-CREATE VIEW problem_decomposition.costs_per_user AS (
+CREATE OR REPLACE VIEW problem_decomposition.costs_per_user AS (
   SELECT
     user_id,
     type,
@@ -41,15 +41,16 @@ CREATE VIEW problem_decomposition.costs_per_user AS (
   GROUP BY user_id, type
 );
 
-CREATE VIEW problem_decomposition.feedback_decomposition_avg AS (
+CREATE OR REPLACE VIEW problem_decomposition.feedback_decomposition_avg AS (
   SELECT
     user_id,
     creation_ts,
-    root_task_name,
+    CASE WHEN LENGTH(root_task_name) > 15 THEN SUBSTRING(root_task_name FROM 1 FOR 15) || '...' ELSE root_task_name END AS root_task_name,
     AVG(q1) AS q1,
     AVG(q2) AS q2,
     AVG(q3) AS q3,
     AVG(q4) AS q4,
+    COUNT(comments) AS comments,
     COUNT(*) AS amount
   FROM problem_decomposition.feedback_decomposition
   GROUP BY
