@@ -279,8 +279,8 @@ function onNodeClick(event, item) {
 
     // Set description
     let description = $('#task-description');
-    description.text(item.data.description);
-    description.unbind().on('input', () => item.data.description = description.text());
+    description.val(item.data.description);
+    description.unbind().on('input', () => item.data.description = description.val());
     
     // Set implementation, if available
     let impl = $('#task-implementation');
