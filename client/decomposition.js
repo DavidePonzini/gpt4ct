@@ -472,7 +472,7 @@ function manual_decomposition(item) {
     // Bind functionality to "add subtask" button
     $('#task-decomposition-manual-add-subtask').unbind().on('click', () => manual_decomposition_add_button('', ''));
 
-    $('#task-decomposition-manual-submit').on('click', () => submit_manual_decomposition(item));
+    $('#task-decomposition-manual-submit').unbind().on('click', () => submit_manual_decomposition(item));
     $('#task-decomposition-manual').show();
 }
 
