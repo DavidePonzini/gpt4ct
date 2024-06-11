@@ -7,6 +7,7 @@ VALUES
     ('test'),
     ('giovanna'),
     ('giorgio'),
+    ('daniele'),
     ('phd1'),
     ('phd2'),
     ('phd3'),
@@ -21,7 +22,17 @@ VALUES
     ('phd12'),
     ('phd13'),
     ('phd14'),
-    ('phd15')
+    ('phd15'),
+    ('bsc1'),
+    ('bsc2'),
+    ('bsc3'),
+    ('bsc4'),
+    ('bsc5'),
+    ('bsc6'),
+    ('bsc7'),
+    ('bsc8'),
+    ('bsc9'),
+    ('bsc10')
 ON CONFLICT (user_id) DO NOTHING;
 
 COMMIT;
