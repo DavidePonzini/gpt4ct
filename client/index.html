@@ -34,10 +34,10 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <div class="navbar-nav me-auto mb-2 mb-lg-0">
                     <button class="btn btn-outline-primary" type="button" id="user-id" onclick="login()">Login</button>
-                    <div class="vr"></div>
                     <button class="btn btn-outline-success" type="button" data-bs-toggle="modal" data-bs-target="#new-tree-modal">New</button>
                     <button class="btn btn-outline-success" type="button" onclick="load_tree()">Load</button>
                     <button class="btn btn-outline-success" type="button" onclick="save_tree('tree.json')">Save</button>
+                    <button class="btn btn-outline-light hidden" id="feedback-count" type="button" onclick="alert('To provide feedback, click on the tasks highlighted in magenta.')"></button>
                 </div>
                 <div class="navbar-text">
                     <i><small>
@@ -55,14 +55,15 @@
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="task-name" contenteditable="true"></h5>
+                    <h5 class="modal-title" style="margin-right: 1rem;">Name:</h5>
+                    <input type="text" id="task-name" class="form-control" placeholder="Brief description of the task.">
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
                 <div class="modal-body">
                     <div>
                         <h5>Description:</h5>
-                        <div id="task-description" contenteditable="true"></div>
+                        <textarea id="task-description" class="form-control" placeholder="Detailed description of the task."></textarea>
                     </div>
 
                     <div id="task-decomposition-manual">
@@ -146,8 +147,8 @@
                     <div class="btn-group" id="decompose">
                         <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Decomposition</button>
                         <ul class="dropdown-menu">
+                            <li><a href="#" class="dropdown-item" id="decompose-ai">Generate</a></li>
                             <li><a href="#" class="dropdown-item" id="decompose-manual">Manual</a></li>
-                            <li><a href="#" class="dropdown-item" id="decompose-ai">(Re)generate</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a href="#" class="dropdown-item" id="solve">Complete</a></li>
                             <li><a href="#" class="dropdown-item" id="delete-decomposition">Delete</a></li>

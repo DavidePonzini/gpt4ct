@@ -215,6 +215,7 @@ function update() {
         .classed('explored', d => d.target.data.is_explored())
         .classed('implemented', d => d.target.data.implementation)
         .classed('solved', d => d.target.data.is_solved())
+        .classed('feedback-required', d => d.target.data.needs_feedback())
         .attr('d', d3.linkVertical()
         .source(d => [
             d.source.x + width/2 + margin.left,
@@ -235,6 +236,7 @@ function update() {
         .classed('explored', d => d.target.data.is_explored())
         .classed('implemented', d => d.target.data.implementation)
         .classed('solved', d => d.target.data.is_solved())
+        .classed('feedback-required', d => d.target.data.needs_feedback())
         .attr('d', d3.linkVertical()
         .source(d => [
             d.source.x + width/2 + margin.left,
@@ -248,6 +250,17 @@ function update() {
 
     // Links - Exit
     links.exit().remove('path');
+
+    // Update feedback counter
+    let feedback_count = $('g.feedback-required').length;
+    let feedback_button = $('#feedback-count');
+    if (feedback_count > 0) {
+        feedback_button.text(`You need to provide feedback for ${feedback_count} task(s)`)
+        feedback_button.show();
+    } else {
+        feedback_button.hide();
+    }
+
 }
 
 function onNodeClick(event, item) {
@@ -258,9 +271,9 @@ function onNodeClick(event, item) {
 
     // Set name
     let name = $('#task-name');
-    name.text(item.data.name);
+    name.val(item.data.name);
     name.unbind().on('input', function() {
-        item.data.name = name.text();
+        item.data.name = name.val();
         update();   // Reflect name changes in UI
     });
 

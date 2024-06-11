@@ -2,6 +2,10 @@ body {
     background-color: #f4f4f4;
 }
 
+.hidden {
+    display: none;
+}
+
 #container {
     position: absolute;
     width: calc(100vw - 0px);
@@ -22,13 +26,18 @@ body {
     border-bottom: 1px solid gray;
 }
 
+#feedback-count {
+    color: magenta;
+    border-color: magenta;
+}
+
 /* ---------- Nodes ---------- */
 .node * {
     transition: .1s ease-in-out;
 }
 
 .node text {
-    font: 10px sans-serif;
+    font: 12px sans-serif;
     text-anchor: start;
 }
 
@@ -95,7 +104,11 @@ body {
 }
 
 .feedback-required circle {
+    stroke: magenta;
     fill: magenta;
+}
+
+.feedback-required.link {
     stroke: magenta;
 }
 
