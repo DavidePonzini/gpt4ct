@@ -3,8 +3,6 @@ BEGIN;
 DROP SCHEMA IF EXISTS problem_decomposition CASCADE;
 CREATE SCHEMA problem_decomposition;
 
-DROP USER IF EXISTS problem_decomposition_admin;
-CREATE USER problem_decomposition_admin WITH PASSWORD 'decomp';
 GRANT USAGE ON SCHEMA problem_decomposition TO problem_decomposition_admin;
 ALTER DEFAULT PRIVILEGES IN SCHEMA problem_decomposition GRANT ALL ON TABLES TO problem_decomposition_admin;
 
