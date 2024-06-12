@@ -99,7 +99,7 @@ function new_tree() {
         type: 'POST',
         url: `http://${SERVER_ADDR}/create-tree`,
         data: {
-            'user_id': JSON.stringify(uid),
+            'user_id': JSON.stringify(user_id),
             'name': JSON.stringify(name),
             'description': JSON.stringify(description),
         },
