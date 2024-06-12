@@ -60,6 +60,16 @@ def login():
 
     return database.check_user_exists(user_id)
 
+@app.route('/create-tree', methods=['POST'])
+def create_tree():
+    user_id = json.loads(request.form['user_id'])
+    
+    tree_data = json.loads(request.form['tree'])
+    tree = task.from_json(tree_data)
+
+    tree_id = database.create_tree(tree, user_id)
+
+    return tree_id
 
 @app.route('/feedback-decomposition', methods=['POST'])
 def feedback_decomposition():

@@ -1,3 +1,5 @@
+import json
+
 class Task:
     '''
     Represents a single task, and its decomposition in subtasks
@@ -37,6 +39,9 @@ class Task:
             'implementation': self.implementation,
             'implementation_language': self.implementation_language,
         }
+    
+    def to_json(self) -> str:
+        return json.dumps(self.to_dict())
     
     def add_subtask(self, name, description, implementation=None):
         child = Task(name, description, implementation)
@@ -103,4 +108,7 @@ def from_dict(data) -> Task:
 
 
     return task
+
+def from_json(data: str) -> Task:
+    return from_dict(json.loads(data))
 

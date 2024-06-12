@@ -10,8 +10,19 @@ db = database.PostgreSQL(database='postgres',
                          user='problem_decomposition_admin',
                          password='decomp')
 
+def create_tree(task: Task, user_id: str) -> int:
+    '''Create a tree and get its id'''
+    
+    root_task = task.get_root()
 
-def log_usage_decomposition(task: Task, creation_ts, user_id, subtasks_amount, answer, usage):
+    return db.insert(schema, 'trees', {
+        'user_id': user_id,
+        'root_task_name': root_task.name,
+        'tree_data': root_task.to_json()
+    },
+    return_fields=['tree_id'])
+
+def log_decomposition(task: Task, creation_ts, user_id, subtasks_amount, answer, usage):
     root_task = task.get_root()
 
     db.insert(schema, 'decomposition', {

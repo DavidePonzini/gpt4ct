@@ -21,7 +21,7 @@ def decompose(task: Task, creation_ts, user_id):
     subtasks = answer['result']
 
     usage = message.usage[-1]
-    database.log_usage_decomposition(
+    database.log_decomposition(
         task=task,
         creation_ts=creation_ts,
         user_id=user_id,
