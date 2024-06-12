@@ -11,7 +11,7 @@ const SERVER_ADDR = '15.237.153.101:5000';
 
 // Handle zoom
 let zoom = d3.zoom().on('zoom', function(e) {
-    $('#task-data').hide();
+    $('#task-data').modal('hide');
     g.attr('transform', e.transform);
 });
 svg.call(zoom);
@@ -88,6 +88,9 @@ $(document).ready(function() {
 })
 
 function new_tree() {
+    if (check_user_id())
+        return;
+
     let name = $('#new-task-name').val();
     let description = $('#new-task-description').val();
 
