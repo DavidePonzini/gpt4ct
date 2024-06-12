@@ -10,49 +10,64 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA problem_decomposition GRANT ALL ON TABLES TO 
 
 
 CREATE TABLE problem_decomposition.users (
-  user_id CHAR(32) PRIMARY KEY
+  user_id VARCHAR(32) PRIMARY KEY
 );
 
+CREATE TABLE problem_decomposition.trees (
+  -- primary key
+  tree_id SERIAL PRIMARY KEY,
 
-CREATE TABLE problem_decomposition.decomposition (
   user_id VARCHAR(32) REFERENCES problem_decomposition.users(user_id) NOT NULL,
-  creation_ts TIMESTAMP NOT NULL,
+  creation_ts TIMESTAMP NOT NULL DEFAULT NOW(),
   root_task_name VARCHAR(1000) NOT NULL,
-  task_name VARCHAR(1000) NOT NULL,
-  task_id DECIMAL(2)[] NOT NULL,
-  task_level DECIMAL(4) NOT NULL,
-  subtasks_amount DECIMAL(3) NOT NULl,
-  tree TEXT NOT NULL,
-  answer TEXT NOT NULL,
+
+  last_save_ts TIMESTAMP NOT NULL DEFAULT NOW(),
+  tree_data TEXT NOT NULL
+);
+
+CREATE TABLE problem_decomposition.decompositions (
+  -- primary key
+  decomposition_id SERIAL PRIMARY KEY,
+
+  tree_id SERIAL REFERENCES problem_decomposition.trees(tree_id) NOT NULL,
+  
   decomposition_ts TIMESTAMP NOT NULL DEFAULT NOW(),
+
+  task_name VARCHAR(1000) NOT NULL,
+  task_level DECIMAL(2) NOT NULL,
+  task_id DECIMAL(2)[] NOT NULL,
+  subtasks_amount DECIMAL(2) NOT NULl,
+  answer TEXT NOT NULL,
+
+  -- usage
   prompt_tokens DECIMAL(6) NOT NULL,
   completion_tokens DECIMAL(6) NOT NULL
 );
 
+CREATE TABLE problem_decomposition.implementations (
+  -- primary key
+  implementation_id SERIAL PRIMARY KEY,
 
-CREATE TABLE problem_decomposition.implementation (
-  user_id VARCHAR(32) REFERENCES problem_decomposition.users(user_id) NOT NULL,
-  creation_ts TIMESTAMP NOT NULL,
-  root_task_name VARCHAR(1000) NOT NULL,
+  tree_id SERIAL REFERENCES problem_decomposition.trees(tree_id) NOT NULL,
+  decomposition_id SERIAL REFERENCES problem_decomposition.decompositions(decomposition_id),
+
+  implementation_ts TIMESTAMP NOT NULL DEFAULT NOW(),
+
   task_name VARCHAR(1000) NOT NULL,
   task_level DECIMAL(4) NOT NULL,
   task_id DECIMAL(2)[] NOT NULL,
   implementation_language VARCHAR(64),
-  implementation_ts TIMESTAMP NOT NULL DEFAULT NOW(),
-  tree TEXT NOT NULL,
   answer TEXT NOT NULL,
+
+  -- usage
   prompt_tokens DECIMAL(6) NOT NULL,
   completion_tokens DECIMAL(6) NOT NULL
 );
 
-CREATE TABLE problem_decomposition.feedback_decomposition (
-  user_id VARCHAR(32) REFERENCES problem_decomposition.users(user_id) NOT NULL,
-  creation_ts TIMESTAMP NOT NULL,
-  root_task_name VARCHAR(1000) NOT NULL,
-  task_name VARCHAR(1000) NOT NULL,
-  task_level DECIMAL(4) NOT NULL,
-  task_id DECIMAL(2)[] NOT NULL,
-  tree TEXT NOT NULL,
+CREATE TABLE problem_decomposition.feedback_decompositions (
+  -- primary key
+  decomposition_id SERIAL REFERENCES problem_decomposition.decompositions(decomposition_id) NOT NULL PRIMARY KEY,
+
   q1 DECIMAL(1) NOT NULL,
   q2 DECIMAL(1) NOT NULL,
   q3 DECIMAL(1) NOT NULL,
@@ -60,5 +75,6 @@ CREATE TABLE problem_decomposition.feedback_decomposition (
   comments VARCHAR(2000),
   feedback_ts TIMESTAMP NOT NULL DEFAULT NOW()
 );
+
 
 COMMIT;
