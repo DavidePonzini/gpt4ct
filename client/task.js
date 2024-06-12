@@ -214,7 +214,7 @@ class Task {
         task.requires_feedback_decomposition = data.needs_feedback_decomposition;
         
         task.implementation = data.implementation;
-        task.implementation+id = data.implementation_id;
+        task.implementation_id = data.implementation_id;
         task.implementation_language = data.implementation_language;
 
         return task; // Return the constructed Task instance
