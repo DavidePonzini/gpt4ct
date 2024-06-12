@@ -88,7 +88,7 @@ $(document).ready(function() {
 })
 
 function new_tree() {
-    if (check_user_id())
+    if (!check_user_id())
         return;
 
     let name = $('#new-task-name').val();
