@@ -5,7 +5,7 @@ import json
 import prompts
 
 
-def decompose(task: Task, creation_ts, user_id):
+def decompose(tree_id: int, task: Task):
     message = Message()
     message.add_message('system', prompts.Decomposition.instructions)
     
@@ -14,7 +14,7 @@ def decompose(task: Task, creation_ts, user_id):
     
     # Add request for next task
     message.add_message('user', prompts.Decomposition.prompt(task))
-    message.print()
+    # message.print()
 
     answer_json = message.generate_answer(require_json=True, add_to_messages=False)
     answer = json.loads(answer_json)
@@ -22,9 +22,8 @@ def decompose(task: Task, creation_ts, user_id):
 
     usage = message.usage[-1]
     database.log_decomposition(
+        tree_id=tree_id,
         task=task,
-        creation_ts=creation_ts,
-        user_id=user_id,
         subtasks_amount=len(subtasks),
         answer=answer_json,
         usage=usage
@@ -34,7 +33,7 @@ def decompose(task: Task, creation_ts, user_id):
 
     return answer_json
 
-def implement(task: Task, language: str, creation_ts, user_id):
+def implement(tree_id: int, task: Task, language: str):
     message = Message()
     message.add_message('system', prompts.Decomposition.instructions)
 
@@ -56,16 +55,15 @@ def implement(task: Task, language: str, creation_ts, user_id):
 
     # Ask for final implemenation
     message.add_message('user', prompts.Implementation.prompt(task, language))
-    message.print()
+    # message.print()
 
     # Get the result
     answer = message.generate_answer(require_json=False, add_to_messages=False)
 
     usage = message.usage[-1]
-    database.log_usage_implementation(
+    database.log_implementation(
+        tree_id=tree_id,
         task=task,
-        creation_ts=creation_ts,
-        user_id=user_id,
         language=language,
         answer=answer,
         usage=usage)

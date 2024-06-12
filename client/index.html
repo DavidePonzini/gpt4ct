@@ -28,25 +28,24 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">Problem Decomposition</a>
-            <!-- <div class="btn-group" id="nav-task-button">
-                <button type="button" class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Task</button>
-                <ul class="dropdown-menu">
-                    <li><a href="#" class="dropdown-item" id="decompose-ai">Generate</a></li>
-                    <li><a href="#" class="dropdown-item" id="decompose-manual">Manual</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a href="#" class="dropdown-item" id="solve">Complete</a></li>
-                    <li><a href="#" class="dropdown-item" id="delete-decomposition">Delete</a></li>
-                </ul>
-            </div> -->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <div class="navbar-nav me-auto mb-2 mb-lg-0">
                     <button class="btn btn-outline-primary" type="button" id="user-id" onclick="login()">Login</button>
-                    <button class="btn btn-outline-success" type="button" data-bs-toggle="modal" data-bs-target="#new-tree-modal">New</button>
-                    <button class="btn btn-outline-success" type="button" onclick="load_tree()">Load</button>
-                    <button class="btn btn-outline-success" type="button" onclick="save_tree('tree.json')">Save</button>
+                    <div class="btn-group" id="nav-task-button">
+                        <button type="button" class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" id="task-button">Task</button>
+                        <ul class="dropdown-menu">
+                            <li><a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#new-tree-modal">New</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a href="#" class="dropdown-item" onclick="load_from_server()">Load</a></li>
+                            <li><a href="#" class="dropdown-item" onclick="save_to_server()">Save</a></li>
+                            <!-- <li><hr class="dropdown-divider"></li>
+                            <li><a href="#" class="dropdown-item" onclick="load_tree()">Load from file</a></li>
+                            <li><a href="#" class="dropdown-item" onclick="save_tree()">Save to file</a></li> -->
+                        </ul>
+                    </div>
                     <button class="btn btn-outline-light hidden" id="feedback-count" type="button" onclick="alert('To provide feedback, click on the tasks highlighted in magenta.')"></button>
                 </div>
                 <div class="navbar-text">

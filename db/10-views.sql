@@ -1,6 +1,6 @@
 BEGIN TRANSACTION;
 
-CREATE OR REPLACE VIEW problem_decomposition.costs AS (
+CREATE OR REPLACE VIEW problem_decomposition.v_costs AS (
   SELECT
     'Decomposition' AS type,
     user_id,
@@ -20,7 +20,7 @@ CREATE OR REPLACE VIEW problem_decomposition.costs AS (
   FROM problem_decomposition.implementation
 );
 
-CREATE OR REPLACE VIEW problem_decomposition.costs_per_type AS (
+CREATE OR REPLACE VIEW problem_decomposition.v_costs_per_type AS (
   SELECT
     type,
     SUM(prompt_tokens) as prompt_tokens,
@@ -30,7 +30,7 @@ CREATE OR REPLACE VIEW problem_decomposition.costs_per_type AS (
   GROUP BY type 
 );
 
-CREATE OR REPLACE VIEW problem_decomposition.costs_per_user AS (
+CREATE OR REPLACE VIEW problem_decomposition.v_costs_per_user AS (
   SELECT
     user_id,
     type,
@@ -41,7 +41,7 @@ CREATE OR REPLACE VIEW problem_decomposition.costs_per_user AS (
   GROUP BY user_id, type
 );
 
-CREATE OR REPLACE VIEW problem_decomposition.feedback_decomposition_avg AS (
+CREATE OR REPLACE VIEW problem_decomposition.v_feedback_decomposition_avg AS (
   SELECT
     user_id,
     creation_ts,

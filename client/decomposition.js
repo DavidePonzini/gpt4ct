@@ -16,6 +16,25 @@ let zoom = d3.zoom().on('zoom', function(e) {
 });
 svg.call(zoom);
 
+
+// load
+$(document).ready(function() {
+    // Make dummy tree
+    let data = make_tree('Load a task', 'Load an existing task');
+    let tree = data.tree
+
+    let sub1 = tree.add_subtask('Click on "Load" button', 'Click on the "Load" button using the bar on top');
+    sub1.add_subtask('Locate the top bar', 'Locate the top bar where the "Load" button is located');
+    sub1.add_subtask('Click on the button', 'Click on the "Load" button by selecting it with the cursor');
+    
+    let sub2 = tree.add_subtask('Select a file', 'Select a file to be loaded');
+    let sub3 = tree.add_subtask('Load the file', 'Load a file by clicking on "OK"');
+
+    init(data);
+    show_children(tree);
+    show_children(sub1);
+})
+
 function login() {
     if (user_id)
         return;
@@ -55,9 +74,9 @@ function login() {
 function make_tree(name, description) {
     return {
         'tree': new Task(name, description),
-        'creation_ts': new Date()
     };
 }
+
 
 function check_user_id(cb) {
     if (!user_id) {
@@ -69,24 +88,6 @@ function check_user_id(cb) {
 }
 
 
-// load
-$(document).ready(function() {
-    // Make dummy tree
-    let data = make_tree('Load a task', 'Load an existing task');
-    let tree = data.tree
-
-    let sub1 = tree.add_subtask('Click on "Load" button', 'Click on the "Load" button using the bar on top');
-    sub1.add_subtask('Locate the top bar', 'Locate the top bar where the "Load" button is located');
-    sub1.add_subtask('Click on the button', 'Click on the "Load" button by selecting it with the cursor');
-    
-    let sub2 = tree.add_subtask('Select a file', 'Select a file to be loaded');
-    let sub3 = tree.add_subtask('Load the file', 'Load a file by clicking on "OK"');
-
-    init(data);
-    show_children(tree);
-    show_children(sub1);
-})
-
 function new_tree() {
     if (!check_user_id())
         return;
@@ -94,13 +95,31 @@ function new_tree() {
     let name = $('#new-task-name').val();
     let description = $('#new-task-description').val();
 
-    let data = make_tree(name, description);
+    $.ajax({
+        type: 'POST',
+        url: `http://${SERVER_ADDR}/create-tree`,
+        data: {
+            'user_id': JSON.stringify(uid),
+            'name': JSON.stringify(name),
+            'description': JSON.stringify(description),
+        },
+        success: function(d) {
+            let data = d;
+            
+            if (data.status && data.status == 'invalid_request') {
+                throw Error(data.message);
+            }
+            
+            tree_data = Task.load_tree(data.tree);
+            init(tree_data);
+        },
+        error: console.error
+    });
 
-    init(data);
     $('#new-tree-modal').modal('hide');
 }
 
-function load_tree() {
+function load_tree_from_file() {
     let input = $('<input type="file" accept=".json,text/plain" />');
     input.unbind().bind('change', function(e) {
         let reader = new FileReader();
@@ -109,7 +128,6 @@ function load_tree() {
             
             let data = {
                 'tree': Task.load_tree(json.tree),
-                'creation_ts': json.creation_ts
             };
 
             init(data);
@@ -119,13 +137,12 @@ function load_tree() {
     input.click();
 }
 
-function save_tree() {
+function save_tree_to_file() {
     var a = document.createElement("a");
     let filename = `${tree_data.tree.name.replace(/\s/g, '_')}.json`;
 
     let data = {
         'tree': tree_data.tree,
-        'creation_ts': tree_data.creation_ts
     }
 
     var file = new Blob([JSON.stringify(data)], {type: 'text/plain'});
@@ -354,10 +371,7 @@ function prepare_feedback_decomposition(item) {
                 type: 'POST',
                 url: `http://${SERVER_ADDR}/feedback-decomposition`,
                 data: {
-                    'tree': JSON.stringify(tree_data.tree),
-                    'task_id': JSON.stringify(item.data.id()),
-                    'creation_ts': JSON.stringify(tree_data.creation_ts),
-                    'user_id': JSON.stringify(user_id),
+                    'decomposition_id': JSON.stringify(item.data.decomposition_id),
                     'q1': JSON.stringify(q1),
                     'q2': JSON.stringify(q2),
                     'q3': JSON.stringify(q3),
@@ -450,7 +464,7 @@ function generate_decomposition(item) {
 
     let task = item.data;
 
-    task.generate_decomposition(user_id, tree_data.creation_ts, function(data) {
+    task.generate_decomposition(user_id, function(data) {
         task.running = false;
         show_children(task);
     }, function(e) {
@@ -534,7 +548,7 @@ function implement_task(item, language) {
     if (!check_user_id())
         return;    
 
-    item.data.generate_implementation(user_id, tree_data.creation_ts, language, function() {
+    item.data.generate_implementation(user_id, language, function() {
         item.data.running = false;
 
         update();
@@ -611,6 +625,6 @@ function unsolve(item) {
 
 window.update = update;
 window.new_tree = new_tree;
-window.load_tree = load_tree;
-window.save_tree = save_tree;
+window.load_tree = load_tree_from_file;
+window.save_tree = save_tree_to_file;
 window.login = login;

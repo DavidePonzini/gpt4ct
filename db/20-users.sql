@@ -7,6 +7,7 @@ VALUES
     ('test'),
     ('giovanna'),
     ('giorgio'),
+    ('giovanni'),
     ('daniele'),
     ('phd1'),
     ('phd2'),

@@ -9,9 +9,16 @@ class Task:
         self.name = name
         self.description = description
         self.subtasks = []
-        self.implementation = None              # None: not yet implemented; False: task doesn't need to be implemented
-        self.implementation_language = None
         self.parent = None
+
+        self.solved = False
+
+        self.decomposition_id = None
+        self.requires_feedback_decomposition = False
+
+        self.implementation = None              # None: not yet implemented; False: task doesn't need to be implemented
+        self.implementation_id = None
+        self.implementation_language = None
 
     def is_root(self):
         return self.parent is None
@@ -35,8 +42,14 @@ class Task:
             'name': self.name,
             'description': self.description,
             'subtasks': [ subtask.to_dict() for subtask in self.subtasks ],
-            # 'id': self.id(),
+
+            'solved': self.solved,
+
+            'decomposition_id': self.decomposition_id,
+            'requires_feedback_decomposition': self.requires_feedback_decomposition,
+
             'implementation': self.implementation,
+            'implementation_id': self.implementation_id,
             'implementation_language': self.implementation_language,
         }
     
@@ -103,9 +116,12 @@ def from_dict(data) -> Task:
         subtask.parent = task
 
     # Set other properties
+    task.solved = data['solved']
+    task.decomposition_id = data['decomposition_id']
+    task.requires_feedback_decomposition = data['requires_feedback_decomposition']
     task.implementation = data['implementation']
+    task.implementation_id = data['implementation_id']
     task.implementation_language = data['implementation_language']
-
 
     return task
 

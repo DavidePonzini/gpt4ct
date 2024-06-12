@@ -9,12 +9,18 @@ class Task {
         this.description = description;
         this.subtasks = [];
         this.parent = null;
+
         this.solved = false;
+
+        this.decomposition_id = null;
+        this.requires_feedback_decomposition = false;
+
         this.implementation = null;
+        this.implementation_id = null;
         this.implementation_language = null;
+        
+        // only needed for ui, no need to store these properties on server
         this.children = null;
-        this.level = 0;
-        this.needs_feedback_decomposition = false;
     }
 
     id() {
@@ -27,7 +33,7 @@ class Task {
     }
 
     needs_feedback() {
-        return this.needs_feedback_decomposition;
+        return this.requires_feedback_decomposition;
     }
 
     is_root() {
@@ -79,16 +85,22 @@ class Task {
     }
 
     toJSON() {
-        // Exclude the 'parent' property while converting to JSON, to avoid circular structures
         return {
             name: this.name,
             description: this.description,
             subtasks: this.subtasks,
+            // Exclude the 'parent' property while converting to JSON, to avoid circular structures
+
             solved: this.solved,
+
+            decomposition_id: this.decomposition_id,
+            requires_feedback_decomposition: this.requires_feedback_decomposition,
+            
             implementation: this.implementation,
+            implementation_id: this.implementation_id,
             implementation_language: this.implementation_language,
+
             children: !!this.subtasks.length,
-            needs_feedback_decomposition: this.needs_feedback_decomposition 
         };
     }
 
@@ -97,7 +109,7 @@ class Task {
         this.children = [];
     }
 
-    generate_decomposition(user_id, creation_ts, cb, cb_error = console.error) {
+    generate_decomposition(tree_id, cb, cb_error = console.error) {
         // Clear previous decomposition, if exists
         this.clear_subtasks();
 
@@ -112,9 +124,8 @@ class Task {
             url: `http://${SERVER_ADDR}/decompose`,
             data: {
                 'tree': JSON.stringify(root_task),
+                'tree_id': JSON.stringify(tree_id),
                 'task_id': JSON.stringify(this_task.id()),
-                'creation_ts': JSON.stringify(creation_ts),
-                'user_id': JSON.stringify(user_id)
             },
             success: function(d) {
                 try {
@@ -128,7 +139,7 @@ class Task {
                         this_task.add_subtask(subtask.name, subtask.description);
                     }
 
-                    this_task.needs_feedback_decomposition = true;
+                    this_task.requires_feedback_decomposition = true;
 
                     cb(data);
                 } catch (e) {
@@ -140,7 +151,7 @@ class Task {
         });
     }
 
-    generate_implementation(user_id, creation_ts, language, cb, cb_error = console.error) {
+    generate_implementation(tree_id, language, cb, cb_error = console.error) {
         if (!this.can_be_implemented()) {
             throw Error('This task cannot be implemented');
         }
@@ -156,10 +167,9 @@ class Task {
             url: `http://${SERVER_ADDR}/implement`,
             data: {
                 'tree': JSON.stringify(root_task),
-                'language': JSON.stringify(language),
+                'tree_id': JSON.stringify(tree_id),
                 'task_id': JSON.stringify(this_task.id()),
-                'creation_ts': JSON.stringify(creation_ts),
-                'user_id': JSON.stringify(user_id)
+                'language': JSON.stringify(language),
             },
             success: function(d) {
                 try {
@@ -199,9 +209,13 @@ class Task {
 
         // Set other properties
         task.solved = data.solved;
+
+        task.decomposition_id = data.decomposition_id;
+        task.requires_feedback_decomposition = data.needs_feedback_decomposition;
+        
         task.implementation = data.implementation;
+        task.implementation+id = data.implementation_id;
         task.implementation_language = data.implementation_language;
-        task.needs_feedback_decomposition = data.needs_feedback_decomposition;
 
         return task; // Return the constructed Task instance
 
@@ -210,7 +224,6 @@ class Task {
     add_subtask(name, description) {
         let child = new Task(name, description);
         child.parent = this;
-        child.level = this.level + 1;
 
         this.subtasks.push(child);
         

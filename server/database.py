@@ -22,51 +22,80 @@ def create_tree(task: Task, user_id: str) -> int:
     },
     return_fields=['tree_id'])
 
-def log_decomposition(task: Task, creation_ts, user_id, subtasks_amount, answer, usage):
+def save_tree(tree_id: int, task: Task) -> None:
+    '''Save current tree state'''
+
     root_task = task.get_root()
 
-    db.insert(schema, 'decomposition', {
-        'user_id': user_id,
-        'creation_ts': creation_ts,
+    base_query = '''
+        UPDATE {schema}.trees
+        SET
+            tree_data = {tree_data},
+            root_task_name = {root_task_name},
+            last_save_ts = NOW()
+        WHERE tree_id = {tree_id}
+        '''
+
+    query = database.sql.SQL(base_query).format(
+        schema=database.sql.Identifier(schema),
+        tree_data=database.sql.Placeholder('tree_data'),
+        root_task_name=database.sql.Placeholder('root_task_name'),
+        tree_id=database.sql.Placeholder('tree_id'),
+    )
+
+    db.execute(query, {
+        'tree_id': tree_id,
         'root_task_name': root_task.name,
+        'tree_data': root_task.to_json(),
+    })
+
+    db.commit()
+
+
+def log_decomposition(tree_id: int, task: Task, subtasks_amount: int, answer, usage) -> int:
+    # log decomposition
+    decomposition_id = db.insert(schema, 'decompositions', {
+        'tree_id': tree_id,
+        
         'task_name': task.name,
         'task_level': task.level(),
         'task_id': task.id(),
         'subtasks_amount': subtasks_amount,
-        'tree': json.dumps(root_task.to_dict()),
         'answer': answer,
+        
         'prompt_tokens': usage.prompt_tokens,
         'completion_tokens': usage.completion_tokens 
-    })
+    },
+    return_fields=['decomposition_id'])
 
-def log_usage_implementation(task: Task, creation_ts, user_id, language, answer, usage):
-    root_task = task.get_root()
+    # save tree state
+    save_tree(tree_id, task)
 
-    db.insert(schema, 'implementation', {
-        'user_id': user_id,
-        'creation_ts': creation_ts,
-        'root_task_name': root_task.name,
+    return decomposition_id
+
+def log_implementation(tree_id: int, decomposition_id: int, task: Task, language, answer, usage) -> int:
+    db.insert(schema, 'implementations', {
+        'tree_id': tree_id,
+        'decomposition_id': decomposition_id,
+
         'task_name': task.name,
         'task_level': task.level(),
         'task_id': task.id(),
         'implementation_language': language,
-        'tree': json.dumps(root_task.to_dict()),
         'answer': answer,
+
         'prompt_tokens': usage.prompt_tokens,
         'completion_tokens': usage.completion_tokens 
-    })
+    },
+    return_fields=['implementation_id'])
 
-def log_feedback(user_id, creation_ts, task: Task, q1, q2, q3, q4, comments):
-    root_task = task.get_root()
+    save_tree(tree_id, task)
 
-    db.insert(schema, 'feedback_decomposition', {
-        'user_id': user_id,
-        'creation_ts': creation_ts,
-        'root_task_name': root_task.name,
-        'task_name': task.name,
-        'task_level': task.level(),
-        'task_id': task.id(),
-        'tree': json.dumps(root_task.to_dict()),
+
+def log_feedback_decomposition(decomposition_id: int, q1, q2, q3, q4, comments):
+    db.insert(schema, 'feedback_decompositions', {
+        'decomposition_id': decomposition_id,
+
         'q1': q1,
         'q2': q2,
         'q3': q3,
@@ -75,26 +104,19 @@ def log_feedback(user_id, creation_ts, task: Task, q1, q2, q3, q4, comments):
     })
 
 def check_user_exists(user_id: str):
-    base_query = 'SELECT COUNT(*) FROM {schema}.{table} WHERE {column} = {value}'
+    base_query = 'SELECT COUNT(*) FROM {schema}.users WHERE user_id = {user_id}'
 
-    query = database._sql.SQL(base_query).format(
-        schema=database._sql.Identifier('problem_decomposition'),
-        table=database._sql.Identifier('users'),
-        column=database._sql.Identifier('user_id'),
-        value = database._sql.Placeholder('user_id')
+    query = database.sql.SQL(base_query).format(
+        schema=database.sql.Identifier(schema),
+        user_id = database.sql.Placeholder('user_id')
     )
 
-    data = {
+    db.execute(query, {
         'user_id': user_id
-    }
+    })
 
-    db._cursor.execute(query, data)
     val = db._cursor.fetchone()
 
-    return {
-        'user': val[0] == 1
-    }
-
-    print(val)
+    return val[0] == 1
 
 

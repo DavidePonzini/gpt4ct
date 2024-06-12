@@ -5,6 +5,7 @@ CREATE SCHEMA problem_decomposition;
 
 GRANT USAGE ON SCHEMA problem_decomposition TO problem_decomposition_admin;
 ALTER DEFAULT PRIVILEGES IN SCHEMA problem_decomposition GRANT ALL ON TABLES TO problem_decomposition_admin;
+ALTER DEFAULT PRIVILEGES IN SCHEMA problem_decomposition GRANT ALL ON SEQUENCES TO problem_decomposition_admin;
 
 
 CREATE TABLE problem_decomposition.users (
