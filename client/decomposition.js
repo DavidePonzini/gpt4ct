@@ -155,7 +155,7 @@ function load_from_server_id() {
         },
         success: function(d) {
             tree_data = Task.load_from_json(d.tree);
-            set_tree_id(tree_id);
+            init(tree_data, tree_id);
         },
         error: console.error
     });
