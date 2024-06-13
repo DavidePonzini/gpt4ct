@@ -214,7 +214,7 @@ class Task {
         task.solved = data.solved;
 
         task.decomposition_id = data.decomposition_id;
-        task.requires_feedback_decomposition = data.needs_feedback_decomposition;
+        task.requires_feedback_decomposition = data.requires_feedback_decomposition;
         
         task.implementation = data.implementation;
         task.implementation_id = data.implementation_id;

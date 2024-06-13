@@ -183,7 +183,6 @@ function update() {
     // Nodes - Enter
     let nodesG_enter = nodes.enter().append('g')
         .classed('node', true)
-        .classed('node-internal', console.warn)
         .classed('node-internal', d => !d.data.is_leaf())
         .classed('node-leaf', d => d.data.is_leaf())
         .classed('unexplored', d => d.data.is_unexplored())
