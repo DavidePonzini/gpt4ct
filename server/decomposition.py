@@ -5,7 +5,7 @@ import json
 import prompts
 
 
-def decompose(tree_id: int, task: Task):
+def decompose(tree_id: int, user_id: str, task: Task):
     message = Message()
     message.add_message('system', prompts.Decomposition.instructions)
     
@@ -21,8 +21,9 @@ def decompose(tree_id: int, task: Task):
     subtasks = answer['result']
 
     usage = message.usage[-1]
-    decomposition_id = database.log_decomposition(
+    decomposition_id, tree_id = database.log_decomposition(
         tree_id=tree_id,
+        user_id=user_id,
         task=task,
         subtasks_amount=len(subtasks),
         answer=answer_json,
@@ -34,9 +35,10 @@ def decompose(tree_id: int, task: Task):
     return {
         'subtasks': subtasks,
         'decomposition_id': decomposition_id,
+        'tree_id': tree_id,
     }
 
-def implement(tree_id: int, task: Task, language: str):
+def implement(tree_id: int, user_id: str, task: Task, language: str):
     message = Message()
     message.add_message('system', prompts.Decomposition.instructions)
 
@@ -64,7 +66,7 @@ def implement(tree_id: int, task: Task, language: str):
     answer = message.generate_answer(require_json=False, add_to_messages=False)
 
     usage = message.usage[-1]
-    database.log_implementation(
+    implementation_id, tree_id = database.log_implementation(
         tree_id=tree_id,
         task=task,
         language=language,
@@ -73,9 +75,11 @@ def implement(tree_id: int, task: Task, language: str):
     
     print_price(usage)
 
-    return json.dumps({
-        'implementation': answer
-    })
+    return {
+        'implementation': answer,
+        'implementation_id': implementation_id,
+        'tree_id': tree_id,
+    }
 
 def _add_decomposition_step(message: Message, t: Task):
     '''

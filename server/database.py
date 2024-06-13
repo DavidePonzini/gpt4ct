@@ -10,10 +10,10 @@ db = database.PostgreSQL(database='postgres',
                          user='problem_decomposition_admin',
                          password='decomp')
 
-def create_tree(task: Task, user_id: str) -> int:
+def create_tree(tree: Task, user_id: str) -> int:
     '''Create a tree and get its id'''
     
-    root_task = task.get_root()
+    root_task = tree.get_root()
 
     result = db.insert(schema, 'trees', {
         'user_id': user_id,
@@ -24,10 +24,26 @@ def create_tree(task: Task, user_id: str) -> int:
 
     return result[0]
 
-def save_tree(tree_id: int, task: Task) -> None:
-    '''Save current tree state'''
+def save_tree(tree_id: int, user_id: str, tree: Task) -> None:
+    '''Save current tree state for trees you own, otherwise create a new tree'''
 
-    root_task = task.get_root()
+    base_query = 'SELECT user_id FROM {schema}.trees WHERE tree_id = {tree_id}'
+    query = database.sql.SQL(base_query).format(
+        schema=database.sql.Identifier(schema),
+        tree_id=database.sql.Placeholder('tree_id'),
+    )
+
+    db.execute(query, {
+        'tree_id': tree_id
+    })
+
+    tree_owner = db._cursor.fetchone()[0]
+
+    # Create a new tree if the user is not the owner
+    if tree_owner != user_id:
+        tree_id = create_tree(tree, user_id)
+
+    root_task = tree.get_root()
 
     base_query = '''
         UPDATE {schema}.trees
@@ -53,8 +69,26 @@ def save_tree(tree_id: int, task: Task) -> None:
 
     db.commit()
 
+    return tree_id
 
-def log_decomposition(tree_id: int, task: Task, subtasks_amount: int, answer, usage) -> int:
+def get_tree(tree_id) -> str:
+    base_query = 'SELECT tree_data FROM {schema}.trees WHERE tree_id = {tree_id}'
+
+    query = database.sql.SQL(base_query).format(
+        schema=database.sql.Identifier(schema),
+        tree_id=database.sql.Placeholder('tree_id')
+    )
+
+    db.execute(query, {
+        'tree_id': tree_id
+    })
+
+    result = db._cursor.fetchone()
+
+    return result[0]
+
+
+def log_decomposition(tree_id: int, user_id: str, task: Task, subtasks_amount: int, answer, usage) -> int:
     # log decomposition
     decomposition_id = db.insert(schema, 'decompositions', {
         'tree_id': tree_id,
@@ -71,12 +105,12 @@ def log_decomposition(tree_id: int, task: Task, subtasks_amount: int, answer, us
     return_fields=['decomposition_id'])
 
     # save tree state
-    save_tree(tree_id, task)
+    tree_id = save_tree(tree_id, user_id, task)
 
-    return decomposition_id[0]
+    return decomposition_id[0], tree_id
 
-def log_implementation(tree_id: int, decomposition_id: int, task: Task, language, answer, usage) -> int:
-    db.insert(schema, 'implementations', {
+def log_implementation(tree_id: int, user_id: str, decomposition_id: int, task: Task, language, answer, usage) -> int:
+    implementation_id = db.insert(schema, 'implementations', {
         'tree_id': tree_id,
         'decomposition_id': decomposition_id,
 
@@ -91,7 +125,9 @@ def log_implementation(tree_id: int, decomposition_id: int, task: Task, language
     },
     return_fields=['implementation_id'])
 
-    save_tree(tree_id, task)
+    tree_id = save_tree(tree_id, user_id, task)
+
+    return implementation_id[0], tree_id
 
 
 def log_feedback_decomposition(decomposition_id: int, q1, q2, q3, q4, comments):

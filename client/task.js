@@ -109,7 +109,7 @@ class Task {
         this.children = [];
     }
 
-    generate_decomposition(tree_id, cb, cb_error = console.error) {
+    generate_decomposition(tree_id, user_id, cb, cb_error = console.error) {
         // Clear previous decomposition, if exists
         this.clear_subtasks();
 
@@ -125,6 +125,7 @@ class Task {
             data: {
                 'tree': JSON.stringify(root_task),
                 'tree_id': JSON.stringify(tree_id),
+                'user_id': JSON.stringify(user_id),
                 'task_id': JSON.stringify(this_task.id()),
             },
             success: function(d) {
@@ -152,7 +153,7 @@ class Task {
         });
     }
 
-    generate_implementation(tree_id, language, cb, cb_error = console.error) {
+    generate_implementation(tree_id, user_id, language, cb, cb_error = console.error) {
         if (!this.can_be_implemented()) {
             throw Error('This task cannot be implemented');
         }
@@ -169,6 +170,7 @@ class Task {
             data: {
                 'tree': JSON.stringify(root_task),
                 'tree_id': JSON.stringify(tree_id),
+                'user_id': JSON.stringify(user_id),
                 'task_id': JSON.stringify(this_task.id()),
                 'language': JSON.stringify(language),
             },

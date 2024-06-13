@@ -40,10 +40,10 @@ def save_tre():
     tree = task.from_json(request.form['tree'])
     tree_id = json.loads(request.form['tree_id'])
 
-    database.save_tree(tree_id, tree)
+    tree_id = database.save_tree(tree_id, tree)
 
     return {
-        'status': 'ok'
+        'tree_id': tree_id
     }
 
 
@@ -53,19 +53,25 @@ def list_saves():
 
 @app.route('/load-tree', methods=['POST'])
 def load_tree():
-    pass
+    tree_id = json.loads(request.form['tree_id'])
+    
+    return {
+        'tree': database.get_tree(tree_id)
+    }
 
 
 @app.route('/decompose', methods=['POST'])
 def decompose_task():
     tree = task.from_json(request.form['tree'])
     tree_id = json.loads(request.form['tree_id'])
+    user_id = json.loads(request.form['user_id'])
     task_id = json.loads(request.form['task_id'])
 
     current_task = tree.get_subtask_from_id(task_id)
 
     return decomposition.decompose(
         tree_id=tree_id,
+        user_id=user_id,
         task=current_task,
     )
 
@@ -74,6 +80,7 @@ def decompose_task():
 def implement_task():
     tree = task.from_json(request.form['tree'])
     tree_id = json.loads(request.form['tree_id'])
+    user_id = json.loads(request.form['user_id'])
     task_id = json.loads(request.form['task_id'])
     language = json.loads(request.form['language'])
 
@@ -81,6 +88,7 @@ def implement_task():
 
     return decomposition.implement(
         tree_id=tree_id,
+        user_id=user_id,
         task=current_task,
         language=language
     )

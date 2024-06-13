@@ -2,6 +2,7 @@ import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
 // Main components
 let tree_data = null;
+let tree_id = null;
 let user_id = null;
 
 const svg = d3.select('#tree');
@@ -80,7 +81,6 @@ function check_user_id(cb) {
     return true;
 }
 
-
 function new_tree() {
     if (!check_user_id())
         return;
@@ -114,25 +114,8 @@ function new_tree() {
     $('#new-tree-modal').modal('hide');
 }
 
-function load_tree_from_file() {
-    let input = $('<input type="file" accept=".json,text/plain" />');
-    input.unbind().bind('change', function(e) {
-        let reader = new FileReader();
-        reader.addEventListener('load', function(e) {
-            let json = JSON.parse(e.target.result);
-            
-            let tree = Task.load_tree(json.tree)
-            let tree_id = json.tree_id;
-
-            init(tree, tree_id);
-        });
-        reader.readAsText(e.target.files[0]);
-    });
-    input.click();
-}
-
 function save_to_server() {
-    if (!tree_data.tree_id) {
+    if (!tree_id) {
         alert('This tree cannot be saved.')
         return
     }
@@ -141,51 +124,52 @@ function save_to_server() {
         type: 'POST',
         url: `http://${SERVER_ADDR}/save-tree`,
         data: {
-            'tree_id': JSON.stringify(tree_data.tree_id),
-            'name': JSON.stringify(name),
-            'description': JSON.stringify(description),
+            'user_id': JSON.stringify(user_id),
+            'tree_id': JSON.stringify(tree_id),
+            'tree': JSON.stringify(tree_data),
         },
         success: function(d) {
-            let data = d;
-            
-            if (data.status && data.status == 'invalid_request') {
-                throw Error(data.message);
-            }
-            
-            let tree = Task.load_from_json(data.tree);
-            let tree_id = data.tree_id;
+            set_tree_id(d.tree_id);
 
-            init(tree, tree_id);
+            alert('Save successful');
         },
         error: console.error
     });
+}
+
+function load_from_server() {
 
 }
 
-function save_tree_to_file() {
-    var a = document.createElement("a");
-    let filename = `${tree_data.tree.name.replace(/\s/g, '_')}.json`;
-
-    let data = {
-        'tree': tree_data.tree,
-    }
-
-    var file = new Blob([JSON.stringify(data)], {type: 'text/plain'});
-    a.href = URL.createObjectURL(file);
-    a.download = filename;
-    a.click();
+function load_from_server_id(tree_id) {
+    $.ajax({
+        type: 'POST',
+        url: `http://${SERVER_ADDR}/load-tree`,
+        data: {
+            'tree_id': JSON.stringify(tree_id),
+            'tree': JSON.stringify(tree_data),
+        },
+        success: function(d) {
+            alert('Save successful')
+        },
+        error: console.error
+    });
 }
 
 function init(tree, id) {
-    tree_data = {
-        'tree': tree,
-        'tree_id': id,
-    };
+    tree_data = tree;
+    set_tree_id(id);
     
     update();
 
     // Useful for debugging, should be eventually removed
     window.data = tree_data;
+}
+
+function set_tree_id(id) {
+    tree_id = id;
+
+    $('#task-button').text(`Task [${tree_id}]`);
 }
 
 function update() {
@@ -203,7 +187,7 @@ function update() {
     // const height = svg_height - margin.top - margin.bottom;
 
     const treeLayout = d3.tree(null).nodeSize([200, 200]);
-    const treeData = treeLayout(d3.hierarchy(tree_data.tree, d => d.children));
+    const treeData = treeLayout(d3.hierarchy(tree_data, d => d.children));
 
     // -------------------------------------------------------------------------------------------------------------
     // Nodes
@@ -319,7 +303,7 @@ function onNodeClick(event, item) {
     }
 
     // Prevent any action for sample tree
-    if (!tree_data.tree_id) {
+    if (!tree_id) {
         return
     }
 
@@ -498,7 +482,9 @@ function generate_decomposition(item) {
 
     let task = item.data;
 
-    task.generate_decomposition(tree_data.tree_id, function(data) {
+    task.generate_decomposition(tree_id, user_id, function(d) {
+        set_tree_id(d.tree_id);
+        
         task.running = false;
         show_children(task);
     }, function(e) {
@@ -582,8 +568,10 @@ function implement_task(item, language) {
     if (!check_user_id())
         return;    
 
-    item.data.generate_implementation(tree_data.tree_id, language, function() {
+    item.data.generate_implementation(tree_id, user_id, language, function(d) {
         item.data.running = false;
+
+        set_tree_id(d.tree_id);
 
         update();
     }, function(e) {
@@ -619,18 +607,6 @@ function hide_children(task) {
     update();
 }
 
-// function add_subtask(item) {
-//     hide_buttons();
-
-//     let task = item.data;
-
-//     let subtask_name = prompt('subtask name');
-//     let subtask_description = prompt('subtask description');
-
-//     task.add_subtask(subtask_name, subtask_description);
-//     show_children(item.data);
-// }
-
 function delete_children(item) {
     hide_buttons();
 
@@ -659,6 +635,7 @@ function unsolve(item) {
 
 window.update = update;
 window.new_tree = new_tree;
-window.load_tree = load_tree_from_file;
-window.save_tree = save_tree_to_file;
+window.save = save_to_server;
+window.load = load_from_server;
+window.load_id = load_from_server_id;
 window.login = login;

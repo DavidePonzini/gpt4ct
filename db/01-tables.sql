@@ -30,6 +30,7 @@ CREATE TABLE problem_decomposition.decompositions (
 
   tree_id SERIAL REFERENCES problem_decomposition.trees(tree_id) NOT NULL,
   
+  user_id VARCHAR(32) REFERENCES problem_decomposition.users(user_id) NOT NULL, -- support decomposition by different users
   decomposition_ts TIMESTAMP NOT NULL DEFAULT NOW(),
 
   task_name VARCHAR(1000) NOT NULL,
@@ -50,6 +51,7 @@ CREATE TABLE problem_decomposition.implementations (
   tree_id SERIAL REFERENCES problem_decomposition.trees(tree_id) NOT NULL,
   decomposition_id SERIAL REFERENCES problem_decomposition.decompositions(decomposition_id),
 
+  user_id VARCHAR(32) REFERENCES problem_decomposition.users(user_id) NOT NULL, -- support implementation by different users
   implementation_ts TIMESTAMP NOT NULL DEFAULT NOW(),
 
   task_name VARCHAR(1000) NOT NULL,
@@ -66,6 +68,8 @@ CREATE TABLE problem_decomposition.implementations (
 CREATE TABLE problem_decomposition.feedback_decompositions (
   -- primary key
   decomposition_id SERIAL REFERENCES problem_decomposition.decompositions(decomposition_id) NOT NULL PRIMARY KEY,
+  
+  user_id VARCHAR(32) REFERENCES problem_decomposition.users(user_id) NOT NULL, -- support feedback by different users
 
   q1 DECIMAL(1) NOT NULL,
   q2 DECIMAL(1) NOT NULL,
