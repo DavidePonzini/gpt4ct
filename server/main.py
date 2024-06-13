@@ -105,6 +105,8 @@ def implement_task():
 def feedback_decomposition():
     decomposition_id = json.loads(request.form['decomposition_id'])
 
+    user_id = json.loads(request.form['user_id'])
+
     q1 = json.loads(request.form['q1'])
     q2 = json.loads(request.form['q2'])
     q3 = json.loads(request.form['q3'])
@@ -113,6 +115,7 @@ def feedback_decomposition():
 
     database.log_feedback_decomposition(
         decomposition_id=decomposition_id,
+        user_id=user_id,
         q1=q1,
         q2=q2,
         q3=q3,
