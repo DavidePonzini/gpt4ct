@@ -20,8 +20,7 @@ svg.call(zoom);
 // load
 $(document).ready(function() {
     // Make dummy tree
-    let data = make_tree('Load a task', 'Load an existing task');
-    let tree = data.tree
+    let tree = new Task('Load a task', 'Load an existing task');
 
     let sub1 = tree.add_subtask('Click on "Load" button', 'Click on the "Load" button using the bar on top');
     sub1.add_subtask('Locate the top bar', 'Locate the top bar where the "Load" button is located');
@@ -30,7 +29,7 @@ $(document).ready(function() {
     let sub2 = tree.add_subtask('Select a file', 'Select a file to be loaded');
     let sub3 = tree.add_subtask('Load the file', 'Load a file by clicking on "OK"');
 
-    init(data);
+    init(tree, null);
     show_children(tree);
     show_children(sub1);
 })
@@ -71,13 +70,6 @@ function login() {
     });
 }
 
-function make_tree(name, description) {
-    return {
-        'tree': new Task(name, description),
-        'tree_id': null,
-    };
-}
-
 
 function check_user_id(cb) {
     if (!user_id) {
@@ -111,8 +103,10 @@ function new_tree() {
                 throw Error(data.message);
             }
             
-            tree_data = Task.load_from_json(data.tree);
-            init(tree_data);
+            let tree = Task.load_from_json(data.tree);
+            let tree_id = data.tree_id;
+
+            init(tree, tree_id);
         },
         error: console.error
     });
@@ -127,11 +121,10 @@ function load_tree_from_file() {
         reader.addEventListener('load', function(e) {
             let json = JSON.parse(e.target.result);
             
-            let data = {
-                'tree': Task.load_tree(json.tree),
-            };
+            let tree = Task.load_tree(json.tree)
+            let tree_id = json.tree_id;
 
-            init(data);
+            init(tree, tree_id);
         });
         reader.readAsText(e.target.files[0]);
     });
@@ -166,7 +159,7 @@ function init(tree, id) {
 
 function update() {
     const svg_width = $('#tree').innerWidth();
-    const svg_height = $('#tree').innerHeight();
+    // const svg_height = $('#tree').innerHeight();
 
     const margin = {
         left: 50,
@@ -176,7 +169,7 @@ function update() {
     };
 
     const width = svg_width - margin.left - margin.right;
-    const height = svg_height - margin.top - margin.bottom;
+    // const height = svg_height - margin.top - margin.bottom;
 
     const treeLayout = d3.tree(null).nodeSize([200, 200]);
     const treeData = treeLayout(d3.hierarchy(tree_data.tree, d => d.children));
@@ -190,6 +183,7 @@ function update() {
     // Nodes - Enter
     let nodesG_enter = nodes.enter().append('g')
         .classed('node', true)
+        .classed('node-internal', console.warn)
         .classed('node-internal', d => !d.data.is_leaf())
         .classed('node-leaf', d => d.data.is_leaf())
         .classed('unexplored', d => d.data.is_unexplored())
