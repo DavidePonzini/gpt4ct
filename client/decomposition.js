@@ -174,7 +174,11 @@ function init(tree, id) {
 function set_tree_id(id) {
     tree_id = id;
 
-    $('#task-button').text(`Task [${tree_id}]`);
+    if (tree_id)
+        $('#task-button').text(`Task [${tree_id}]`);
+    else
+        $('#task-button').text(`Task`);
+
 }
 
 function update() {
