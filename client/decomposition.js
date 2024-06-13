@@ -131,6 +131,37 @@ function load_tree_from_file() {
     input.click();
 }
 
+function save_to_server() {
+    if (!tree_data.tree_id) {
+        alert('This tree cannot be saved.')
+        return
+    }
+
+    $.ajax({
+        type: 'POST',
+        url: `http://${SERVER_ADDR}/save-tree`,
+        data: {
+            'tree_id': JSON.stringify(tree_data.tree_id),
+            'name': JSON.stringify(name),
+            'description': JSON.stringify(description),
+        },
+        success: function(d) {
+            let data = d;
+            
+            if (data.status && data.status == 'invalid_request') {
+                throw Error(data.message);
+            }
+            
+            let tree = Task.load_from_json(data.tree);
+            let tree_id = data.tree_id;
+
+            init(tree, tree_id);
+        },
+        error: console.error
+    });
+
+}
+
 function save_tree_to_file() {
     var a = document.createElement("a");
     let filename = `${tree_data.tree.name.replace(/\s/g, '_')}.json`;
@@ -285,6 +316,11 @@ function onNodeClick(event, item) {
     // Prevent any action if API is generating output
     if ($('.running').length > 0) {
         return;
+    }
+
+    // Prevent any action for sample tree
+    if (!tree_data.tree_id) {
+        return
     }
 
     // Set name

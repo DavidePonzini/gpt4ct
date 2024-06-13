@@ -35,6 +35,25 @@ def create_tree():
         'tree': tree.to_json()
     }
 
+@app.route('/save-tree', methods=['POST'])
+def save_tre():
+    tree = task.from_json(request.form['tree'])
+    tree_id = json.loads(request.form['tree_id'])
+
+    database.save_tree(tree_id, tree)
+
+    return {
+        'status': 'ok'
+    }
+
+
+@app.route('/list-saves', methods=['POST'])
+def list_saves():
+    pass
+
+@app.route('/load-tree', methods=['POST'])
+def load_tree():
+    pass
 
 
 @app.route('/decompose', methods=['POST'])
@@ -89,7 +108,7 @@ def feedback_decomposition():
     return {
         'status': 'ok'
     }
-
+    
 
 if __name__ == '__main__':
     app.run(
