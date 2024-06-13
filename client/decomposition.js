@@ -18,7 +18,6 @@ let zoom = d3.zoom().on('zoom', function(e) {
 svg.call(zoom);
 
 
-// load
 $(document).ready(function() {
     // Make dummy tree
     let tree = new Task('Load a task', 'Load an existing task');
@@ -141,7 +140,12 @@ function load_from_server() {
 
 }
 
-function load_from_server_id(tree_id) {
+function load_from_server_id() {
+    let tree_id = +prompt('Insert tree ID:');
+    if (isNaN(tree_id)) {
+        alert('Invalid ID format, please try again.');
+    }
+
     $.ajax({
         type: 'POST',
         url: `http://${SERVER_ADDR}/load-tree`,
@@ -150,7 +154,8 @@ function load_from_server_id(tree_id) {
             'tree': JSON.stringify(tree_data),
         },
         success: function(d) {
-            alert('Save successful')
+            tree_data = Task.load_from_json(d.tree);
+            set_tree_id(tree_id);
         },
         error: console.error
     });

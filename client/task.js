@@ -107,6 +107,7 @@ class Task {
     clear_subtasks() {
         this.subtasks = [];
         this.children = [];
+        this.requires_feedback_decomposition = false;
     }
 
     generate_decomposition(tree_id, user_id, cb, cb_error = console.error) {
