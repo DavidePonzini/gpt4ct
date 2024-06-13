@@ -144,6 +144,7 @@ function load_from_server_id() {
     let tree_id = +prompt('Insert tree ID:');
     if (isNaN(tree_id)) {
         alert('Invalid ID format, please try again.');
+        return;
     }
 
     $.ajax({
