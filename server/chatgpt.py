@@ -29,7 +29,7 @@ class Message:
         Returns:
             str: The generated answer.
         """
-        messages.progress('Generating answer...')
+        # messages.progress('Generating answer...')
         completion = client.chat.completions.create(
             model='gpt-3.5-turbo',
             messages=self.messages,
@@ -41,7 +41,7 @@ class Message:
             frequency_penalty=frequency_penalty
         )
 
-        messages.info('Generated answer')
+        # messages.info('Generated answer')
         self.usage.append(completion.usage)
         # print_price(completion.usage)
 
