@@ -129,7 +129,7 @@ class Task {
             },
             success: function(d) {
                 try {
-                    let data = JSON.parse(d);
+                    let data = d;
                     
                     if (data.status && data.status == 'invalid_request') {
                         throw Error(data.message);
