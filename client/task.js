@@ -192,6 +192,9 @@ class Task {
         });
     }
 
+    static load_from_json(data) {
+        return Task.load_tree(JSON.parse(data));
+    }
 
     static load_tree(data) {
         const task = new Task(data.name, data.description);

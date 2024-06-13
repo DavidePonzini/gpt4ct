@@ -36,6 +36,7 @@ def create_tree():
     }
 
 
+
 @app.route('/decompose', methods=['POST'])
 def decompose_task():
     tree = task.from_json(request.form['tree'])

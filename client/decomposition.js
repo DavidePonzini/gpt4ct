@@ -74,6 +74,7 @@ function login() {
 function make_tree(name, description) {
     return {
         'tree': new Task(name, description),
+        'tree_id': null,
     };
 }
 
@@ -110,7 +111,7 @@ function new_tree() {
                 throw Error(data.message);
             }
             
-            tree_data = Task.load_tree(data.tree);
+            tree_data = Task.load_from_json(data.tree);
             init(tree_data);
         },
         error: console.error
@@ -151,8 +152,12 @@ function save_tree_to_file() {
     a.click();
 }
 
-function init(data) {
-    tree_data = data;
+function init(tree, id) {
+    tree_data = {
+        'tree': tree,
+        'tree_id': id,
+    };
+    
     update();
 
     // Useful for debugging, should be eventually removed
