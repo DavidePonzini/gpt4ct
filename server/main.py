@@ -39,8 +39,9 @@ def create_tree():
 def save_tre():
     tree = task.from_json(request.form['tree'])
     tree_id = json.loads(request.form['tree_id'])
+    user_id = json.loads(request.form['user_id'])
 
-    tree_id = database.save_tree(tree_id, tree)
+    tree_id = database.save_tree(tree_id, user_id, tree)
 
     return {
         'tree_id': tree_id
