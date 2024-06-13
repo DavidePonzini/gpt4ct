@@ -56,10 +56,16 @@ def list_saves():
 def load_tree():
     tree_id = json.loads(request.form['tree_id'])
     
-    return {
-        'tree': database.get_tree(tree_id)
-    }
+    tree = database.get_tree(tree_id)
 
+    if tree is not None:
+        return {
+            'tree': tree
+        }
+    
+    return {
+        'status': 'error'
+    }
 
 @app.route('/decompose', methods=['POST'])
 def decompose_task():
