@@ -155,6 +155,11 @@ function load_from_server_id() {
             'tree': JSON.stringify(tree_data),
         },
         success: function(d) {
+            if (d.status && d.status == 'error') {
+                alert('Invalid tree ID.');
+                return;
+            } 
+
             tree_data = Task.load_from_json(d.tree);
             init(tree_data, tree_id);
         },

@@ -85,7 +85,11 @@ def get_tree(tree_id) -> str:
 
     result = db._cursor.fetchone()
 
-    return result[0]
+    if result is not None:
+        return result[0]
+    return {
+        'status': 'error'
+    }
 
 
 def log_decomposition(tree_id: int, user_id: str, task: Task, subtasks_amount: int, answer, usage) -> int:
