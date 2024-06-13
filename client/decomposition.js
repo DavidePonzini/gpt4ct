@@ -319,7 +319,7 @@ function onNodeClick(event, item) {
     $('#task-decomposition-manual').hide();
 
     // Show decomposition feedback, if needed
-    if (item.data.needs_feedback_decomposition) {
+    if (item.data.requires_feedback_decomposition) {
         $('#task-feedback-decomposition').show();
         prepare_feedback_decomposition(item);
     } else {
@@ -377,7 +377,7 @@ function prepare_feedback_decomposition(item) {
                     'comments': JSON.stringify(comments)
                 },
                 success: function(d) {
-                    item.data.needs_feedback_decomposition = false;
+                    item.data.requires_feedback_decomposition = false;
                     $('#task-feedback-decomposition').hide();
 
                     update();
