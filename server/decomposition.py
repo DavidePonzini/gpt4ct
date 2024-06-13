@@ -21,7 +21,7 @@ def decompose(tree_id: int, task: Task):
     subtasks = answer['result']
 
     usage = message.usage[-1]
-    database.log_decomposition(
+    decomposition_id = database.log_decomposition(
         tree_id=tree_id,
         task=task,
         subtasks_amount=len(subtasks),
@@ -31,7 +31,10 @@ def decompose(tree_id: int, task: Task):
 
     print_price(usage)
 
-    return answer_json
+    return {
+        'subtasks': subtasks,
+        'decomposition_id': decomposition_id,
+    }
 
 def implement(tree_id: int, task: Task, language: str):
     message = Message()

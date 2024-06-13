@@ -135,10 +135,11 @@ class Task {
                         throw Error(data.message);
                     }
                     
-                    for (let subtask of data.result) {
+                    for (let subtask of data.subtasks) {
                         this_task.add_subtask(subtask.name, subtask.description);
                     }
 
+                    this_task.decomposition_id = data.decomposition_id;
                     this_task.requires_feedback_decomposition = true;
 
                     cb(data);
