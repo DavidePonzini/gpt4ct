@@ -462,7 +462,7 @@ function generate_decomposition(item) {
 
     let task = item.data;
 
-    task.generate_decomposition(user_id, function(data) {
+    task.generate_decomposition(tree_data.tree_id, function(data) {
         task.running = false;
         show_children(task);
     }, function(e) {
@@ -546,7 +546,7 @@ function implement_task(item, language) {
     if (!check_user_id())
         return;    
 
-    item.data.generate_implementation(user_id, language, function() {
+    item.data.generate_implementation(tree_data.tree_id, language, function() {
         item.data.running = false;
 
         update();
