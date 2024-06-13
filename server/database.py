@@ -92,6 +92,8 @@ def log_decomposition(tree_id: int, user_id: str, task: Task, subtasks_amount: i
     # log decomposition
     decomposition_id = db.insert(schema, 'decompositions', {
         'tree_id': tree_id,
+
+        'user_id': user_id,
         
         'task_name': task.name,
         'task_level': task.level(),
@@ -113,6 +115,8 @@ def log_implementation(tree_id: int, user_id: str, decomposition_id: int, task: 
     implementation_id = db.insert(schema, 'implementations', {
         'tree_id': tree_id,
         'decomposition_id': decomposition_id,
+
+        'user_id': user_id,
 
         'task_name': task.name,
         'task_level': task.level(),
