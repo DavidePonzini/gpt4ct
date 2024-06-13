@@ -15,12 +15,14 @@ def create_tree(task: Task, user_id: str) -> int:
     
     root_task = task.get_root()
 
-    return db.insert(schema, 'trees', {
+    result = db.insert(schema, 'trees', {
         'user_id': user_id,
         'root_task_name': root_task.name,
         'tree_data': root_task.to_json()
     },
     return_fields=['tree_id'])
+
+    return result[0]
 
 def save_tree(tree_id: int, task: Task) -> None:
     '''Save current tree state'''
@@ -64,7 +66,7 @@ def log_decomposition(tree_id: int, task: Task, subtasks_amount: int, answer, us
         'answer': answer,
         
         'prompt_tokens': usage.prompt_tokens,
-        'completion_tokens': usage.completion_tokens 
+        'completion_tokens': usage.completion_tokens
     },
     return_fields=['decomposition_id'])
 
