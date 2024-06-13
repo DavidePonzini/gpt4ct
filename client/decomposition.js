@@ -405,6 +405,7 @@ function prepare_feedback_decomposition(item) {
                 url: `http://${SERVER_ADDR}/feedback-decomposition`,
                 data: {
                     'decomposition_id': JSON.stringify(item.data.decomposition_id),
+                    'user_id': JSON.stringify(user_id),
                     'q1': JSON.stringify(q1),
                     'q2': JSON.stringify(q2),
                     'q3': JSON.stringify(q3),
