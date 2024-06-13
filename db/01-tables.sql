@@ -67,8 +67,7 @@ CREATE TABLE problem_decomposition.implementations (
 
 CREATE TABLE problem_decomposition.feedback_decompositions (
   -- primary key
-  decomposition_id SERIAL REFERENCES problem_decomposition.decompositions(decomposition_id) NOT NULL PRIMARY KEY,
-  
+  decomposition_id SERIAL REFERENCES problem_decomposition.decompositions(decomposition_id) NOT NULL,
   user_id VARCHAR(32) REFERENCES problem_decomposition.users(user_id) NOT NULL, -- support feedback by different users
 
   q1 DECIMAL(1) NOT NULL,
@@ -76,7 +75,9 @@ CREATE TABLE problem_decomposition.feedback_decompositions (
   q3 DECIMAL(1) NOT NULL,
   q4 DECIMAL(1) NOT NULL,
   comments VARCHAR(2000),
-  feedback_ts TIMESTAMP NOT NULL DEFAULT NOW()
+  feedback_ts TIMESTAMP NOT NULL DEFAULT NOW(),
+
+  PRIMARY KEY(decomposition_id, user_id)
 );
 
 
