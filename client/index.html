@@ -42,9 +42,9 @@
                             <!-- <li><a href="#" class="dropdown-item" onclick="load()">Load</a></li> -->
                             <li><a href="#" class="dropdown-item" onclick="load_id()">Load by ID</a></li>
                             <li><a href="#" class="dropdown-item" onclick="save()">Save</a></li>
-                            <!-- <li><hr class="dropdown-divider"></li>
-                            <li><a href="#" class="dropdown-item" onclick="load_tree()">Load from file</a></li>
-                            <li><a href="#" class="dropdown-item" onclick="save_tree()">Save to file</a></li> -->
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a href="#" class="dropdown-item" onclick="data.tree.show_children(true)">Expand all tasks</a></li>
+                            <li><a href="#" class="dropdown-item" onclick="data.tree.hide_children(true)">Collapse all tasks</a></li>
                         </ul>
                     </div>
                     <button class="btn btn-outline-light hidden" id="feedback-count" type="button" onclick="alert('To provide feedback, click on the tasks highlighted in magenta.')"></button>

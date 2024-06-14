@@ -64,13 +64,23 @@ class Task {
         return this.subtasks.length;
     }
 
-    show_children() {
+    show_children(recursive = false) {
         this.children = this.subtasks;
+
+        if (recursive)
+            for (let subtask of this.subtasks)
+                subtask.show_children();
+
         return this;
     }
 
-    hide_children() {
+    hide_children(recursive = false) {
         this.children = null;
+
+        if (recursive)
+            for (let subtask of this.subtasks)
+                subtask.hide_children();
+
         return this;
     }
 
