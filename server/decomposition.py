@@ -22,7 +22,7 @@ def decompose(tree_id: int, user_id: str, task: Task):
 
     # add subtasks to tree
     for subtask in subtasks:
-        task.add_subtask(subtasks.name, subtask.description)
+        task.add_subtask(subtask.name, subtask.description)
 
     usage = message.usage[-1]
     decomposition_id, tree_id = database.log_decomposition(
