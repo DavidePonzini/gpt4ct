@@ -138,8 +138,11 @@ class Task {
                     }
 
                     let new_task = Task.load_from_json(data.task, parent = this_task.parent)
-                    console.log(new_task)
 
+                    // replace this_task with new_task in parent list
+                    this_task.replace_with(new_task);
+                    this_task = new_task;
+        
                     cb(data);
                 } catch (e) {
                     cb_error(d);
@@ -150,22 +153,18 @@ class Task {
         });
     }
 
-    // init_from_task(task) {
-    //     this.name = task.name;
-    //     this.description = task.description;
+    replace_with(other_task) {
+        // root can't be replaced
+        if (this.is_root()) {
+            console.warn('Tried to replace root node');
+            return;
+        }
 
-    //     for (let subtask of task.subtask)
-    //     this.subtasks = task.subtasks;
-
-    //     this.solved = task.solved;
-
-    //     this.decomposition_id = task.decomposition_id;
-    //     this.requires_feedback_decomposition = task.requires_feedback_decomposition;
-
-    //     this.implementation = task.implementation;
-    //     this.implementation_id = task.implementation_id;
-    //     this.implementation_language = task.implementation_language;
-    // }
+        let idx = this.parent.subtasks.indexOf(this);
+        this.parent.subtasks[idx] = other_task;
+        
+        this.parent.hide_children();
+    }
 
     generate_implementation(tree_id, user_id, language, cb, cb_error = console.error) {
         if (!this.can_be_implemented()) {
