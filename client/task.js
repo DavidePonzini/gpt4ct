@@ -32,6 +32,12 @@ class Task {
         return this.parent.id().concat(my_id);
     }
 
+    short_name(max_len) {
+        if (this.name.length > max_len)
+            return this.name.substr(0, max_len - 3) + '...';
+        return this.name;
+    }
+
     needs_feedback() {
         return this.requires_feedback_decomposition;
     }

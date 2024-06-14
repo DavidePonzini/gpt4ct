@@ -214,6 +214,7 @@ function update() {
 
     const width = svg_width - margin.left - margin.right;
     // const height = svg_height - margin.top - margin.bottom;
+    const max_label_length = 50;
 
     const treeLayout = d3.tree(null).nodeSize([200, 200]);
     const treeData = treeLayout(d3.hierarchy(tree_data, d => d.children));
@@ -242,7 +243,7 @@ function update() {
     nodesG_enter.append('text')
         .attr('dx', 18)
         .attr('dy', '.31em')
-        .text(d => d.data.name);
+        .text(d => d.data.short_name(max_label_length));
 
     // Nodes - Update
     let nodesG_update = nodes
@@ -257,7 +258,7 @@ function update() {
         .attr('transform', d => `translate(${d.x + width/2 + margin.left}, ${d.y + margin.top})`)
         .on('click', onNodeClick);
     nodesG_update.select('text')
-        .text(d => d.data.name);
+        .text(d => d.data.short_name(max_label_length));
 
     // Nodes - Exit
     nodes.exit().remove('g');
