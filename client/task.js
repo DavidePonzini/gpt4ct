@@ -137,14 +137,11 @@ class Task {
                         throw Error(data.message);
                     }
 
-                    let new_task = Task.load_from_json(data.task, parent = this_task.parent)
+                    let new_task = Task.load_from_json(data.task, parent = this_task.parent);
+                    this_task.subtasks = new_task.subtasks;
+                    this_task.decomposition_id = new_task.decomposition_id;
+                    this_task.requires_feedback_decomposition = new task.requires_feedback_decomposition;
 
-                    // replace this_task with new_task in parent list
-                    this_task.replace_with(new_task);
-                    this_task = new_task;
-
-                    this_task.show_children();
-        
                     cb(data);
                 } catch (e) {
                     cb_error(d);
@@ -153,19 +150,6 @@ class Task {
             },
             error: cb_error
         });
-    }
-
-    replace_with(other_task) {
-        // root can't be replaced
-        if (this.is_root()) {
-            console.warn('Tried to replace root node');
-            return;
-        }
-
-        let idx = this.parent.subtasks.indexOf(this);
-        this.parent.subtasks[idx] = other_task;
-        
-        this.parent.hide_children();
     }
 
     generate_implementation(tree_id, user_id, language, cb, cb_error = console.error) {
