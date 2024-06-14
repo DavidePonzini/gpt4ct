@@ -91,12 +91,11 @@ def get_tree(tree_id) -> str:
 
 
 def log_decomposition(tree_id: int, user_id: str, task: Task, subtasks_amount: int, answer, usage) -> int:
-    # log decomposition
+    tree_id = save_tree(tree_id, user_id, task)
+
     decomposition_id = db.insert(schema, 'decompositions', {
         'tree_id': tree_id,
 
-        'user_id': user_id,
-        
         'task_name': task.name,
         'task_level': task.level(),
         'task_id': task.id(),
@@ -108,17 +107,14 @@ def log_decomposition(tree_id: int, user_id: str, task: Task, subtasks_amount: i
     },
     return_fields=['decomposition_id'])
 
-    # save tree state
-    tree_id = save_tree(tree_id, user_id, task)
-
     return decomposition_id[0], tree_id
 
 def log_implementation(tree_id: int, user_id: str, decomposition_id: int, task: Task, language, answer, usage) -> int:
+    tree_id = save_tree(tree_id, user_id, task)
+
     implementation_id = db.insert(schema, 'implementations', {
         'tree_id': tree_id,
         'decomposition_id': decomposition_id,
-
-        'user_id': user_id,
 
         'task_name': task.name,
         'task_level': task.level(),
@@ -131,7 +127,6 @@ def log_implementation(tree_id: int, user_id: str, decomposition_id: int, task: 
     },
     return_fields=['implementation_id'])
 
-    tree_id = save_tree(tree_id, user_id, task)
 
     return implementation_id[0], tree_id
 

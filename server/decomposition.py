@@ -20,6 +20,10 @@ def decompose(tree_id: int, user_id: str, task: Task):
     answer = json.loads(answer_json)
     subtasks = answer['result']
 
+    # add subtasks to tree
+    for subtask in subtasks:
+        task.add_subtask(subtasks.name, subtask.description)
+
     usage = message.usage[-1]
     decomposition_id, tree_id = database.log_decomposition(
         tree_id=tree_id,
@@ -65,9 +69,12 @@ def implement(tree_id: int, user_id: str, task: Task, language: str):
     # Get the result
     answer = message.generate_answer(require_json=False, add_to_messages=False)
 
+    task.implementation = answer
+
     usage = message.usage[-1]
     implementation_id, tree_id = database.log_implementation(
         tree_id=tree_id,
+        user_id=user_id,
         task=task,
         language=language,
         answer=answer,
