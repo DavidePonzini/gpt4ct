@@ -41,7 +41,7 @@ def decompose(tree_id: int, user_id: str, task: Task):
     print_price(usage)
 
     return {
-        'task': task,
+        'task': task.to_json(),
         'tree_id': tree_id,
     }
 
