@@ -39,7 +39,7 @@ $(document).ready(function() {
     sample_new.add_subtask('Click on "Task" button');
     sample_new.add_subtask('Click on "New"');
     let sample_new_task = sample_new.add_subtask('Create a new task');
-    sample_load.add_subtask('Click on OK');
+    sample_new.add_subtask('Click on OK');
 
     sample_new_task.add_subtask('Enter task name');
     sample_new_task.add_subtask('Enter task description');
