@@ -69,7 +69,7 @@ class Task {
 
         if (recursive)
             for (let subtask of this.subtasks)
-                subtask.show_children();
+                subtask.show_children(recursive);
 
         return this;
     }
@@ -79,7 +79,7 @@ class Task {
 
         if (recursive)
             for (let subtask of this.subtasks)
-                subtask.hide_children();
+                subtask.hide_children(recursive);
 
         return this;
     }
