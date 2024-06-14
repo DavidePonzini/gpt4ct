@@ -136,13 +136,8 @@ class Task {
                     if (data.status && data.status == 'invalid_request') {
                         throw Error(data.message);
                     }
-                    
-                    for (let subtask of data.subtasks) {
-                        this_task.add_subtask(subtask.name, subtask.description);
-                    }
 
-                    this_task.decomposition_id = data.decomposition_id;
-                    this_task.requires_feedback_decomposition = true;
+                    this_task.copy(data.task);
 
                     cb(data);
                 } catch (e) {
@@ -152,6 +147,10 @@ class Task {
             },
             error: cb_error
         });
+    }
+
+    copy(task) {
+        console.log(task)
     }
 
     generate_implementation(tree_id, user_id, language, cb, cb_error = console.error) {

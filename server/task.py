@@ -62,6 +62,8 @@ class Task:
 
         self.subtasks.append(child)
 
+        return child
+
     def get_root(self):
         task = self
 

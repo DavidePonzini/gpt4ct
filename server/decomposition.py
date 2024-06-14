@@ -34,11 +34,14 @@ def decompose(tree_id: int, user_id: str, task: Task):
         usage=usage
     )
 
+    # update task properties
+    task.requires_feedback_decomposition = True
+    task.decomposition_id = decomposition_id
+
     print_price(usage)
 
     return {
-        'subtasks': subtasks,
-        'decomposition_id': decomposition_id,
+        'task': task,
         'tree_id': tree_id,
     }
 
