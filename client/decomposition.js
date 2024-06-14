@@ -214,7 +214,7 @@ function update() {
 
     const width = svg_width - margin.left - margin.right;
     // const height = svg_height - margin.top - margin.bottom;
-    const max_label_length = 50;
+    const max_label_length = 150;
 
     const treeLayout = d3.tree(null).nodeSize([200, 200]);
     const treeData = treeLayout(d3.hierarchy(tree_data, d => d.children));
@@ -243,7 +243,21 @@ function update() {
     nodesG_enter.append('text')
         .attr('dx', 18)
         .attr('dy', '.31em')
-        .text(d => d.data.short_name(max_label_length));
+        .each(function (d) {
+            let name = d.data.name;
+            let elem = d3.select(this);
+            
+            elem.text(name);
+
+            // skip root node, we always have infinite space
+            if (d.data.is_root())
+                return;
+
+            while (this.getComputedTextLength() > max_label_length) {
+                name = name.substr(0, name.length - 1);
+                elem.text(name + '...');
+            }
+        });
 
     // Nodes - Update
     let nodesG_update = nodes
@@ -258,7 +272,21 @@ function update() {
         .attr('transform', d => `translate(${d.x + width/2 + margin.left}, ${d.y + margin.top})`)
         .on('click', onNodeClick);
     nodesG_update.select('text')
-        .text(d => d.data.short_name(max_label_length));
+        .each(function (d) {
+            let name = d.data.name;
+            let elem = d3.select(this);
+            
+            elem.text(name);
+
+            // skip root node, we always have infinite space
+            if (d.data.is_root())
+                return;
+            
+            while (this.getComputedTextLength() > max_label_length) {
+                name = name.substr(0, name.length - 1);
+                elem.text(name + '...');
+            }
+        });
 
     // Nodes - Exit
     nodes.exit().remove('g');
