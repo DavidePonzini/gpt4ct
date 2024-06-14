@@ -56,10 +56,10 @@ class Task:
     def to_json(self) -> str:
         return json.dumps(self.to_dict())
     
-    def add_subtask(self, name, description, implementation=None):
-        child = Task(name, description, implementation)
+    def add_subtask(self, name, description):
+        child = Task(name, description)
         child.parent = self
-        
+
         self.subtasks.append(child)
 
     def get_root(self):
