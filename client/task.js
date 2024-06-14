@@ -142,6 +142,8 @@ class Task {
                     // replace this_task with new_task in parent list
                     this_task.replace_with(new_task);
                     this_task = new_task;
+
+                    this_task.show_children();
         
                     cb(data);
                 } catch (e) {
