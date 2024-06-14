@@ -18,6 +18,12 @@ let zoom = d3.zoom().on('zoom', function(e) {
 svg.call(zoom);
 
 
+function focus_root() {
+    svg.transition()
+        .duration(750)
+        .call(zoom.transform, d3.zoomIdentity);
+}
+
 $(document).ready(function() {
     // Make dummy tree
     let tree = new Task('Load a task', 'Load an existing task');
@@ -658,6 +664,7 @@ function hide_all_children() {
     update();
 }
 
+
 window.update = update;
 window.new_tree = new_tree;
 window.save = save_to_server;
@@ -666,3 +673,4 @@ window.load_id = load_from_server_id;
 window.login = login;
 window.show_all_children = show_all_children;
 window.hide_all_children = hide_all_children;
+window.focus_root = focus_root;
