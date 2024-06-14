@@ -26,18 +26,26 @@ function focus_root() {
 
 $(document).ready(function() {
     // Make dummy tree
-    let tree = new Task('Load a task', 'Load an existing task');
+    let tree = new Task('Load an existing task or create a new one', '');
 
-    let sub1 = tree.add_subtask('Click on "Load" button', 'Click on the "Load" button using the bar on top');
-    sub1.add_subtask('Locate the top bar', 'Locate the top bar where the "Load" button is located');
-    sub1.add_subtask('Click on the button', 'Click on the "Load" button by selecting it with the cursor');
-    
-    let sub2 = tree.add_subtask('Select a file', 'Select a file to be loaded');
-    let sub3 = tree.add_subtask('Load the file', 'Load a file by clicking on "OK"');
+    let sample_load = tree.add_subtask('Load an existing task', '');
+    let sample_new = tree.add_subtask('Create a new task');
+
+    sample_load.add_subtask('Click on "Task" button');
+    sample_load.add_subtask('Click on "Load by ID"');
+    sample_load.add_subtask('Enter the task\'s ID');
+    sample_load.add_subtask('Click on OK');
+
+    sample_new.add_subtask('Click on "Task" button');
+    sample_new.add_subtask('Click on "New"');
+    let sample_new_task = sample_new.add_subtask('Create a new task');
+    sample_load.add_subtask('Click on OK');
+
+    sample_new_task.add_subtask('Enter task name');
+    sample_new_task.add_subtask('Enter task description');
 
     init(tree, null);
-    show_children(tree);
-    show_children(sub1);
+    show_all_children(tree);
 })
 
 function login() {

@@ -1,6 +1,19 @@
 from dav_tools import database
 from task import Task
-import json
+
+
+'''
+    SELECT decomposition_id
+    FROM 
+        {schema}.decompositions d
+        JOIN {schema}.trees t ON t.tree_id = d.tree_id
+    WHERE
+        t.tree_id = {tree_id} AND
+        decomposition_id NOT IN (
+            SELECT decomposition_id
+            FROM {schema}.feedback_decompositions
+            WHERE user_id = {user_id})
+'''
 
 
 schema = 'problem_decomposition'
