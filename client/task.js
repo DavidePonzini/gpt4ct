@@ -137,7 +137,8 @@ class Task {
                         throw Error(data.message);
                     }
 
-                    this_task.copy(data.task);
+                    let new_task = Task.load_from_json(data.task, parent = this_task.parent)
+                    console.log(new_task)
 
                     cb(data);
                 } catch (e) {
@@ -149,9 +150,22 @@ class Task {
         });
     }
 
-    copy(task) {
-        console.log(task)
-    }
+    // init_from_task(task) {
+    //     this.name = task.name;
+    //     this.description = task.description;
+
+    //     for (let subtask of task.subtask)
+    //     this.subtasks = task.subtasks;
+
+    //     this.solved = task.solved;
+
+    //     this.decomposition_id = task.decomposition_id;
+    //     this.requires_feedback_decomposition = task.requires_feedback_decomposition;
+
+    //     this.implementation = task.implementation;
+    //     this.implementation_id = task.implementation_id;
+    //     this.implementation_language = task.implementation_language;
+    // }
 
     generate_implementation(tree_id, user_id, language, cb, cb_error = console.error) {
         if (!this.can_be_implemented()) {
@@ -195,12 +209,16 @@ class Task {
         });
     }
 
-    static load_from_json(data) {
-        return Task.load_tree(JSON.parse(data));
+    static load_from_json(data, parent = null) {
+        return Task.load_tree(JSON.parse(data), parent);
     }
 
-    static load_tree(data) {
+    static load_tree(data, parent = null) {
         const task = new Task(data.name, data.description);
+
+        if (parent) {
+            task.parent = parent;
+        }
 
         // If 'subtasks' array is present in JSON, add each subtask to the task
         data.subtasks.forEach(subtaskData => {
