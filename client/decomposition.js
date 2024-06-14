@@ -31,18 +31,14 @@ $(document).ready(function() {
     let sample_load = tree.add_subtask('Load an existing task', '');
     let sample_new = tree.add_subtask('Create a new task');
 
-    sample_load.add_subtask('Click on "Task" button');
-    sample_load.add_subtask('Click on "Load by ID"');
+    sample_load.add_subtask('Click on Task > Load by ID');
     sample_load.add_subtask('Enter the task\'s ID');
-    sample_load.add_subtask('Click on OK');
+    sample_load.add_subtask('Confirm');
 
-    sample_new.add_subtask('Click on "Task" button');
-    sample_new.add_subtask('Click on "New"');
-    let sample_new_task = sample_new.add_subtask('Create a new task');
-    sample_new.add_subtask('Click on OK');
-
-    sample_new_task.add_subtask('Enter task name');
-    sample_new_task.add_subtask('Enter task description');
+    sample_new.add_subtask('Login');
+    sample_new.add_subtask('Click on Task > New');
+    sample_new.add_subtask('Insert task data');
+    sample_new.add_subtask('Confirm');
 
     init(tree, null);
     show_all_children(tree);
@@ -281,7 +277,7 @@ function update() {
             // skip root node, we always have infinite space
             if (d.data.is_root())
                 return;
-            
+
             while (this.getComputedTextLength() > max_label_length) {
                 name = name.substr(0, name.length - 1);
                 elem.text(name + '...');
@@ -362,7 +358,7 @@ function onNodeClick(event, item) {
 
     // Prevent any action for sample tree
     if (!tree_id) {
-        return
+        return;
     }
 
     // Set name
