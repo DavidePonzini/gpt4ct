@@ -35,7 +35,7 @@ def create_tree(tree: Task, user_id: str) -> int:
     },
     return_fields=['tree_id'])
 
-    return result[0]
+    return result[0][0]
 
 def save_tree(tree_id: int, user_id: str, tree: Task) -> None:
     '''Save current tree state for trees you own, otherwise create a new tree'''
