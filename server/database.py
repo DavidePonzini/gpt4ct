@@ -46,14 +46,17 @@ def save_tree(tree_id: int, user_id: str, tree: Task) -> None:
         tree_id=database.sql.Placeholder('tree_id'),
     )
 
-    db.execute(query, {
+    result = db.execute_and_fetch(query, {
         'tree_id': tree_id
     })
 
-    tree_owner = db._cursor.fetchone()[0]
+    if len(result) > 0:
+        tree_owner = result[0][0]
+    else:
+        tree_owner = None
 
     # Create a new tree if the user is not the owner
-    if tree_owner != user_id:
+    if tree_owner is None or tree_owner != user_id:
         tree_id = create_tree(tree, user_id)
 
     root_task = tree.get_root()
@@ -80,8 +83,6 @@ def save_tree(tree_id: int, user_id: str, tree: Task) -> None:
         'tree_data': root_task.to_json(),
     })
 
-    db.commit()
-
     return tree_id
 
 def get_tree(tree_id) -> str:
@@ -92,14 +93,12 @@ def get_tree(tree_id) -> str:
         tree_id=database.sql.Placeholder('tree_id')
     )
 
-    db.execute(query, {
+    result = db.execute_and_fetch(query, {
         'tree_id': tree_id
     })
 
-    result = db._cursor.fetchone()
-
-    if result is not None:
-        return result[0]
+    if len(result) > 0:
+        return result[0][0]
     return None
 
 
@@ -165,12 +164,10 @@ def check_user_exists(user_id: str):
         user_id = database.sql.Placeholder('user_id')
     )
 
-    db.execute(query, {
+    result = db.execute_and_fetch(query, {
         'user_id': user_id
     })
 
-    val = db._cursor.fetchone()
-
-    return val[0] == 1
+    return result[0][0] == 1
 
 
