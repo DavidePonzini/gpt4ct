@@ -119,7 +119,7 @@ def log_decomposition(tree_id: int, user_id: str, task: Task, subtasks_amount: i
     },
     return_fields=['decomposition_id'])
 
-    return decomposition_id[0], tree_id
+    return decomposition_id[0][0], tree_id
 
 def log_implementation(tree_id: int, user_id: str, decomposition_id: int, task: Task, language, answer, usage) -> int:
     tree_id = save_tree(tree_id, user_id, task)
@@ -140,7 +140,7 @@ def log_implementation(tree_id: int, user_id: str, decomposition_id: int, task: 
     return_fields=['implementation_id'])
 
 
-    return implementation_id[0], tree_id
+    return implementation_id[0][0], tree_id
 
 
 def log_feedback_decomposition(decomposition_id: int, user_id: str, q1, q2, q3, q4, comments):
