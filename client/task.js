@@ -148,7 +148,7 @@ class Task {
                     }
 
                     let new_task = Task.load_from_json(data.task, parent = this_task.parent);
-                    this_task.subtasks = new_task.subtasks;
+                    this_task.copy_subtasks(new_task);
                     this_task.decomposition_id = new_task.decomposition_id;
                     this_task.requires_feedback_decomposition = new_task.requires_feedback_decomposition;
 
@@ -160,6 +160,11 @@ class Task {
             },
             error: cb_error
         });
+    }
+
+    copy_subtasks(task) {
+        this.subtasks = task.subtasks;
+        this.subtasks.forEach(t => t.parent = this);
     }
 
     generate_implementation(tree_id, user_id, language, cb, cb_error = console.error) {
