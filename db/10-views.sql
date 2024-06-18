@@ -60,11 +60,17 @@ CREATE OR REPLACE VIEW problem_decomposition.v_feedback_decomposition_avg AS (
 
 CREATE OR REPLACE VIEW problem_decomposition.v_latest_trees AS (
   SELECT
-    tree_id,
+    t.tree_id,
+    user_id,
+    root_task_name,
+    MAX(task_level) as depth
+  FROM problem_decomposition.trees t
+    JOIN problem_decomposition.decompositions d ON d.tree_id = t.tree_id
+  GROUP BY
+    t.tree_id,
     user_id,
     root_task_name
-  FROM problem_decomposition.trees
-  ORDER BY tree_id DESC
+  ORDER BY t.tree_id DESC
 );
 
 COMMIT;
