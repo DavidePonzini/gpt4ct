@@ -41,7 +41,7 @@ CREATE OR REPLACE VIEW problem_decomposition.v_costs_per_user AS (
 
 CREATE OR REPLACE VIEW problem_decomposition.v_feedback_decomposition_avg AS (
   SELECT
-    user_id,
+    fd.user_id,
     t.tree_id,
     root_task_name,
     CASE WHEN LENGTH(root_task_name) > 15 THEN SUBSTRING(root_task_name FROM 1 FOR 15) || '...' ELSE root_task_name END AS root_task_name,
@@ -55,8 +55,8 @@ CREATE OR REPLACE VIEW problem_decomposition.v_feedback_decomposition_avg AS (
     JOIN problem_decomposition.decompositions d ON fd.decomposition_id = d.decomposition_id
     JOIN problem_decomposition.trees t ON t.tree_id = d.tree_id
   GROUP BY
-    user_id,
-    tree_id
+    fd.user_id,
+    t.tree_id
 );
 
 CREATE OR REPLACE VIEW problem_decomposition.v_latest_trees AS (
