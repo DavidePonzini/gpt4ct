@@ -7,7 +7,7 @@ CREATE OR REPLACE VIEW problem_decomposition.v_costs AS (
     t.tree_id,
     SUM(prompt_tokens) AS tokens_in,
     SUM(completion_tokens) AS tokens_out,
-    SUM(prompt_tokens) / 1000000 * .50 + SUM(completion_tokens) / 1000000 * 1.50 AS cost,
+    SUM(prompt_tokens) / 1000000 * .50 + SUM(completion_tokens) / 1000000 * 1.50 AS cost
   FROM problem_decomposition.decompositions d
     JOIN problem_decomposition.trees t ON t.tree_id = d.tree_id
   GROUP BY
@@ -20,7 +20,7 @@ CREATE OR REPLACE VIEW problem_decomposition.v_costs AS (
     t.tree_id,
     SUM(prompt_tokens) AS tokens_in,
     SUM(completion_tokens) AS tokens_out,
-    SUM(prompt_tokens) / 1000000 * .50 + SUM(completion_tokens) / 1000000 * 1.50 AS cost,
+    SUM(prompt_tokens) / 1000000 * .50 + SUM(completion_tokens) / 1000000 * 1.50 AS cost
   FROM problem_decomposition.implementations i
     JOIN problem_decomposition.trees t ON t.tree_id = i.tree_id
   GROUP BY
@@ -67,6 +67,5 @@ CREATE OR REPLACE VIEW problem_decomposition.v_latest_trees AS (
   FROM problem_decomposition.trees
   ORDER BY tree_id DESC
 );
-
 
 COMMIT;
