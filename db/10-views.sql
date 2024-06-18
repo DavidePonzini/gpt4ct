@@ -43,7 +43,6 @@ CREATE OR REPLACE VIEW problem_decomposition.v_feedback_decomposition_avg AS (
   SELECT
     fd.user_id,
     t.tree_id,
-    root_task_name,
     CASE WHEN LENGTH(root_task_name) > 15 THEN SUBSTRING(root_task_name FROM 1 FOR 15) || '...' ELSE root_task_name END AS root_task_name,
     AVG(q1) AS q1,
     AVG(q2) AS q2,
