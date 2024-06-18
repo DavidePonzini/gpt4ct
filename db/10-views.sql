@@ -12,7 +12,7 @@ CREATE OR REPLACE VIEW problem_decomposition.v_costs AS (
     JOIN problem_decomposition.trees t ON t.tree_id = d.tree_id
   GROUP BY
     user_id,
-    tree_id
+    t.tree_id
   UNION
   SELECT
     'Implementation' AS type,
@@ -25,7 +25,7 @@ CREATE OR REPLACE VIEW problem_decomposition.v_costs AS (
     JOIN problem_decomposition.trees t ON t.tree_id = i.tree_id
   GROUP BY
     user_id,
-    tree_id
+    t.tree_id
 );
 
 CREATE OR REPLACE VIEW problem_decomposition.v_costs_per_user AS (
