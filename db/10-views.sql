@@ -32,8 +32,8 @@ CREATE OR REPLACE VIEW problem_decomposition.v_costs_per_user AS (
   SELECT
     user_id,
     type,
-    SUM(prompt_tokens) as prompt_tokens,
-    SUM(completion_tokens) as completion_tokens,
+    SUM(tokens_in) as tokens_in,
+    SUM(tokens_out) as tokens_out,
     SUM(cost) as cost
   FROM problem_decomposition.v_costs
   GROUP BY user_id, type
