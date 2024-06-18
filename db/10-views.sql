@@ -62,7 +62,7 @@ CREATE OR REPLACE VIEW problem_decomposition.v_latest_trees AS (
   SELECT
     t.tree_id,
     user_id,
-    CASE WHEN LENGTH(root_task_name) > 15 THEN SUBSTRING(root_task_name FROM 1 FOR 15) || '...' ELSE root_task_name END AS root_task_name,
+    CASE WHEN LENGTH(root_task_name) > 50 THEN SUBSTRING(root_task_name FROM 1 FOR 50) || '...' ELSE root_task_name END AS root_task_name,
     MAX(task_level) as depth
   FROM problem_decomposition.trees t
     JOIN problem_decomposition.decompositions d ON d.tree_id = t.tree_id
