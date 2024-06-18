@@ -93,7 +93,27 @@ VALUES
     ('pcto57'),
     ('pcto58'),
     ('pcto59'),
-    ('pcto60')
+    ('pcto60'),
+    ('pcto61'),
+    ('pcto62'),
+    ('pcto63'),
+    ('pcto64'),
+    ('pcto65'),
+    ('pcto66'),
+    ('pcto67'),
+    ('pcto68'),
+    ('pcto69'),
+    ('pcto70'),
+    ('pcto71'),
+    ('pcto72'),
+    ('pcto73'),
+    ('pcto74'),
+    ('pcto75'),
+    ('pcto76'),
+    ('pcto77'),
+    ('pcto78'),
+    ('pcto79'),
+    ('pcto80')
 ON CONFLICT (user_id) DO NOTHING;
 
 COMMIT;
