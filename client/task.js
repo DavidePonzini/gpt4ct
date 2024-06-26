@@ -124,7 +124,7 @@ class Task {
             implementation: this.implementation,
             implementation_id: this.implementation_id,
             implementation_language: this.implementation_language,
-            this.requires_feedback_implementation: this.requires_feedback_implementation,
+            requires_feedback_implementation: this.requires_feedback_implementation,
 
             children: !!this.subtasks.length,
         };
