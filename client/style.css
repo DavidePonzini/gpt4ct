@@ -104,19 +104,19 @@ body {
 }
 
 .feedback-required circle {
-    stroke: magenta;
-    fill: magenta;
+    stroke: magenta!important;
+    fill: magenta!important;
 }
 
 .feedback-required.link {
-    stroke: magenta;
+    stroke: magenta!important;
 }
 
 
 /* ---------- Hover ---------- */
 .node:hover circle {
-    fill: cyan;
-    stroke: steelblue;
+    fill: cyan!important;
+    stroke: steelblue!important;
 }
 
 .node:hover text {
