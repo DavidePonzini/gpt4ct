@@ -1,0 +1,3 @@
+#!/bin/bash -e
+
+pg_dump -n problem_decomposition -f pcto_dump.sql -d postgres -U problem_decomposition_admin -h 127.0.0.1
