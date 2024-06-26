@@ -510,9 +510,9 @@ function show_buttons(item) {
         button_add_subtask.hide();
     }
 
-    // Implement: only available on unsolved tasks
+    // Implement: only available on unsolved tasks that can be implemented
     let button_implement = $('#implement');
-    if (!item.data.is_solved()) {
+    if (!item.data.is_solved() && item.data.can_be_implemented()) {
         button_implement.show();
         $('#implement-py').unbind().on('click', () => implement_task(item, 'python'));
         $('#implement-js').unbind().on('click', () => implement_task(item, 'javascript'));
