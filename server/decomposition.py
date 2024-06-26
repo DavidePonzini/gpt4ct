@@ -38,6 +38,8 @@ def decompose(tree_id: int, user_id: str, task: Task):
     task.requires_feedback_decomposition = True
     task.decomposition_id = decomposition_id
 
+    database.save_tree(tree_id, user_id, task)
+
     print_price(usage)
 
     return {
@@ -83,6 +85,8 @@ def implement(tree_id: int, user_id: str, task: Task, language: str):
         answer=answer,
         usage=usage)
     
+    database.save_tree(tree_id, user_id, task)
+
     print_price(usage)
 
     return {

@@ -38,7 +38,11 @@ def create_tree(tree: Task, user_id: str) -> int:
     return result[0][0]
 
 def save_tree(tree_id: int, user_id: str, tree: Task) -> None:
-    '''Save current tree state for trees you own, otherwise create a new tree'''
+    '''
+        Save current tree state for trees you own, otherwise create a new tree
+    
+        :param tree: can be any task of the tree
+    '''
 
     base_query = 'SELECT user_id FROM {schema}.trees WHERE tree_id = {tree_id}'
     query = database.sql.SQL(base_query).format(
