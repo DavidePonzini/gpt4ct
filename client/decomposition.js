@@ -508,14 +508,14 @@ function show_buttons(item) {
 
     // Implement: only available on unsolved tasks
     let button_implement = $('#implement');
-    // if (!item.data.is_solved()) {
-    //     button_implement.show();
-    //     $('#implement-py').unbind().on('click', () => implement_task(item, 'python'));
-    //     $('#implement-js').unbind().on('click', () => implement_task(item, 'javascript'));
-    //     $('#implement-delete').unbind().on('click', () => delete_implementation(item));
-    // } else {
+    if (!item.data.is_solved()) {
+        button_implement.show();
+        $('#implement-py').unbind().on('click', () => implement_task(item, 'python'));
+        $('#implement-js').unbind().on('click', () => implement_task(item, 'javascript'));
+        $('#implement-delete').unbind().on('click', () => delete_implementation(item));
+    } else {
         button_implement.hide();
-    // }
+    }
 
     // Solve/unsolve: available on all tasks, depending on whether they've been solved
     let button_solve = $('#solve');
