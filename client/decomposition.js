@@ -711,3 +711,4 @@ window.login = login;
 window.show_all_children = show_all_children;
 window.hide_all_children = hide_all_children;
 window.focus_root = focus_root;
+window.disable_feedback = disable_feedback;
