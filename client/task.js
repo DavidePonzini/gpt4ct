@@ -18,6 +18,7 @@ class Task {
         this.implementation = null;
         this.implementation_id = null;
         this.implementation_language = null;
+        this.requires_feedback_implementation = false;
         
         // only needed for ui, no need to store these properties on server
         this.children = null;
@@ -33,7 +34,7 @@ class Task {
     }
 
     needs_feedback() {
-        return this.requires_feedback_decomposition;
+        return this.requires_feedback_decomposition || this.requires_feedback_implementation;
     }
 
     is_root() {
@@ -92,6 +93,20 @@ class Task {
         }
 
         return true;
+    }
+
+    /**
+     * Remove implemenation from current task and all tasks above it (since it would be invalid)
+     */
+    remove_implementation() {
+        this.implementation = null;
+        this.implementation_id = null;
+        this.implementation_language = null;
+
+        this.requires_feedback_implementation = false;
+
+        if (this.parent)
+            this.parent.remove_implementation()
     }
 
     toJSON() {
@@ -198,16 +213,12 @@ class Task {
                     
                     this_task.implementation_language = language;
                     this_task.implementation = data.implementation;
+                    this_task.implementation_id = data.implementation_id;
+                    this_task.requires_feedback_implementation = true;
 
                     // remove all implementations above (which would now be invalid)
-                    let t = this_task.parent;
-                    while (t) {
-                        t.implementation = null;
-                        t.implementation_id = null;
-                        t.implementation_language = null;
-
-                        t = t.parent;
-                    }
+                    if (t.parent)
+                        t.parent.remove_implementation()
 
                     cb(data);
                 } catch (e) {
