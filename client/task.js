@@ -217,8 +217,8 @@ class Task {
                     this_task.requires_feedback_implementation = true;
 
                     // remove all implementations above (which would now be invalid)
-                    if (t.parent)
-                        t.parent.remove_implementation()
+                    if (this_task.parent)
+                        this_task.parent.remove_implementation()
 
                     cb(data);
                 } catch (e) {
