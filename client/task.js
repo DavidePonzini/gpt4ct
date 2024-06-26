@@ -86,10 +86,10 @@ class Task {
 
     can_be_implemented() {
         // Only leaves and nodes with all theirs children already implemented can be implemented
-        // for (let child of this.subtasks) {
-        //     if (!child.implementation || !child.can_be_implemented())
-        //         return false;
-        // }
+        for (let child of this.subtasks) {
+            if (!child.implementation || !child.can_be_implemented())
+                return false;
+        }
 
         return true;
     }
@@ -198,6 +198,16 @@ class Task {
                     
                     this_task.implementation_language = language;
                     this_task.implementation = data.implementation;
+
+                    // remove all implementations above (which would now be invalid)
+                    let t = this_task.parent;
+                    while (t) {
+                        t.implementation = null;
+                        t.implementation_id = null;
+                        t.implementation_language = null;
+
+                        t = t.parent;
+                    }
 
                     cb(data);
                 } catch (e) {
