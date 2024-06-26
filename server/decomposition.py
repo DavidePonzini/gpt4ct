@@ -80,6 +80,7 @@ def implement(tree_id: int, user_id: str, task: Task, language: str):
     implementation_id, tree_id = database.log_implementation(
         tree_id=tree_id,
         user_id=user_id,
+        decomposition_id=task.decomposition_id,
         task=task,
         language=language,
         answer=answer,
