@@ -613,8 +613,7 @@ function submit_manual_decomposition(item) {
 
 
 function delete_implementation(item) {
-    item.data.implementation = null;
-    item.data.implementation_language = null;
+    item.data.remove_implementation();
 
     hide_buttons();
     update();
