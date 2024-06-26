@@ -150,12 +150,12 @@ function save_to_server() {
     });
 }
 
-function load_from_server() {
+function load_from_server(cb = () => {}) {
     let tree_id = +prompt('Insert tree ID:');
-    load_from_server_id(tree_id);
+    load_from_server_id(tree_id, cb);
 }
 
-function load_from_server_id(tree_id) {
+function load_from_server_id(tree_id, cb = () => {}) {
     if (isNaN(tree_id)) {
         alert('Invalid ID format, please try again.');
         return;
@@ -176,6 +176,8 @@ function load_from_server_id(tree_id) {
 
             tree_data = Task.load_from_json(d.tree);
             init(tree_data, tree_id);
+
+            cb();
         },
         error: console.error
     });
