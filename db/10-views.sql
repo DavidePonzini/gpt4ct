@@ -13,7 +13,7 @@ CREATE OR REPLACE VIEW problem_decomposition.v_costs AS (
   GROUP BY
     user_id,
     t.tree_id
-  UNION
+  UNION ALL
   SELECT
     'Implementation' AS type,
     user_id,
