@@ -10,6 +10,10 @@ const g = svg.append('g');
 
 const SERVER_ADDR = '15.237.153.101:5000';
 
+let disable_feedback = false;
+
+
+// --------------------------------------------------------------------------
 // Handle zoom
 let zoom = d3.zoom().on('zoom', function(e) {
     $('#task-data').modal('hide');
@@ -231,7 +235,7 @@ function update() {
         .classed('implemented', d => d.data.implementation)
         .classed('solved', d => d.data.is_solved())
         .classed('running', d => d.data.running)
-        .classed('feedback-required', d => d.data.needs_feedback())
+        .classed('feedback-required', d => d.data.needs_feedback() && !disable_feedback)
         .attr('transform', d => `translate(${d.x + width/2 + margin.left}, ${d.y + margin.top})`)
         .on('click', onNodeClick);
     nodesG_enter.append('circle')
@@ -264,7 +268,7 @@ function update() {
         .classed('implemented', d => d.data.implementation)
         .classed('solved', d => d.data.is_solved())
         .classed('running', d => d.data.running)
-        .classed('feedback-required', d => d.data.needs_feedback())
+        .classed('feedback-required', d => d.data.needs_feedback() && !disable_feedback)
         .attr('transform', d => `translate(${d.x + width/2 + margin.left}, ${d.y + margin.top})`)
         .on('click', onNodeClick);
     nodesG_update.select('text')
@@ -302,7 +306,7 @@ function update() {
         .classed('explored', d => d.target.data.is_explored())
         .classed('implemented', d => d.target.data.implementation)
         .classed('solved', d => d.target.data.is_solved())
-        .classed('feedback-required', d => d.target.data.needs_feedback())
+        .classed('feedback-required', d => d.target.data.needs_feedback() && !disable_feedback)
         .attr('d', d3.linkVertical()
         .source(d => [
             d.source.x + width/2 + margin.left,
@@ -323,7 +327,7 @@ function update() {
         .classed('explored', d => d.target.data.is_explored())
         .classed('implemented', d => d.target.data.implementation)
         .classed('solved', d => d.target.data.is_solved())
-        .classed('feedback-required', d => d.target.data.needs_feedback())
+        .classed('feedback-required', d => d.target.data.needs_feedback() && !disable_feedback)
         .attr('d', d3.linkVertical()
         .source(d => [
             d.source.x + width/2 + margin.left,
@@ -341,7 +345,7 @@ function update() {
     // Update feedback counter
     let feedback_count = $('g.feedback-required').length;
     let feedback_button = $('#feedback-count');
-    if (feedback_count > 0) {
+    if (feedback_count > 0  && !disable_feedback) {
         feedback_button.text(`You need to provide feedback for ${feedback_count} task(s)`)
         feedback_button.show();
     } else {
@@ -393,7 +397,7 @@ function onNodeClick(event, item) {
     $('#task-decomposition-manual').hide();
 
     // Show decomposition feedback, if needed
-    if (item.data.requires_feedback_decomposition) {
+    if (item.data.requires_feedback_decomposition && !disable_feedback) {
         $('#task-feedback-decomposition').show();
         prepare_feedback_decomposition(item);
     } else {
