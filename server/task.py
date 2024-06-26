@@ -19,6 +19,7 @@ class Task:
         self.implementation = None              # None: not yet implemented; False: task doesn't need to be implemented
         self.implementation_id = None
         self.implementation_language = None
+        self.requires_feedback_implementation = False
 
     def is_root(self):
         return self.parent is None
@@ -51,6 +52,7 @@ class Task:
             'implementation': self.implementation,
             'implementation_id': self.implementation_id,
             'implementation_language': self.implementation_language,
+            'requires_feedback_implementation': self.requires_feedback_implementation,
         }
     
     def to_json(self) -> str:
@@ -119,11 +121,14 @@ def from_dict(data) -> Task:
 
     # Set other properties
     task.solved = data['solved']
+
     task.decomposition_id = data['decomposition_id']
     task.requires_feedback_decomposition = data['requires_feedback_decomposition']
+
     task.implementation = data['implementation']
     task.implementation_id = data['implementation_id']
     task.implementation_language = data['implementation_language']
+    task.requires_feedback_implementation = data['requires_feedback_implementation']
 
     return task
 

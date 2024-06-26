@@ -151,11 +151,11 @@ function save_to_server() {
 }
 
 function load_from_server() {
-
+    let tree_id = +prompt('Insert tree ID:');
+    load_from_server_id(tree_id);
 }
 
-function load_from_server_id() {
-    let tree_id = +prompt('Insert tree ID:');
+function load_from_server_id(tree_id) {
     if (isNaN(tree_id)) {
         alert('Invalid ID format, please try again.');
         return;

@@ -86,6 +86,9 @@ def implement(tree_id: int, user_id: str, task: Task, language: str):
         answer=answer,
         usage=usage)
     
+    task.implementation_id = implementation_id
+    task.requires_feedback_implementation = True
+
     database.save_tree(tree_id, user_id, task)
 
     print_price(usage)
