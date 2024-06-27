@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
     <!-- Custom -->
     <link rel="stylesheet" href="style.css">
@@ -33,7 +33,7 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <div class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <button class="btn btn-outline-primary" type="button" id="user-id" onclick="login()">Login</button>
+                    <button class="btn btn-outline-primary" type="button" id="login" onclick="login()">Login</button>
                     <div class="btn-group" id="nav-task-button">
                         <button type="button" class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" id="task-button">Task</button>
                         <ul class="dropdown-menu">
@@ -51,12 +51,20 @@
                     <button class="btn btn-outline-light hidden" id="feedback-count" type="button" onclick="alert('To provide feedback, click on the tasks highlighted in magenta.')"></button>
                 </div>
                 <div class="navbar-text">
-                    <i><small>
-                        Developed by Davide Ponzini
-                        <a href="mailto:davide.ponzini@edu.unige.it" class="bi bi-envelope-at social social-email"></a>
-                    </small></i>
-                    
+                    <span class="mx-1">
+                        <i class="fa-solid fa-user"></i>
+                        <span id="user-id">Not logged in</span>
+                    </span>
+                    <span class="mx-1">
+                        <i class="fa-solid fa-gem"></i>
+                        <span id="credits">N/A</span>
+                    </span>
+                    <span class="mx-1">
+                        <i class="fa-solid fa-ranking-star"></i>
+                        <span id="ranking">N/A</span>
+                    </span>
                 </div>
+                <button class="btn btn-outline-primary mx-1" type="button" onclick="">Leaderboard</button>
             </div>
         </div>
     </nav>
@@ -210,9 +218,24 @@
         </div>
     </div>
 
-    <div id="container">
+    <!-- Tree -->
+    <div id="tree-container">
         <svg id="tree"></svg>
     </div>
+
+    <!-- Footer -->
+    <footer class="navbar navbar-light bg-light">
+        <div class="container-fluid">
+            <div>
+            </div>
+            <div class="navbar-text">
+                <i><small>
+                    Developed by Davide Ponzini
+                    <a href="mailto:davide.ponzini@edu.unige.it" class="bi bi-envelope-at social social-email"></a>
+                </small></i>
+            </div>
+        </div>
+    </footer>
 
     <!-- Boostrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
@@ -225,7 +248,7 @@
 
     <!-- Data -->
     <script src="task.js"></script>
-    <!-- <script src="movies.js"></script> -->
+    <script src="user.js"></script>
 
     <!-- d3 + visualization -->
     <script type="module" src="decomposition.js"></script>

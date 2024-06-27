@@ -3,7 +3,6 @@ import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 // Main components
 let tree_data = null;
 let tree_id = null;
-let user_id = null;
 
 const svg = d3.select('#tree');
 const g = svg.append('g');
@@ -47,52 +46,6 @@ $(document).ready(function() {
     init(tree, null);
     show_all_children(tree);
 })
-
-function login() {
-    if (user_id)
-        return;
-
-    let uid = prompt('Insert user id:');
-    $.ajax({
-        type: 'POST',
-        url: `http://${SERVER_ADDR}/login`,
-        data: {
-            'user_id': JSON.stringify(uid),
-        },
-        success: function(d) {
-            let data = d;
-            
-            if (data.status && data.status == 'invalid_request') {
-                throw Error(data.message);
-            }
-            
-            if (data.user) {
-                user_id = uid;
-
-                $('#user-id')
-                    .text(`User: ${user_id}`)
-                    .removeClass('btn-outline-primary')
-                    .addClass('btn-outline-secondary')
-                    .prop('disabled', true);
-                
-                    return;
-            }
-
-            alert(`User "${uid}" does not exist. Try again.`);
-        },
-        error: console.error
-    });
-}
-
-
-function check_user_id(cb) {
-    if (!user_id) {
-        alert('You need to login first!');
-        return false;
-    }
-
-    return true;
-}
 
 function new_tree() {
     if (!check_user_id())
@@ -708,7 +661,7 @@ window.new_tree = new_tree;
 window.save = save_to_server;
 window.load = load_from_server;
 window.load_id = load_from_server_id;
-window.login = login;
+// window.login = login;
 window.show_all_children = show_all_children;
 window.hide_all_children = hide_all_children;
 window.focus_root = focus_root;

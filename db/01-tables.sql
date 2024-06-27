@@ -9,7 +9,8 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA problem_decomposition GRANT ALL ON SEQUENCES 
 
 
 CREATE TABLE problem_decomposition.users (
-  user_id VARCHAR(32) PRIMARY KEY
+  user_id VARCHAR(32) PRIMARY KEY,
+  credits DECIMAL(10) NOT NULL DEFAULT 0
 );
 
 CREATE TABLE problem_decomposition.trees (

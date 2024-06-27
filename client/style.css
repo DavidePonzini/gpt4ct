@@ -6,10 +6,10 @@ body {
     display: none;
 }
 
-#container {
-    position: absolute;
+#tree-container {
+    /* position: absolute; */
     width: calc(100vw - 0px);
-    height: calc(100vh - 57px);
+    height: calc(100vh - 114px);
     overflow: hidden;
 }
 
@@ -18,17 +18,21 @@ body {
     height: 100%;
 }
 
-.navbar button {
+nav button {
     margin-right: .5rem;
 }
 
-.navbar {
+nav {
     border-bottom: 1px solid gray;
 }
 
 #feedback-count {
     color: magenta;
     border-color: magenta;
+}
+
+footer {
+    border-top: 1px solid gray;
 }
 
 /* ---------- Nodes ---------- */
