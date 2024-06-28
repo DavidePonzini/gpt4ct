@@ -1,6 +1,8 @@
 BEGIN TRANSACTION;
 
-INSERT INTO problem_decomposition.users(user_id, credits)
+SET search_path TO problem_decomposition;
+
+INSERT INTO users(user_id, credits)
 VALUES
     ('dav', 2000),
     ('dev', 999999),
