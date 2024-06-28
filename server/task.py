@@ -42,9 +42,9 @@ class Task:
         if self.is_root():
             return []
 
-        my_id = self.parent.subtasks.index(self)
+        my_path = self.parent.subtasks.index(self)
         
-        return self.parent.id() + [my_id]
+        return self.parent.path() + [my_path]
 
     def to_dict(self) -> str:
         '''
@@ -177,9 +177,6 @@ def from_node_list(data: list[dict]) -> Task | None:
         
         t.add_subtask(child)
 
-        from dav_tools import messages
-
-        messages.warning(t.path(), node_path)
-        #assert t.path() == node_path
+        assert child.path() == node_path
 
     return root_task
