@@ -12,9 +12,9 @@ app = Flask(__name__)
 CORS(app)
 
 
-@app.route('/login', methods=['GET'])
+@app.route('/login', methods=['POST'])
 def login():
-    user_id = json.loads(request.args.get('user_id'))
+    user_id = json.loads(request.form['user_id'])
 
     return {
         'user': database.check_user_exists(user_id)

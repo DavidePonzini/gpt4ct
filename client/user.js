@@ -10,7 +10,7 @@ function login() {
     }
 
     $.ajax({
-        type: 'GET',
+        type: 'POST',
         url: `http://${SERVER_ADDR}/login`,
         data: {
             'user_id': JSON.stringify(uid),
