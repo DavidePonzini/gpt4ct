@@ -3,6 +3,7 @@ import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 // Main components
 let tree_data = null;
 let tree_id = null;
+let last_update = null;
 
 const svg = d3.select('#tree');
 const g = svg.append('g');
@@ -43,7 +44,7 @@ $(document).ready(function() {
     sample_new.add_subtask('Insert task data');
     sample_new.add_subtask('Confirm');
 
-    init(tree, null);
+    init(tree, null, null);
     show_all_children(tree);
 })
 
@@ -71,8 +72,9 @@ function new_tree() {
             
             let tree = Task.load_from_json(data.tree);
             let tree_id = data.tree_id;
+            let last_update = data.last_update;
 
-            init(tree, tree_id);
+            init(tree, tree_id, last_update);
         },
         error: console.error
     });
@@ -128,7 +130,7 @@ function load_from_server_id(tree_id, cb = () => {}) {
             } 
 
             tree_data = Task.load_from_json(d.tree);
-            init(tree_data, tree_id);
+            init(tree_data, tree_id, d.last_update);
 
             cb();
         },
@@ -136,8 +138,9 @@ function load_from_server_id(tree_id, cb = () => {}) {
     });
 }
 
-function init(tree, id) {
+function init(tree, id, last_update_ts) {
     tree_data = tree;
+    last_update = last_update_ts;
     set_tree_id(id);
     
     update();
@@ -153,12 +156,10 @@ function set_tree_id(id) {
         $('#task-button').text(`Task [${tree_id}]`);
     else
         $('#task-button').text(`Task`);
-
 }
 
 function update() {
     const svg_width = $('#tree').innerWidth();
-    // const svg_height = $('#tree').innerHeight();
 
     const margin = {
         left: 50,
@@ -168,7 +169,6 @@ function update() {
     };
 
     const width = svg_width - margin.left - margin.right;
-    // const height = svg_height - margin.top - margin.bottom;
     const max_label_length = 150;
 
     const treeLayout = d3.tree(null).nodeSize([200, 200]);

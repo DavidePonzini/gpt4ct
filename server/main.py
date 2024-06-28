@@ -12,13 +12,14 @@ app = Flask(__name__)
 CORS(app)
 
 
-@app.route('/login', methods=['POST'])
+@app.route('/login', methods=['GET'])
 def login():
-    user_id = json.loads(request.form['user_id'])
+    user_id = json.loads(request.args.get('user_id'))
 
     return {
         'user': database.check_user_exists(user_id)
     }
+
 
 @app.route('/create-tree', methods=['POST'])
 def create_tree():
@@ -29,23 +30,13 @@ def create_tree():
 
     tree_id = database.create_tree(name, description, user_id)
 
-    tree = database.load_tree(tree_id)
+    tree, last_update = database.load_tree(tree_id)
     return {
         'tree_id': tree_id,
-        'tree': tree.to_json()
+        'tree': tree.to_json(),
+        'last_update': last_update
     }
 
-@app.route('/save-tree', methods=['POST'])
-def save_tree():
-    tree = task.from_json(request.form['tree'])
-    tree_id = json.loads(request.form['tree_id'])
-    user_id = json.loads(request.form['user_id'])
-
-    tree_id = database.save_tree(tree_id, user_id, tree)
-
-    return {
-        'tree_id': tree_id
-    }
 
 @app.route('/load-tree', methods=['POST'])
 def load_tree():
@@ -62,6 +53,7 @@ def load_tree():
     return {
         'status': 'error'
     }
+
 
 @app.route('/decompose', methods=['POST'])
 def decompose_task():
