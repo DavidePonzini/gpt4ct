@@ -36,7 +36,7 @@ CREATE VIEW v_trees AS
       tn.creation_ts,
       tn.name,
       tn.description,
-      solved,
+      tn.solved,
       cte.level + 1,
       cte.path || tn.order_n
     FROM 
