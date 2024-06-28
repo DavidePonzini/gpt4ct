@@ -145,9 +145,9 @@ def load_tree(tree_id) -> task.Task:
             path,
             node_id,
             user_id,
-            creation_mode
+            creation_mode,
             name,
-            description,
+            description
         FROM {schema}.v_trees
         WHERE
             tree_id = {tree_id}

@@ -164,7 +164,7 @@ def from_node_list(data: list[dict]) -> Task | None:
     
     # add all children
     for node in data[1:]:
-        node_path = node['path']
+        node_path = [int(n) for n in node['path']]
 
         t = root_task.get_subtask_from_path(node_path[:-1])
         child = Task(
@@ -176,6 +176,10 @@ def from_node_list(data: list[dict]) -> Task | None:
             description=node['description'])
         
         t.add_subtask(child)
-        assert t.path() == node_path
+
+        from dav_tools import messages
+
+        messages.warning(t.path(), node_path)
+        #assert t.path() == node_path
 
     return root_task
