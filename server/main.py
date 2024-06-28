@@ -26,10 +26,10 @@ def create_tree():
     
     name = json.loads(request.form['name'])
     description = json.loads(request.form['description'])
-    tree = task.Task(name, description)
 
-    tree_id = database.create_tree(tree, user_id)
+    tree_id = database.create_tree(name, description, user_id)
 
+    tree = database.get_tree(tree_id)
     return {
         'tree_id': tree_id,
         'tree': tree.to_json()
@@ -46,11 +46,6 @@ def save_tre():
     return {
         'tree_id': tree_id
     }
-
-
-@app.route('/list-saves', methods=['POST'])
-def list_saves():
-    pass
 
 @app.route('/load-tree', methods=['POST'])
 def load_tree():

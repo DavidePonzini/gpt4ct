@@ -1,19 +1,7 @@
 from dav_tools import database
 from task import Task
 
-
-'''
-    SELECT decomposition_id
-    FROM 
-        {schema}.decompositions d
-        JOIN {schema}.trees t ON t.tree_id = d.tree_id
-    WHERE
-        t.tree_id = {tree_id} AND
-        decomposition_id NOT IN (
-            SELECT decomposition_id
-            FROM {schema}.feedback_decompositions
-            WHERE user_id = {user_id})
-'''
+from typing import Literal
 
 
 schema = 'problem_decomposition'
@@ -23,19 +11,25 @@ db = database.PostgreSQL(database='postgres',
                          user='problem_decomposition_admin',
                          password='decomp')
 
-def create_tree(tree: Task, user_id: str) -> int:
+def create_tree(name: str, description: str, user_id: str) -> int:
     '''Create a tree and get its id'''
-    
-    root_task = tree.get_root()
 
-    result = db.insert(schema, 'trees', {
-        'user_id': user_id,
-        'root_task_name': root_task.name,
-        'tree_data': root_task.to_json()
-    },
-    return_fields=['tree_id'])
+    with db.connect() as c:
+        result = c.insert(schema, 'trees', {'user_id': user_id}, return_fields=['tree_id'])
+        tree_id = result[0][0]
 
-    return result[0][0]
+        c.insert(schema, 'tree_nodes', {
+            'tree_id': tree_id,
+            'order_n': 1,
+            'user_id': user_id,
+            'creation_mode': 'manual',
+            'name': name,
+            'description': description,
+        })
+
+        c.commit()
+
+        return tree_id
 
 def save_tree(tree_id: int, user_id: str, tree: Task) -> None:
     '''
@@ -43,6 +37,8 @@ def save_tree(tree_id: int, user_id: str, tree: Task) -> None:
     
         :param tree: can be any task of the tree
     '''
+
+    return
 
     base_query = 'SELECT user_id FROM {schema}.trees WHERE tree_id = {tree_id}'
     query = database.sql.SQL(base_query).format(
@@ -88,6 +84,34 @@ def save_tree(tree_id: int, user_id: str, tree: Task) -> None:
     })
 
     return tree_id
+
+def add_node(tree_id: int, parent_id: int, name: str, description: str, user_id: str, creation_mode: Literal['manual', 'ai', 'mixed']):
+    '''Adds a new node as the last child of `parent_id` for tree `tree_id`'''
+    with db.connect() as c:
+        select_max_order_n = '''
+            SELECT MAX(order_n)
+            FROM tree_nodes
+            WHERE parent_id = {parent_id} AND deleted = FALSE
+            '''
+        
+        select_max_order_n = database.sql.SQL(select_max_order_n).format({
+            'parent_id': parent_id
+        })
+
+        c.execute(select_max_order_n)
+        max_order_n = c.fetch_one()[0]
+
+        c.insert(schema, 'tree_nodes', {
+            'parent_id': parent_id,
+            'tree_id': tree_id,
+            'order_n': max_order_n + 1 if max_order_n is not None else 1,
+            'user_id': user_id,
+            'name': name,
+            'description': description,
+            'creation_mode': creation_mode,
+        })
+
+        c.commit()
 
 def get_tree(tree_id) -> str:
     base_query = 'SELECT tree_data FROM {schema}.trees WHERE tree_id = {tree_id}'
