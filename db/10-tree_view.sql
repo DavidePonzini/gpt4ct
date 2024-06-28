@@ -1,8 +1,10 @@
 BEGIN TRANSACTION;
 
-DROP VIEW IF EXISTS problem_decomposition.v_trees;
+SET search_path TO problem_decomposition;
 
-CREATE VIEW problem_decomposition.v_trees AS
+DROP VIEW IF EXISTS v_trees;
+
+CREATE VIEW v_trees AS
   WITH RECURSIVE tree_cte AS (
     SELECT 
       node_id,
