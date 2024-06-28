@@ -36,7 +36,7 @@ def create_tree():
     }
 
 @app.route('/save-tree', methods=['POST'])
-def save_tre():
+def save_tree():
     tree = task.from_json(request.form['tree'])
     tree_id = json.loads(request.form['tree_id'])
     user_id = json.loads(request.form['user_id'])
@@ -55,7 +55,7 @@ def load_tree():
 
     if tree is not None:
         return {
-            'tree': tree
+            'tree': tree.to_json()
         }
     
     return {

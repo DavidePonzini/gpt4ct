@@ -661,7 +661,6 @@ window.new_tree = new_tree;
 window.save = save_to_server;
 window.load = load_from_server;
 window.load_id = load_from_server_id;
-// window.login = login;
 window.show_all_children = show_all_children;
 window.hide_all_children = hide_all_children;
 window.focus_root = focus_root;

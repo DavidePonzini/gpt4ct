@@ -11,7 +11,7 @@ class Task:
     Represents a single task, and its decomposition in subtasks
     '''
 
-    def __init__(self, tree_id: int, node_id: int, user_id: int, creation_mode: str, name: str, description: str, solved: bool) -> None:
+    def __init__(self, tree_id: int, node_id: int, user_id: int, creation_mode: str, name: str, description: str, solved: bool = False) -> None:
         self.node_id = node_id
         self.user_id = user_id
         self.tree_id = tree_id
@@ -24,7 +24,7 @@ class Task:
 
         self.creation_mode = creation_mode
 
-        self.solved = False
+        self.solved = solved
 
 
     def is_root(self):
