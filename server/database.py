@@ -197,7 +197,7 @@ def log_decomposition(tree_id: int, user_id: str, task: task.Task, subtasks_amou
 
     return decomposition_id[0][0], tree_id
 
-def log_implementation(tree_id: int, user_id: str, decomposition_id: int, task: Task, language, answer, usage) -> int:
+def log_implementation(tree_id: int, user_id: str, decomposition_id: int, task: task.Task, language, answer, usage) -> int:
     tree_id = save_tree(tree_id, user_id, task)
 
     implementation_id = db.insert(schema, 'implementations', {
