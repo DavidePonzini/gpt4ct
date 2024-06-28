@@ -46,19 +46,17 @@ class Task:
         Convert current task and subtasks to a dictionary, ready for JSON format conversion
         '''
         return {
+            'node_id': self.node_id,
+            'user_id': self.user_id,
+            'tree_id': self.tree_id,
+
             'name': self.name,
             'description': self.description,
             'subtasks': [ subtask.to_dict() for subtask in self.subtasks ],
 
+            'creation_mode': self.creation_mode,
+
             'solved': self.solved,
-
-            'decomposition_id': self.decomposition_id,
-            'requires_feedback_decomposition': self.requires_feedback_decomposition,
-
-            'implementation': self.implementation,
-            'implementation_id': self.implementation_id,
-            'implementation_language': self.implementation_language,
-            'requires_feedback_implementation': self.requires_feedback_implementation,
         }
     
     def to_json(self) -> str:
@@ -116,29 +114,29 @@ class Task:
             cb(sibling)
 
     
-def from_dict(data) -> Task:
-    task = Task(data['name'], data['description'])
+# def from_dict(data) -> Task:
+#     task = Task(data['name'], data['description'])
 
-    for subtask_data in data['subtasks']:
-        subtask = from_dict(subtask_data)  # Recursively create subtasks
-        task.subtasks.append(subtask)
-        subtask.parent = task
+#     for subtask_data in data['subtasks']:
+#         subtask = from_dict(subtask_data)  # Recursively create subtasks
+#         task.subtasks.append(subtask)
+#         subtask.parent = task
 
-    # Set other properties
-    task.solved = data['solved']
+#     # Set other properties
+#     task.solved = data['solved']
 
-    task.decomposition_id = data['decomposition_id']
-    task.requires_feedback_decomposition = data['requires_feedback_decomposition']
+#     task.decomposition_id = data['decomposition_id']
+#     task.requires_feedback_decomposition = data['requires_feedback_decomposition']
 
-    task.implementation = data['implementation']
-    task.implementation_id = data['implementation_id']
-    task.implementation_language = data['implementation_language']
-    task.requires_feedback_implementation = data['requires_feedback_implementation']
+#     task.implementation = data['implementation']
+#     task.implementation_id = data['implementation_id']
+#     task.implementation_language = data['implementation_language']
+#     task.requires_feedback_implementation = data['requires_feedback_implementation']
 
-    return task
+#     return task
 
-def from_json(data: str) -> Task:
-    return from_dict(json.loads(data))
+# def from_json(data: str) -> Task:
+#     return from_dict(json.loads(data))
 
 def from_node_list(data: list[dict]) -> Task | None:
     '''Load a task from a node list'''
