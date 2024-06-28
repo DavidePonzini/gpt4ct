@@ -94,9 +94,9 @@ def add_node(tree_id: int, parent_id: int, name: str, description: str, user_id:
             WHERE parent_id = {parent_id} AND deleted = FALSE
             '''
         
-        select_max_order_n = database.sql.SQL(select_max_order_n).format({
+        select_max_order_n = database.sql.SQL(select_max_order_n).format(
             parent_id: database.sql.Placeholder('parent_id')
-        })
+        )
 
         c.execute(select_max_order_n, {'parent_id': parent_id})
         max_order_n = c.fetch_one()[0]
