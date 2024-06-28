@@ -51,11 +51,12 @@ def save_tree():
 def load_tree():
     tree_id = json.loads(request.form['tree_id'])
     
-    tree = database.load_tree(tree_id)
+    tree, last_update = database.load_tree(tree_id)
 
     if tree is not None:
         return {
-            'tree': tree.to_json()
+            'tree': tree.to_json(),
+            'last_update': last_update
         }
     
     return {

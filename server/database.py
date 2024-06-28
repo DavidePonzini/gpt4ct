@@ -155,27 +155,48 @@ def load_tree(tree_id) -> task.Task:
             AND deleted = FALSE 
         '''
 
-    query = database.sql.SQL(base_query).format(
+    query_tree_data = database.sql.SQL(base_query).format(
         schema=database.sql.Identifier(schema),
         tree_id=database.sql.Placeholder('tree_id')
     )
 
-    result = db.execute_and_fetch(query, {
-        'tree_id': tree_id
-    })
+    query_last_update = '''SELECT last_update_ts FROM {schema}.trees WHERE tree_id = {tree_id}'''
+    query_last_update = database.sql.SQL(query_last_update).format(
+        schema=database.sql.Identifier(schema),
+        tree_id=database.sql.Placeholder('tree_id')
+    )
 
-    result = [{
-        'path':             node[0],
-        'node_id':          node[1],
-        'user_id':          node[2],
-        'creation_mode':    node[3],
-        'name':             node[4],
-        'description':      node[5],
-        'solved':           node[6],
-        'tree_id':          tree_id,
-    } for node in result]
+    with db.connect() as c:
+        c.execute(query_last_update, {
+            'tree_id': tree_id
+        })
 
-    return task.from_node_list(result)
+        last_update = c.fetch_one()
+        if last_update is None:
+            return None
+        
+        last_update = last_update[0]
+
+        c.execute(query_tree_data, {
+            'tree_id': tree_id
+        })
+
+        result = c.fetch_all()
+
+        result = [{
+            'path':             node[0],
+            'node_id':          node[1],
+            'user_id':          node[2],
+            'creation_mode':    node[3],
+            'name':             node[4],
+            'description':      node[5],
+            'solved':           node[6],
+            'tree_id':          tree_id,
+        } for node in result]
+
+
+
+        return task.from_node_list(result), last_update
 
 def load_tree_with_implementations(tree_id) -> task.Task:
     pass

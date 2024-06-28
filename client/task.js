@@ -1,7 +1,5 @@
 const SERVER_ADDR = '15.237.153.101:5000';
 
-let local_expanded_tasks = [];
-
 class Task {
     constructor(tree_id, node_id, user_id, creation_mode, name, description, solved) {
         this.tree_id = tree_id;
@@ -229,11 +227,11 @@ class Task {
         });
     }
 
-    static load_from_json(data, parent = null) {
-        return Task.load_tree(JSON.parse(data), parent);
+    static load_from_json(data, parent = null, expanded_tasks = []) {
+        return Task.load_tree(JSON.parse(data), parent, expanded_tasks);
     }
 
-    static load_tree(data, parent = null) {
+    static load_tree(data, parent = null, expanded_tasks = []) {
         const task = new Task(
             data.tree_id,
             data.node_id,
@@ -250,17 +248,15 @@ class Task {
 
         // If 'subtasks' array is present in JSON, add each subtask to the task
         data.subtasks.forEach(subtaskData => {
-            const subtask = Task.load_tree(subtaskData); // Recursively create subtasks
-            subtask.parent = task;
+            const subtask = Task.load_tree(subtaskData, task, expanded_tasks); // Recursively create subtasks
             task.subtasks.push(subtask);
         });
 
         // Automatically show children if they were shown
-        if (local_expanded_tasks.includes(task.task_id))
+        if (expanded_tasks.includes(task.task_id))
             task.show_children();
 
         return task; // Return the constructed Task instance
-
     }
 
     add_subtask(name, description) {
