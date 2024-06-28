@@ -11,9 +11,10 @@ class Task:
     Represents a single task, and its decomposition in subtasks
     '''
 
-    def __init__(self, tree_id: int, node_id: int, user_id: int, creation_mode: str, name: str, description: str) -> None:
+    def __init__(self, tree_id: int, node_id: int, user_id: int, creation_mode: str, name: str, description: str, solved: bool) -> None:
         self.node_id = node_id
         self.user_id = user_id
+        self.tree_id = tree_id
 
         self.name = name
         self.description = description
@@ -25,12 +26,6 @@ class Task:
 
         self.solved = False
 
-        self.requires_feedback_decomposition = False
-
-        self.implementation = None              # None: not yet implemented; False: task doesn't need to be implemented
-        self.implementation_id = None
-        self.implementation_language = None
-        self.requires_feedback_implementation = False
 
     def is_root(self):
         return self.parent is None
@@ -160,7 +155,8 @@ def from_node_list(data: list[dict]) -> Task | None:
         user_id=root_node['user_id'],
         creation_mode=root_node['creation_mode'],
         name=root_node['name'],
-        description=root_node['description'])
+        description=root_node['description'],
+        solved=root_node['solved'])
     
     # add all children
     for node in data[1:]:
@@ -173,7 +169,8 @@ def from_node_list(data: list[dict]) -> Task | None:
             user_id=node['user_id'],
             creation_mode=node['creation_mode'],
             name=node['name'],
-            description=node['description'])
+            description=node['description'],
+            solved=node['solved'])
         
         t.add_subtask(child)
 

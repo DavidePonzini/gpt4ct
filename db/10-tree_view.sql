@@ -16,6 +16,7 @@ CREATE VIEW v_trees AS
       creation_ts,
       name,
       description,
+      solved,
       0 AS level,
       ARRAY[]::DECIMAL[] AS path
     FROM 
@@ -35,6 +36,7 @@ CREATE VIEW v_trees AS
       tn.creation_ts,
       tn.name,
       tn.description,
+      solved,
       cte.level + 1,
       cte.path || tn.order_n
     FROM 
@@ -54,7 +56,8 @@ CREATE VIEW v_trees AS
     creation_mode,
     creation_ts,
     name,
-    description
+    description,
+    solved
   FROM 
     tree_cte
   ORDER BY 

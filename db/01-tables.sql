@@ -44,6 +44,8 @@ CREATE TABLE tree_nodes (
   name VARCHAR(1000) NOT NULL,
   description VARCHAR(2000) NOT NULL,
 
+  solved BOOLEAN NOT NULL DEFAULT FALSE,
+
   -- order_n = null iff deleted = true 
   CHECK ((deleted = TRUE AND order_n IS NULL) OR (deleted = FALSE AND order_n IS NOT NULL)),
   

@@ -147,7 +147,8 @@ def load_tree(tree_id) -> task.Task:
             user_id,
             creation_mode,
             name,
-            description
+            description,
+            solved
         FROM {schema}.v_trees
         WHERE
             tree_id = {tree_id}
@@ -170,6 +171,7 @@ def load_tree(tree_id) -> task.Task:
         'creation_mode':    node[3],
         'name':             node[4],
         'description':      node[5],
+        'solved':           node[6],
         'tree_id':          tree_id,
     } for node in result]
 
