@@ -90,11 +90,12 @@ def add_node(tree_id: int, parent_id: int, name: str, description: str, user_id:
     with db.connect() as c:
         select_max_order_n = '''
             SELECT MAX(order_n)
-            FROM tree_nodes
+            FROM {schema}.tree_nodes
             WHERE parent_id = {parent_id} AND deleted = FALSE
             '''
         
         select_max_order_n = database.sql.SQL(select_max_order_n).format(
+            schema=database.sql.Identifier(schema),
             parent_id=database.sql.Placeholder('parent_id')
         )
 
