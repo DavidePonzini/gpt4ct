@@ -24,7 +24,7 @@ CREATE TABLE trees (
 
   user_id VARCHAR(32) REFERENCES users(user_id) NOT NULL,
   creation_ts TIMESTAMP NOT NULL DEFAULT NOW(),
-  last_save_ts TIMESTAMP NOT NULL DEFAULT NOW()
+  last_update_ts TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE tree_nodes (

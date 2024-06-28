@@ -20,7 +20,7 @@ def create_tree(name: str, description: str, user_id: str) -> int:
 
         c.insert(schema, 'tree_nodes', {
             'tree_id': tree_id,
-            'order_n': 1,
+            'order_n': 0,
             'user_id': user_id,
             'creation_mode': 'manual',
             'name': name,
@@ -85,9 +85,10 @@ def save_tree(tree_id: int, user_id: str, tree: Task) -> None:
 
     return tree_id
 
-def add_node(tree_id: int, parent_id: int, name: str, description: str, user_id: str, creation_mode: Literal['manual', 'ai', 'mixed']):
+def add_nodes(tree_id: int, parent_id: int, nodes: list[tuple[str, str]], user_id: str, creation_mode: Literal['manual', 'ai', 'mixed']):
     '''Adds a new node as the last child of `parent_id` for tree `tree_id`'''
     with db.connect() as c:
+        # find max order n
         select_max_order_n = '''
             SELECT MAX(order_n)
             FROM {schema}.tree_nodes
@@ -101,21 +102,45 @@ def add_node(tree_id: int, parent_id: int, name: str, description: str, user_id:
 
         c.execute(select_max_order_n, {'parent_id': parent_id})
         max_order_n = c.fetch_one()[0]
+        order_n = max_order_n + 1 if max_order_n is not None else 0
 
-        c.insert(schema, 'tree_nodes', {
-            'parent_id': parent_id,
-            'tree_id': tree_id,
-            'order_n': max_order_n + 1 if max_order_n is not None else 1,
-            'user_id': user_id,
-            'name': name,
-            'description': description,
-            'creation_mode': creation_mode,
-        })
+        # insert new nodes
+        for node in nodes:
+            c.insert(schema, 'tree_nodes', {
+                'parent_id': parent_id,
+                'tree_id': tree_id,
+                'order_n': order_n,
+                'user_id': user_id,
+                'name': node[0],
+                'description': node[1],
+                'creation_mode': creation_mode,
+            })
 
+            order_n += 1
+
+        # update last_update_ts
+        _update_tree_ts(tree_id, c)        
+
+        # save all operations
         c.commit()
 
+def _update_tree_ts(tree_id: int, connection: database.PostgreSQLConnection):
+    update_tree_ts = '''
+        UPDATE {schema}.trees
+        SET last_update_ts = NOW()
+        WHERE tree_id = {tree_id}
+        '''
+    
+    update_tree_ts = database.sql.SQL(update_tree_ts).format(
+        schema=database.sql.Identifier(schema),
+        tree_id=database.sql.Placeholder('tree_id')
+    )
+
+    connection.execute(update_tree_ts, {'tree_id': tree_id})
+
+
 def get_tree(tree_id) -> str:
-    base_query = 'SELECT tree_data FROM {schema}.trees WHERE tree_id = {tree_id}'
+    base_query = 'SELECT tree_data FROM {schema}.v_trees WHERE tree_id = {tree_id}'
 
     query = database.sql.SQL(base_query).format(
         schema=database.sql.Identifier(schema),
