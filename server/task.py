@@ -1,19 +1,30 @@
 import json
 
+class TaskCreationMode:
+    MANUAL = 'manual'
+    AI = 'ai'
+    MIXED = 'mixed'
+
+
 class Task:
     '''
     Represents a single task, and its decomposition in subtasks
     '''
 
-    def __init__(self, name, description) -> None:
+    def __init__(self, tree_id: int, node_id: int, user_id: int, creation_mode: str, name: str, description: str) -> None:
+        self.node_id = node_id
+        self.user_id = user_id
+
         self.name = name
         self.description = description
+
         self.subtasks = []
         self.parent = None
 
+        self.creation_mode = creation_mode
+
         self.solved = False
 
-        self.decomposition_id = None
         self.requires_feedback_decomposition = False
 
         self.implementation = None              # None: not yet implemented; False: task doesn't need to be implemented
@@ -25,9 +36,9 @@ class Task:
         return self.parent is None
 
     def level(self):
-        return len(self.id())
+        return len(self.path())
 
-    def id(self):
+    def path(self):
         if self.is_root():
             return []
 
@@ -58,13 +69,12 @@ class Task:
     def to_json(self) -> str:
         return json.dumps(self.to_dict())
     
-    def add_subtask(self, name, description):
-        child = Task(name, description)
-        child.parent = self
+    def add_subtask(self, subtask):
+        subtask.parent = self
 
-        self.subtasks.append(child)
+        self.subtasks.append(subtask)
 
-        return child
+        return subtask
 
     def get_root(self):
         task = self
@@ -74,10 +84,10 @@ class Task:
 
         return task
 
-    def get_subtask_from_id(self, id):
+    def get_subtask_from_path(self, path: list[int]):
         task = self.get_root()
 
-        for i in id:
+        for i in path:
             task = task.subtasks[i]
 
         return task
@@ -135,3 +145,37 @@ def from_dict(data) -> Task:
 def from_json(data: str) -> Task:
     return from_dict(json.loads(data))
 
+def from_node_list(data: list[dict]) -> Task | None:
+    '''Load a task from a node list'''
+
+    # if list is empty we don't even have a root node
+    if len(data) == 0:
+        return None
+    
+    # add root node
+    root_node = data[0]
+    root_task = Task(
+        tree_id=root_node['tree_id'],
+        node_id=root_node['node_id'],
+        user_id=root_node['user_id'],
+        creation_mode=root_node['creation_mode'],
+        name=root_node['name'],
+        description=root_node['description'])
+    
+    # add all children
+    for node in data[1:]:
+        node_path = node['path']
+
+        t = root_task.get_subtask_from_path(node_path[:-1])
+        child = Task(
+            tree_id=node['tree_id'],
+            node_id=node['node_id'],
+            user_id=node['user_id'],
+            creation_mode=node['creation_mode'],
+            name=node['name'],
+            description=node['description'])
+        
+        t.add_subtask(child)
+        assert t.path() == node_path
+
+    return root_task

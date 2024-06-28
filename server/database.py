@@ -1,5 +1,5 @@
 from dav_tools import database
-from task import Task
+import task
 
 from typing import Literal
 
@@ -31,7 +31,7 @@ def create_tree(name: str, description: str, user_id: str) -> int:
 
         return tree_id
 
-def save_tree(tree_id: int, user_id: str, tree: Task) -> None:
+def save_tree(tree_id: int, user_id: str, tree: task.Task) -> None:
     '''
         Save current tree state for trees you own, otherwise create a new tree
     
@@ -139,8 +139,20 @@ def _update_tree_ts(tree_id: int, connection: database.PostgreSQLConnection):
     connection.execute(update_tree_ts, {'tree_id': tree_id})
 
 
-def get_tree(tree_id) -> str:
-    base_query = 'SELECT tree_data FROM {schema}.v_trees WHERE tree_id = {tree_id}'
+def load_tree(tree_id) -> task.Task:
+    base_query = '''
+        SELECT
+            path,
+            node_id,
+            user_id,
+            creation_mode
+            name,
+            description,
+        FROM {schema}.v_trees
+        WHERE
+            tree_id = {tree_id}
+            AND deleted = FALSE 
+        '''
 
     query = database.sql.SQL(base_query).format(
         schema=database.sql.Identifier(schema),
@@ -151,12 +163,22 @@ def get_tree(tree_id) -> str:
         'tree_id': tree_id
     })
 
-    if len(result) > 0:
-        return result[0][0]
-    return None
+    result = [{
+        'path':             node[0],
+        'node_id':          node[1],
+        'user_id':          node[2],
+        'creation_mode':    node[3],
+        'name':             node[4],
+        'description':      node[5],
+        'tree_id':          tree_id,
+    } for node in result]
 
+    return task.from_node_list(result)
 
-def log_decomposition(tree_id: int, user_id: str, task: Task, subtasks_amount: int, answer, usage) -> int:
+def load_tree_with_implementations(tree_id) -> task.Task:
+    pass
+
+def log_decomposition(tree_id: int, user_id: str, task: task.Task, subtasks_amount: int, answer, usage) -> int:
     tree_id = save_tree(tree_id, user_id, task)
 
     decomposition_id = db.insert(schema, 'decompositions', {
@@ -164,7 +186,7 @@ def log_decomposition(tree_id: int, user_id: str, task: Task, subtasks_amount: i
 
         'task_name': task.name,
         'task_level': task.level(),
-        'task_id': task.id(),
+        'task_id': task.path(),
         'subtasks_amount': subtasks_amount,
         'answer': answer,
         
