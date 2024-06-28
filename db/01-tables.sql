@@ -7,67 +7,75 @@ GRANT USAGE ON SCHEMA problem_decomposition TO problem_decomposition_admin;
 ALTER DEFAULT PRIVILEGES IN SCHEMA problem_decomposition GRANT ALL ON TABLES TO problem_decomposition_admin;
 ALTER DEFAULT PRIVILEGES IN SCHEMA problem_decomposition GRANT ALL ON SEQUENCES TO problem_decomposition_admin;
 
+SET search_path TO problem_decomposition;
 
-CREATE TABLE problem_decomposition.users (
+
+CREATE TYPE node_generation_mode AS ENUM ('manual', 'ai', 'mixed');
+
+
+CREATE TABLE users (
   user_id VARCHAR(32) PRIMARY KEY,
   credits DECIMAL(10) NOT NULL DEFAULT 0
 );
 
-CREATE TABLE problem_decomposition.trees (
+CREATE TABLE trees (
   -- primary key
   tree_id SERIAL PRIMARY KEY,
 
-  user_id VARCHAR(32) REFERENCES problem_decomposition.users(user_id) NOT NULL,
+  user_id VARCHAR(32) REFERENCES users(user_id) NOT NULL,
   creation_ts TIMESTAMP NOT NULL DEFAULT NOW(),
-  root_task_name VARCHAR(1000) NOT NULL,
-
-  last_save_ts TIMESTAMP NOT NULL DEFAULT NOW(),
-  tree_data TEXT NOT NULL
+  last_save_ts TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE problem_decomposition.decompositions (
+CREATE TABLE tree_nodes (
   -- primary key
-  decomposition_id SERIAL PRIMARY KEY,
+  node_id SERIAL NOT NULL PRIMARY KEY,
 
-  tree_id INTEGER REFERENCES problem_decomposition.trees(tree_id) NOT NULL,
+  parent_id INTEGER REFERENCES tree_nodes(node_id) DEFAULT NULL,
+
+  tree_id INTEGER REFERENCES trees(tree_id) NOT NULL,
+  order_n DECIMAL(2),
+  deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+  user_id VARCHAR(32) REFERENCES users(user_id) NOT NULL,
+  creation_mode node_generation_mode NOT NULL,
+  creation_ts TIMESTAMP NOT NULL DEFAULT NOW(),
+
+  name VARCHAR(1000) NOT NULL,
+  description VARCHAR(2000) NOT NULL,
+
+  -- order_n = null iff deleted = true 
+  CHECK ((deleted = TRUE AND order_n IS NULL) OR (deleted = FALSE AND order_n IS NOT NULL)),
   
-  decomposition_ts TIMESTAMP NOT NULL DEFAULT NOW(),
-
-  task_name VARCHAR(1000) NOT NULL,
-  task_level DECIMAL(2) NOT NULL,
-  task_id DECIMAL(2)[] NOT NULL,
-  subtasks_amount DECIMAL(2) NOT NULl,
-  answer TEXT NOT NULL,
-
-  -- usage
-  prompt_tokens DECIMAL(6) NOT NULL,
-  completion_tokens DECIMAL(6) NOT NULL
+  -- no duplicate order_n for the same parent_id
+  UNIQUE (parent_id, order_n)
 );
 
-CREATE TABLE problem_decomposition.implementations (
+CREATE TABLE implementations (
   -- primary key
-  implementation_id SERIAL PRIMARY KEY,
+  implementation_id SERIAL NOT NULL PRIMARY KEY,
 
-  tree_id INTEGER REFERENCES problem_decomposition.trees(tree_id) NOT NULL,
-  decomposition_id INTEGER REFERENCES problem_decomposition.decompositions(decomposition_id),
+  node_id INTEGER REFERENCES tree_nodes(node_id) NOT NULL,
+  deleted BOOLEAN NOT NULL DEFAULT FALSE,
 
-  implementation_ts TIMESTAMP NOT NULL DEFAULT NOW(),
-
-  task_name VARCHAR(1000) NOT NULL,
-  task_level DECIMAL(4) NOT NULL,
-  task_id DECIMAL(2)[] NOT NULL,
+  user_id VARCHAR(32) REFERENCES users(user_id) NOT NULL,
+  
+  implementation TEXT NOT NULL,
   implementation_language VARCHAR(64),
-  answer TEXT NOT NULL,
+
+  additional_prompt VARCHAR(1000) DEFAULT NULL,
+
+  creation_ts TIMESTAMP NOT NULL DEFAULT NOW(),
 
   -- usage
-  prompt_tokens DECIMAL(6) NOT NULL,
-  completion_tokens DECIMAL(6) NOT NULL
+  tokens_in DECIMAL(6) NOT NULL,
+  tokens_out DECIMAL(6) NOT NULL
 );
 
-CREATE TABLE problem_decomposition.feedback_decompositions (
+CREATE TABLE feedback_nodes (
   -- primary key
-  decomposition_id INTEGER REFERENCES problem_decomposition.decompositions(decomposition_id) NOT NULL,
-  user_id VARCHAR(32) REFERENCES problem_decomposition.users(user_id) NOT NULL, -- support feedback by different users
+  node_id INTEGER REFERENCES tree_nodes(node_id) NOT NULL,
+  user_id VARCHAR(32) REFERENCES users(user_id) NOT NULL,
 
   q1 DECIMAL(1) NOT NULL,
   q2 DECIMAL(1) NOT NULL,
@@ -76,7 +84,7 @@ CREATE TABLE problem_decomposition.feedback_decompositions (
   comments VARCHAR(2000),
   feedback_ts TIMESTAMP NOT NULL DEFAULT NOW(),
 
-  PRIMARY KEY(decomposition_id, user_id)
+  PRIMARY KEY(node_id, user_id)
 );
 
 
