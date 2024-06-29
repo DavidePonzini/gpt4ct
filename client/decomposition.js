@@ -31,21 +31,9 @@ function focus_root() {
 
 $(document).ready(function() {
     // Make dummy tree
-    let tree = new Task('Load an existing task or create a new one', '');
+    let tree = new Task(null, null, null, null, 'Load an existing task or create a new one', '');
 
-    let sample_load = tree.add_subtask('Load an existing task', '');
-    let sample_new = tree.add_subtask('Create a new task');
-
-    sample_load.add_subtask('Click on Task > Load by ID');
-    sample_load.add_subtask('Enter the task\'s ID');
-    sample_load.add_subtask('Confirm');
-
-    sample_new.add_subtask('Login');
-    sample_new.add_subtask('Click on Task > New');
-    sample_new.add_subtask('Insert task data');
-    sample_new.add_subtask('Confirm');
-
-    init(tree, null, null);
+    init(JSON.stringify(tree.toJSON()), null, null);
     show_all_children(tree);
 })
 
@@ -81,6 +69,9 @@ function new_tree() {
 
 function load_from_server(cb = () => {}) {
     let tree_id = +prompt('Insert tree ID:');
+    if (!tree_id)
+        return;
+
     load_from_server_id(tree_id, cb);
 }
 
@@ -95,7 +86,6 @@ function load_from_server_id(tree_id, cb = () => {}) {
         url: `http://${SERVER_ADDR}/load-tree`,
         data: {
             'tree_id': JSON.stringify(tree_id),
-            'tree': JSON.stringify(tree_data),
         },
         success: function(d) {
             if (d.status && d.status == 'error') {
@@ -115,14 +105,14 @@ function init(tree_json, _tree_id, _last_update, _expanded_tasks = []) {
     let tree = Task.load_from_json(tree_json, null, _expanded_tasks);
 
     tree_data = tree;
-    set_tree_id(id);
+    set_tree_id(_tree_id);
     last_update = _last_update;
     expanded_tasks = _expanded_tasks;
     
     update();
 
     // Useful for debugging, should be eventually removed
-    window.data = tree_json;
+    window.data = tree;
 }
 
 function set_tree_id(id) {
@@ -583,21 +573,6 @@ function hide_buttons() {
     $('#task-data').modal('hide');
 }
 
-function show_children(task) {
-    hide_buttons();
-
-    task.show_children();
-    expanded_tasks.push(task.task_id);
-    update();
-}
-
-function hide_children(task) {
-    hide_buttons();
-
-    task.hide_children();
-    update();
-}
-
 function delete_children(item) {
     hide_buttons();
 
@@ -623,13 +598,28 @@ function unsolve(item) {
     update();
 }
 
-function show_all_children() {
-    tree_data.show_children(true);
+function show_children(task) {
+    hide_buttons();
+
+    task.show_children(false, (t) => expanded_tasks.push(t.task_id));
     update();
 }
 
+function hide_children(task) {
+    hide_buttons();
+
+    task.hide_children(false, (t) => expanded_tasks.splice(expanded_tasks.indexOf(t.task_id)));
+    update();
+}
+
+function show_all_children() {
+    tree_data.show_children(true, (t) => expanded_tasks.push(t.task_id));
+    update();
+window.expanded_tasks = expanded_tasks;
+}
+
 function hide_all_children() {
-    tree_data.hide_children(true);
+    tree_data.hide_children(true, (t) => expanded_tasks.splice(expanded_tasks.indexOf(t.task_id)));
     update();
 }
 

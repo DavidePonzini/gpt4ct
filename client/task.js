@@ -68,22 +68,30 @@ class Task {
         return this.subtasks.length;
     }
 
-    show_children(recursive = false) {
+    show_children(recursive = false, cb_expanded = (c) => {}) {
+        if (!this.has_children())
+            return;
+
         this.children = this.subtasks;
+        cb_expanded(this);
 
         if (recursive)
             for (let subtask of this.subtasks)
-                subtask.show_children(recursive);
+                subtask.show_children(recursive, cb_expanded);
 
         return this;
     }
 
-    hide_children(recursive = false) {
+    hide_children(recursive = false, cb_hidden = (c) => {}) {
+        if (!this.has_children())
+            return;
+
         this.children = null;
+        cb_hidden(this);
 
         if (recursive)
             for (let subtask of this.subtasks)
-                subtask.hide_children(recursive);
+                subtask.hide_children(recursive, cb_hidden);
 
         return this;
     }
