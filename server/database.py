@@ -65,11 +65,9 @@ def set_children_of_task(user_id: str, parent_id: int, tasks: list[dict], new_ta
 
     get_task_data = database.sql.SQL('''
         SELECT
-            order_n,
             creation_mode,
             name,
-            description,
-            solved
+            description
         FROM {schema}.tasks
         WHERE task_id = {task_id}
         ''').format(
@@ -123,7 +121,7 @@ def set_children_of_task(user_id: str, parent_id: int, tasks: list[dict], new_ta
                 c.execute(get_task_data, {
                     'task_id': task['task_id']
                 })
-                order_n, creation_mode, name, description, solved = c.fetch_one()
+                creation_mode, name, description = c.fetch_one()
 
                 # if the only change is the order, don't replace the task
                 if task['name'] == name and task['description'] == description:
