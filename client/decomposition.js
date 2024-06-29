@@ -492,7 +492,7 @@ function generate_decomposition(item) {
 
         load_from_server_id(tree_id);
         
-        // show_children(task);
+        show_children(task);
     }, function(e) {
         console.error(e);
         task.running = false;

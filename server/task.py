@@ -81,7 +81,7 @@ class Task:
         task = self.get_root()
 
         for i in path:
-            task = task.subtasks[i]
+            task = task.subtasks[int(i)]    # cast to int is required because we might have `decimal.Decimal`
 
         return task
     
@@ -158,7 +158,7 @@ def from_node_list(data: list[dict]) -> Task | None:
     
     # add all children
     for node in data[1:]:
-        node_path = [int(n) for n in node['path']]
+        node_path = node['path']
 
         t = root_task.get_subtask_from_path(node_path[:-1])
         child = Task(
