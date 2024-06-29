@@ -288,7 +288,7 @@ def delete_tasks(task_ids: list[int]) -> None:
     query = database.sql.SQL('''
         UPDATE {schema}.tasks
         SET deleted = TRUE
-        WHERE task_id IN ({task_ids})
+        WHERE task_id IN {task_ids}
         ''').format(
             schema=database.sql.Identifier(schema),
             task_ids=database.sql.Placeholder('task_ids'),
