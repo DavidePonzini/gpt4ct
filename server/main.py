@@ -78,6 +78,26 @@ def set_task_description():
         'status': 'ok'
     }
 
+@app.route('/delete-tasks', methods=['POST'])
+def delete_tasks():
+    task_ids = json.loads(request.form['task_ids'])
+
+    database.delete_tasks(task_ids)
+
+    return {
+        'status': 'ok'
+    }
+
+@app.route('/solve', methods=['POST'])
+def solve():
+    task_id = json.loads(request.form['task_id'])
+    solved = json.loads(request.form['solved'])
+
+    database.solve_task(task_id, solved)
+
+    return {
+        'status': 'ok'
+    }
 
 @app.route('/decompose', methods=['POST'])
 def decompose_task():

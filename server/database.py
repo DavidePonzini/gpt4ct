@@ -284,6 +284,35 @@ def load_tree(tree_id: int) -> tuple[Task, any]:
 
         return task.from_node_list(result), last_update
 
+def delete_tasks(task_ids: list[int]) -> None:
+    query = database.sql.SQL('''
+        UPDATE {schema}.tasks
+        SET deleted = TRUE
+        WHERE task_id IN {task_ids}
+        ''').format(
+            schema=database.sql.Identifier(schema),
+            task_ids=database.sql.Placeholder('task_ids'),
+        )
+    
+    db.execute(query, {
+        'task_ids': task_ids
+    })
+
+def solve_task(task_id: int, solved: bool) -> None:
+    query = database.sql.SQL('''
+        UPDATE {schema}.tasks
+        SET solved = {solved}
+        WHERE task_id = {task_id}
+        ''').format(
+            schema=database.sql.Identifier(schema),
+            solved=database.sql.Placeholder('solved'),
+            task_ids=database.sql.Placeholder('task_id'),
+        )
+    
+    db.execute(query, {
+        'task_id': task_id,
+        'solved': solved,
+    })
 
 def load_tree_with_implementations(tree_id: int) -> Task:
     pass

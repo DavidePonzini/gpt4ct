@@ -472,9 +472,9 @@ function show_buttons(item) {
     let button_unsolve = $('#unsolve');
     if (item.data.is_solved()) {
         button_solve.hide();
-        button_unsolve.show().unbind().on('click', () => unsolve(item));
+        button_unsolve.show().unbind().on('click', () => solve(item, false));
     } else {
-        button_solve.show().unbind().on('click', () => solve(item));
+        button_solve.show().unbind().on('click', () => solve(item, true));
         button_unsolve.hide();
     }
 }
@@ -490,9 +490,10 @@ function generate_decomposition(item) {
     task.generate_decomposition(user_id, function() {
         task.running = false;
 
+        // show this task after refresh
+        expanded_tasks.push(task.task_id);
+
         load_from_server_id(tree_id);
-        
-        show_children(task);
     }, function(e) {
         console.error(e);
         task.running = false;
@@ -601,26 +602,34 @@ function hide_buttons() {
 function delete_children(item) {
     hide_buttons();
 
-    item.data.clear_subtasks();
-    item.data.needs_feedback_decomposition = false;
-    
-    update();
+    let ids = [];
+    for (let subtask of item.data.subtasks)
+        ids.push(subtask.task_id);
+
+    $.ajax({
+        type: 'POST',
+        url: `http://${SERVER_ADDR}/delete-tasks`,
+        data: {
+            'task_ids': JSON.stringify(ids),
+        },
+        success: () => load_from_server_id(tree_id),
+        error: console.error
+    });
 }
 
-function solve(item) {
+function solve(item, solved) {
     hide_buttons();
 
-    item.data.solve();
-
-    update();
-}
-
-function unsolve(item) {
-    hide_buttons();
-
-    item.data.unsolve();
-
-    update();
+    $.ajax({
+        type: 'POST',
+        url: `http://${SERVER_ADDR}/solve`,
+        data: {
+            'task_id': JSON.stringify(item.data.task_id),
+            'solved': JSON.stringify(solved)
+        },
+        success: () => load_from_server_id(tree_id),
+        error: console.error
+    });
 }
 
 function show_children(task) {

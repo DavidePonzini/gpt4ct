@@ -13,11 +13,14 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Create a trigger that fires before updating the tasks table
 CREATE TRIGGER trg_tasks_deleted
 BEFORE UPDATE ON tasks
 FOR EACH ROW
 WHEN (OLD.deleted IS DISTINCT FROM NEW.deleted)
 EXECUTE FUNCTION trg_tasks_deleted_update();
 
+
+-- Recursively solve all subtasks of a task
+-- Recursively unsolve all parents of a task
+-- Recursively remove all parent implementations of a task
 COMMIT;
