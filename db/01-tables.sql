@@ -48,7 +48,7 @@ CREATE TABLE tasks (
   solved BOOLEAN NOT NULL DEFAULT FALSE,
 
   -- tasks that are edits from another task need to be tagged as deleted
-  CHECK (deleted = FALSE OR (deleted = TRUE AND is_edit_from IS NOT NULL)),
+  CHECK (is_edit_from IS NULL OR (is_edit_from IS NOT NULL AND deleted = TRUE)),
 
   -- order_n = null iff deleted = true 
   CHECK ((deleted = TRUE AND order_n IS NULL) OR (deleted = FALSE AND order_n IS NOT NULL)),
