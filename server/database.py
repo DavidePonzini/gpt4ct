@@ -33,7 +33,7 @@ def create_tree(name: str, description: str, user_id: str) -> int:
         return tree_id
 
 
-def add_nodes(tree_id: int, parent_id: int, nodes: list[tuple[str, str]], user_id: str, creation_mode: Literal['manual', 'ai', 'mixed']):
+def add_nodes(tree_id: int, parent_id: int, nodes: list[tuple[str, str]], user_id: str, creation_mode: Literal['manual', 'ai', 'mixed'], tokens: tuple[int, int] | None = None):
     '''Adds a new node as the last child of `parent_id` for tree `tree_id`'''
     with db.connect() as c:
         # find max order n

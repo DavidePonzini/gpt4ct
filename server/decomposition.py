@@ -29,8 +29,7 @@ def decompose(task: Task, user_id: str):
                            [(subtask['name'], subtask['description'])],
                            user_id,
                            TaskCreationMode.AI,
-                           usage.prompt_tokens,
-                           usage.completion_tokens,
+                           (usage.prompt_tokens, usage.completion_tokens),
             )
 
     print_price(usage)
