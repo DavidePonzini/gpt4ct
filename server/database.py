@@ -88,7 +88,7 @@ def _update_tree_ts(tree_id: int, connection: database.PostgreSQLConnection):
     connection.execute(update_tree_ts, {'tree_id': tree_id})
 
 
-def set_children_of_task(user_id: str, parent_id: int, tasks: list[dict], task_creation_mode: Literal['manual', 'ai', 'mixed'],) -> None:
+def set_children_of_task(user_id: str, parent_id: int, tasks: list[dict], new_task_creation_mode: Literal['manual', 'ai', 'mixed'],) -> None:
     get_tree_id = database.sql.SQL('''SELECT tree_id FROM {schema}.nodes WHERE task_id = {task_id}''').format(
         task_id=database.sql.Placeholder('task_id')
     )
@@ -153,7 +153,7 @@ def set_children_of_task(user_id: str, parent_id: int, tasks: list[dict], task_c
                     'tree_id': tree_id,
                     'order_n': i,
                     'user_id': user_id,
-                    'creation_mode': task_creation_mode,
+                    'creation_mode': new_task_creation_mode,
                     'name': task['name'],
                     'description': task['description'],
                 })

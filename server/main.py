@@ -60,19 +60,7 @@ def update_tasks():
     parent_id = json.loads(request.form['parent_id'])
     tasks = json.loads(request.form['tasks'])
 
-    database.set_children_of_task(user_id, parent_id, tasks)
-
-    return {
-        'status': 'ok'
-    }
-
-@app.route('/set-task-description', methods=['POST'])
-def set_task_description():
-    task_id = json.loads(request.form['task_id'])
-    user_id = json.loads(request.form['user_id'])
-    text = json.loads(request.form['text'])
-
-    database.set_task_description(task_id, user_id, text)
+    database.set_children_of_task(user_id, parent_id, tasks, task.TaskCreationMode.MANUAL)
 
     return {
         'status': 'ok'
