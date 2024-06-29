@@ -1,9 +1,9 @@
 const SERVER_ADDR = '15.237.153.101:5000';
 
 class Task {
-    constructor(tree_id, node_id, user_id, creation_mode, name, description, solved) {
+    constructor(tree_id, task_id, user_id, creation_mode, name, description, solved = false) {
         this.tree_id = tree_id;
-        this.node_id = node_id;
+        this.task_id = task_id;
         this.user_id = user_id;
         
         this.name = name;
@@ -14,7 +14,7 @@ class Task {
 
         this.creation_mode = creation_mode;
 
-        this.solved = false;
+        this.solved = solved;
 
         // only needed for ui, no need to store these properties on server
         this.children = null;
@@ -221,7 +221,7 @@ class Task {
     static load_tree(data, parent = null, expanded_tasks = []) {
         const task = new Task(
             data.tree_id,
-            data.node_id,
+            data.task_id,
             data.user_id,
             data.creation_mode,
             data.name,
