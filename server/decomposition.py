@@ -1,11 +1,11 @@
 from chatgpt import Message, print_price
 import database
-from task import Task
+from task import Task, TaskCreationMode
 import json
 import prompts
 
 
-def decompose(tree_id: int, user_id: str, task: Task):
+def decompose(task: Task, user_id: str):
     message = Message()
     message.add_message('system', prompts.Decomposition.instructions)
     
@@ -20,32 +20,21 @@ def decompose(tree_id: int, user_id: str, task: Task):
     answer = json.loads(answer_json)
     subtasks = answer['result']
 
+    usage = message.usage[-1]
+
     # add subtasks to tree
     for subtask in subtasks:
-        task.add_subtask(subtask['name'], subtask['description'])
-
-    usage = message.usage[-1]
-    decomposition_id, tree_id = database.log_decomposition(
-        tree_id=tree_id,
-        user_id=user_id,
-        task=task,
-        subtasks_amount=len(subtasks),
-        answer=answer_json,
-        usage=usage
-    )
-
-    # update task properties
-    task.requires_feedback_decomposition = True
-    task.decomposition_id = decomposition_id
-
-    database.save_tree(tree_id, user_id, task)
+        database.add_nodes(task.tree_id,
+                           task.task_id,
+                           [(subtask['name'], subtask['description'])],
+                           user_id,
+                           TaskCreationMode.AI,
+                           usage['prompt_tokens'],
+                           usage['completion_tokens'],
+            )
 
     print_price(usage)
 
-    return {
-        'task': task.to_json(),
-        'tree_id': tree_id,
-    }
 
 def implement(tree_id: int, user_id: str, task: Task, language: str):
     message = Message()

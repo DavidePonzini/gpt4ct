@@ -1,7 +1,7 @@
+from typing import Literal
+
 from dav_tools import database
 import task
-
-from typing import Literal
 
 
 schema = 'problem_decomposition'
@@ -11,6 +11,7 @@ db = database.PostgreSQL(database='postgres',
                          user='problem_decomposition_admin',
                          password='decomp')
 
+
 def create_tree(name: str, description: str, user_id: str) -> int:
     '''Create a tree and get its id'''
 
@@ -18,7 +19,7 @@ def create_tree(name: str, description: str, user_id: str) -> int:
         result = c.insert(schema, 'trees', {'user_id': user_id}, return_fields=['tree_id'])
         tree_id = result[0][0]
 
-        c.insert(schema, 'tree_nodes', {
+        c.insert(schema, 'tasks', {
             'tree_id': tree_id,
             'order_n': 0,
             'user_id': user_id,
@@ -31,59 +32,6 @@ def create_tree(name: str, description: str, user_id: str) -> int:
 
         return tree_id
 
-def save_tree(tree_id: int, user_id: str, tree: task.Task) -> None:
-    '''
-        Save current tree state for trees you own, otherwise create a new tree
-    
-        :param tree: can be any task of the tree
-    '''
-
-    return
-
-    base_query = 'SELECT user_id FROM {schema}.trees WHERE tree_id = {tree_id}'
-    query = database.sql.SQL(base_query).format(
-        schema=database.sql.Identifier(schema),
-        tree_id=database.sql.Placeholder('tree_id'),
-    )
-
-    result = db.execute_and_fetch(query, {
-        'tree_id': tree_id
-    })
-
-    if len(result) > 0:
-        tree_owner = result[0][0]
-    else:
-        tree_owner = None
-
-    # Create a new tree if the user is not the owner
-    if tree_owner is None or tree_owner != user_id:
-        tree_id = create_tree(tree, user_id)
-
-    root_task = tree.get_root()
-
-    base_query = '''
-        UPDATE {schema}.trees
-        SET
-            tree_data = {tree_data},
-            root_task_name = {root_task_name},
-            last_save_ts = NOW()
-        WHERE tree_id = {tree_id}
-        '''
-
-    query = database.sql.SQL(base_query).format(
-        schema=database.sql.Identifier(schema),
-        tree_data=database.sql.Placeholder('tree_data'),
-        root_task_name=database.sql.Placeholder('root_task_name'),
-        tree_id=database.sql.Placeholder('tree_id'),
-    )
-
-    db.execute(query, {
-        'tree_id': tree_id,
-        'root_task_name': root_task.name,
-        'tree_data': root_task.to_json(),
-    })
-
-    return tree_id
 
 def add_nodes(tree_id: int, parent_id: int, nodes: list[tuple[str, str]], user_id: str, creation_mode: Literal['manual', 'ai', 'mixed']):
     '''Adds a new node as the last child of `parent_id` for tree `tree_id`'''
@@ -91,7 +39,7 @@ def add_nodes(tree_id: int, parent_id: int, nodes: list[tuple[str, str]], user_i
         # find max order n
         select_max_order_n = '''
             SELECT MAX(order_n)
-            FROM {schema}.tree_nodes
+            FROM {schema}.tasks
             WHERE parent_id = {parent_id} AND deleted = FALSE
             '''
         
@@ -106,7 +54,7 @@ def add_nodes(tree_id: int, parent_id: int, nodes: list[tuple[str, str]], user_i
 
         # insert new nodes
         for node in nodes:
-            c.insert(schema, 'tree_nodes', {
+            c.insert(schema, 'tasks', {
                 'parent_id': parent_id,
                 'tree_id': tree_id,
                 'order_n': order_n,
@@ -139,11 +87,30 @@ def _update_tree_ts(tree_id: int, connection: database.PostgreSQLConnection):
     connection.execute(update_tree_ts, {'tree_id': tree_id})
 
 
-def load_tree(tree_id) -> task.Task:
+def load_task(task_id: int) -> task.Task:
+    query_get_task_info = database.sql.SQL('''SELECT tree_id, path FROM {schema}.v_trees WHERE task_id = {task_id} AND deleted = FALSE''').format(
+        schema=database.sql.Identifier(schema),
+        task_id=database.sql.Placeholder('task_id')
+    )
+
+    result = db.execute_and_fetch(query_get_task_info, {
+        'task_id': task_id
+    })
+
+    if len(result) == 0:
+        return None
+    
+    tree_id, path = result[0]
+    
+    tree, last_update = load_tree(tree_id)
+    return tree.get_subtask_from_path(path)
+
+
+def load_tree(tree_id: int) -> tuple[task.Task, any]:
     base_query = '''
         SELECT
             path,
-            node_id,
+            task_id,
             user_id,
             creation_mode,
             name,
@@ -184,76 +151,22 @@ def load_tree(tree_id) -> task.Task:
         result = c.fetch_all()
 
         result = [{
-            'path':             node[0],
-            'node_id':          node[1],
-            'user_id':          node[2],
-            'creation_mode':    node[3],
-            'name':             node[4],
-            'description':      node[5],
-            'solved':           node[6],
+            'path':             task[0],
+            'task_id':          task[1],
+            'user_id':          task[2],
+            'creation_mode':    task[3],
+            'name':             task[4],
+            'description':      task[5],
+            'solved':           task[6],
             'tree_id':          tree_id,
-        } for node in result]
-
-
+        } for task in result]
 
         return task.from_node_list(result), last_update
 
-def load_tree_with_implementations(tree_id) -> task.Task:
+
+def load_tree_with_implementations(tree_id: int) -> task.Task:
     pass
 
-def log_decomposition(tree_id: int, user_id: str, task: task.Task, subtasks_amount: int, answer, usage) -> int:
-    tree_id = save_tree(tree_id, user_id, task)
-
-    decomposition_id = db.insert(schema, 'decompositions', {
-        'tree_id': tree_id,
-
-        'task_name': task.name,
-        'task_level': task.level(),
-        'task_id': task.path(),
-        'subtasks_amount': subtasks_amount,
-        'answer': answer,
-        
-        'prompt_tokens': usage.prompt_tokens,
-        'completion_tokens': usage.completion_tokens
-    },
-    return_fields=['decomposition_id'])
-
-    return decomposition_id[0][0], tree_id
-
-def log_implementation(tree_id: int, user_id: str, decomposition_id: int, task: task.Task, language, answer, usage) -> int:
-    tree_id = save_tree(tree_id, user_id, task)
-
-    implementation_id = db.insert(schema, 'implementations', {
-        'tree_id': tree_id,
-        'decomposition_id': decomposition_id,
-
-        'task_name': task.name,
-        'task_level': task.level(),
-        'task_id': task.id(),
-        'implementation_language': language,
-        'answer': answer,
-
-        'prompt_tokens': usage.prompt_tokens,
-        'completion_tokens': usage.completion_tokens 
-    },
-    return_fields=['implementation_id'])
-
-
-    return implementation_id[0][0], tree_id
-
-
-def log_feedback_decomposition(decomposition_id: int, user_id: str, q1, q2, q3, q4, comments):
-    db.insert(schema, 'feedback_decompositions', {
-        'decomposition_id': decomposition_id,
-
-        'user_id': user_id,
-
-        'q1': q1,
-        'q2': q2,
-        'q3': q3,
-        'q4': q4,
-        'comments': comments if len(comments) > 0 else None
-    })
 
 def check_user_exists(user_id: str):
     base_query = 'SELECT COUNT(*) FROM {schema}.users WHERE user_id = {user_id}'

@@ -7,7 +7,7 @@ DROP VIEW IF EXISTS v_trees;
 CREATE VIEW v_trees AS
   WITH RECURSIVE tree_cte AS (
     SELECT 
-      node_id,
+      task_id,
       parent_id,
       tree_id,
       deleted,
@@ -20,36 +20,36 @@ CREATE VIEW v_trees AS
       0 AS level,
       ARRAY[]::DECIMAL[] AS path
     FROM 
-      tree_nodes
+      tasks
     WHERE 
       parent_id IS NULL
 
     UNION ALL
 
     SELECT 
-      tn.node_id,
-      tn.parent_id,
-      tn.tree_id,
-      tn.deleted,
-      tn.user_id,
-      tn.creation_mode,
-      tn.creation_ts,
-      tn.name,
-      tn.description,
-      tn.solved,
+      t.task_id,
+      t.parent_id,
+      t.tree_id,
+      t.deleted,
+      t.user_id,
+      t.creation_mode,
+      t.creation_ts,
+      t.name,
+      t.description,
+      t.solved,
       cte.level + 1,
-      cte.path || tn.order_n
+      cte.path || t.order_n
     FROM 
-      tree_nodes tn
+      tasks t
     INNER JOIN 
-      tree_cte cte ON tn.parent_id = cte.node_id
+      tree_cte cte ON t.parent_id = cte.task_id
   )
 
   SELECT 
     tree_id,
     path,
     level,
-    node_id,
+    task_id,
     parent_id,
     deleted,
     user_id,

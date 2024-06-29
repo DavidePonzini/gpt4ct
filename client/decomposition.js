@@ -4,6 +4,7 @@ import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 let tree_data = null;
 let tree_id = null;
 let last_update = null;
+let expanded_tasks = [];
 
 const svg = d3.select('#tree');
 const g = svg.append('g');
@@ -496,11 +497,12 @@ function generate_decomposition(item) {
 
     let task = item.data;
 
-    task.generate_decomposition(tree_id, user_id, function(d) {
-        set_tree_id(d.tree_id);
-        
+    task.generate_decomposition(user_id, function() {
         task.running = false;
-        show_children(task);
+
+        load_from_server_id(tree_id);
+        
+        // show_children(task);
     }, function(e) {
         console.error(e);
         task.running = false;

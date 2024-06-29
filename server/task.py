@@ -11,8 +11,8 @@ class Task:
     Represents a single task, and its decomposition in subtasks
     '''
 
-    def __init__(self, tree_id: int, node_id: int, user_id: int, creation_mode: str, name: str, description: str, solved: bool = False) -> None:
-        self.node_id = node_id
+    def __init__(self, tree_id: int, task_id: int, user_id: int, creation_mode: str, name: str, description: str, solved: bool = False) -> None:
+        self.task_id = task_id
         self.user_id = user_id
         self.tree_id = tree_id
 
@@ -46,7 +46,7 @@ class Task:
         Convert current task and subtasks to a dictionary, ready for JSON format conversion
         '''
         return {
-            'node_id': self.node_id,
+            'task_id': self.task_id,
             'user_id': self.user_id,
             'tree_id': self.tree_id,
 
@@ -149,7 +149,7 @@ def from_node_list(data: list[dict]) -> Task | None:
     root_node = data[0]
     root_task = Task(
         tree_id=root_node['tree_id'],
-        node_id=root_node['node_id'],
+        task_id=root_node['task_id'],
         user_id=root_node['user_id'],
         creation_mode=root_node['creation_mode'],
         name=root_node['name'],
@@ -163,7 +163,7 @@ def from_node_list(data: list[dict]) -> Task | None:
         t = root_task.get_subtask_from_path(node_path[:-1])
         child = Task(
             tree_id=node['tree_id'],
-            node_id=node['node_id'],
+            task_id=node['task_id'],
             user_id=node['user_id'],
             creation_mode=node['creation_mode'],
             name=node['name'],

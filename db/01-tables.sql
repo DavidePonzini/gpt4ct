@@ -27,11 +27,11 @@ CREATE TABLE trees (
   last_update_ts TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE tree_nodes (
+CREATE TABLE tasks (
   -- primary key
-  node_id SERIAL NOT NULL PRIMARY KEY,
+  task_id SERIAL NOT NULL PRIMARY KEY,
 
-  parent_id INTEGER REFERENCES tree_nodes(node_id) DEFAULT NULL,
+  parent_id INTEGER REFERENCES tasks(task_id) DEFAULT NULL,
 
   tree_id INTEGER REFERENCES trees(tree_id) NOT NULL,
   order_n DECIMAL(2),
@@ -57,7 +57,7 @@ CREATE TABLE implementations (
   -- primary key
   implementation_id SERIAL NOT NULL PRIMARY KEY,
 
-  node_id INTEGER REFERENCES tree_nodes(node_id) NOT NULL,
+  task_id INTEGER REFERENCES tasks(task_id) NOT NULL,
   deleted BOOLEAN NOT NULL DEFAULT FALSE,
 
   user_id VARCHAR(32) REFERENCES users(user_id) NOT NULL,
@@ -76,7 +76,7 @@ CREATE TABLE implementations (
 
 CREATE TABLE feedback_nodes (
   -- primary key
-  node_id INTEGER REFERENCES tree_nodes(node_id) NOT NULL,
+  task_id INTEGER REFERENCES tasks(task_id) NOT NULL,
   user_id VARCHAR(32) REFERENCES users(user_id) NOT NULL,
 
   q1 DECIMAL(1) NOT NULL,
@@ -86,7 +86,7 @@ CREATE TABLE feedback_nodes (
   comments VARCHAR(2000),
   feedback_ts TIMESTAMP NOT NULL DEFAULT NOW(),
 
-  PRIMARY KEY(node_id, user_id)
+  PRIMARY KEY(task_id, user_id)
 );
 
 

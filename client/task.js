@@ -20,13 +20,13 @@ class Task {
         this.children = null;
     }
 
-    id() {
+    path() {
         if (this.is_root())
             return []
 
         let my_id = this.parent.subtasks.findIndex(d => d === this);
         
-        return this.parent.id().concat(my_id);
+        return this.parent.path().concat(my_id);
     }
 
     needs_feedback() {
@@ -35,6 +35,13 @@ class Task {
 
     is_root() {
         return this.parent == null;
+    }
+
+    get_root() {
+        if (this.is_root())
+            return this;
+
+        return this.parent.get_root();
     }
 
     is_leaf() {
@@ -132,39 +139,19 @@ class Task {
         this.requires_feedback_decomposition = false;
     }
 
-    generate_decomposition(tree_id, user_id, cb, cb_error = console.error) {
-        // Clear previous decomposition, if exists
-        this.clear_subtasks();
-
+    generate_decomposition(user_id, cb, cb_error = console.error) {
         let this_task = this;
-
-        let root_task = this;
-        while(!root_task.is_root())
-            root_task = root_task.parent;
 
         $.ajax({
             type: 'POST',
             url: `http://${SERVER_ADDR}/decompose`,
             data: {
-                'tree': JSON.stringify(root_task),
-                'tree_id': JSON.stringify(tree_id),
+                'task_id': JSON.stringify(this_task.task_id),
                 'user_id': JSON.stringify(user_id),
-                'task_id': JSON.stringify(this_task.id()),
             },
             success: function(d) {
                 try {
-                    let data = d;
-                    
-                    if (data.status && data.status == 'invalid_request') {
-                        throw Error(data.message);
-                    }
-
-                    let new_task = Task.load_from_json(data.task, parent = this_task.parent);
-                    this_task.copy_subtasks(new_task);
-                    this_task.decomposition_id = new_task.decomposition_id;
-                    this_task.requires_feedback_decomposition = new_task.requires_feedback_decomposition;
-
-                    cb(data);
+                    cb();
                 } catch (e) {
                     cb_error(d);
                     throw e;
@@ -197,7 +184,7 @@ class Task {
                 'tree': JSON.stringify(root_task),
                 'tree_id': JSON.stringify(tree_id),
                 'user_id': JSON.stringify(user_id),
-                'task_id': JSON.stringify(this_task.id()),
+                'task_id': JSON.stringify(this_task.path()),
                 'language': JSON.stringify(language),
             },
             success: function(d) {
