@@ -1,3 +1,5 @@
+BEGIN;
+
 SET search_path TO problem_decomposition;
 
 -- Set order n to null for deleted tasks
@@ -17,3 +19,5 @@ BEFORE UPDATE ON tasks
 FOR EACH ROW
 WHEN (OLD.deleted IS DISTINCT FROM NEW.deleted)
 EXECUTE FUNCTION trg_tasks_deleted_update();
+
+COMMIT;
