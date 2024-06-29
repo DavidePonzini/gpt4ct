@@ -36,11 +36,6 @@ nav {
     border: 1px solid transparent;
     background-color: #cff4fc;
     border-color: #b6effb
-}
-
-.task-decomposition-manual-task-placeholder {
-    background-color: red;
-}
 
 footer {
     border-top: 1px solid gray;
