@@ -261,7 +261,7 @@ def load_tree(tree_id: int) -> tuple[Task, any]:
 
         last_update = c.fetch_one()
         if last_update is None:
-            return None
+            return None, None
         
         last_update = last_update[0]
 
