@@ -71,11 +71,7 @@ function new_tree() {
                 throw Error(data.message);
             }
             
-            let tree = Task.load_from_json(data.tree);
-            let tree_id = data.tree_id;
-            let last_update = data.last_update;
-
-            init(tree, tree_id, last_update);
+            init(data.tree, data.tree_id, data.last_update);
         },
         error: console.error
     });
@@ -107,8 +103,7 @@ function load_from_server_id(tree_id, cb = () => {}) {
                 return;
             } 
 
-            tree_data = Task.load_from_json(d.tree);
-            init(tree_data, tree_id, d.last_update);
+            init(d.tree, tree_id, d.last_update, expanded_tasks);
 
             cb();
         },
@@ -116,15 +111,18 @@ function load_from_server_id(tree_id, cb = () => {}) {
     });
 }
 
-function init(tree, id, last_update_ts) {
+function init(tree_json, _tree_id, _last_update, _expanded_tasks = []) {
+    let tree = Task.load_from_json(tree_json, null, _expanded_tasks);
+
     tree_data = tree;
-    last_update = last_update_ts;
     set_tree_id(id);
+    last_update = _last_update;
+    expanded_tasks = _expanded_tasks;
     
     update();
 
     // Useful for debugging, should be eventually removed
-    window.data = tree_data;
+    window.data = tree_json;
 }
 
 function set_tree_id(id) {
@@ -589,6 +587,7 @@ function show_children(task) {
     hide_buttons();
 
     task.show_children();
+    expanded_tasks.push(task.task_id);
     update();
 }
 

@@ -5,3 +5,5 @@ link-vis:
 	
 	mkdir -p $(DIR)/api
 	for f in `find * -type f`; do ln -v $$f $(DIR)/$$f; done
+	
+	python -m dav_tools.messages success 'Updated client'
