@@ -1,3 +1,5 @@
+SET search_path TO problem_decomposition;
+
 -- Set order n to null for deleted tasks
 CREATE OR REPLACE FUNCTION trg_tasks_deleted_update()
 RETURNS TRIGGER AS $$
