@@ -32,6 +32,7 @@ CREATE TABLE tasks (
   task_id SERIAL NOT NULL PRIMARY KEY,
 
   parent_id INTEGER REFERENCES tasks(task_id) DEFAULT NULL,
+  is_edit_from INTEGER REFERENCES tasks(task_id) DEFAULT NULL,
 
   tree_id INTEGER REFERENCES trees(tree_id) NOT NULL,
   order_n DECIMAL(2),
@@ -45,6 +46,9 @@ CREATE TABLE tasks (
   description VARCHAR(2000) NOT NULL,
 
   solved BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- tasks that are edits from another task need to be tagged as deleted
+  CHECK (is_edit_from IS NOT NULL AND deleted = TRUE),
 
   -- order_n = null iff deleted = true 
   CHECK ((deleted = TRUE AND order_n IS NULL) OR (deleted = FALSE AND order_n IS NOT NULL)),

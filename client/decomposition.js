@@ -289,15 +289,40 @@ function onNodeClick(event, item) {
     // Set name
     let name = $('#task-name');
     name.val(item.data.name);
-    name.unbind().on('input', function() {
-        item.data.name = name.val();
-        update();   // Reflect name changes in UI
+    name.unbind().on('change', function() {
+        let text = name.val();
+
+        $.ajax({
+            type: 'POST',
+            url: `http://${SERVER_ADDR}/set-task-name`,
+            data: {
+                'task_id': JSON.stringify(item.data.task_id),
+                'user_id': JSON.stringify(user_id),
+                'text': JSON.stringify(text),
+            },
+            success: () => load_from_server_id(tree_id),
+            error: console.error
+        });
     });
 
     // Set description
     let description = $('#task-description');
     description.val(item.data.description);
-    description.unbind().on('input', () => item.data.description = description.val());
+    description.unbind().on('change', function() {
+        let text = description.val();
+
+        $.ajax({
+            type: 'POST',
+            url: `http://${SERVER_ADDR}/set-task-description`,
+            data: {
+                'task_id': JSON.stringify(item.data.task_id),
+                'user_id': JSON.stringify(user_id),
+                'text': JSON.stringify(text),
+            },
+            success: () => load_from_server_id(tree_id),
+            error: console.error
+        });
+    });
     
     // Set implementation, if available
     let impl = $('#task-implementation');

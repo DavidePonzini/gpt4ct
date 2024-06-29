@@ -54,6 +54,30 @@ def load_tree():
         'status': 'error'
     }
 
+@app.route('/set-task-name', methods=['POST'])
+def set_task_name():
+    task_id = json.loads(request.form['task_id'])
+    user_id = json.loads(request.form['user_id'])
+    text = json.loads(request.form['text'])
+
+    database.set_task_name(task_id, user_id, text)
+
+    return {
+        'status': 'ok'
+    }
+
+@app.route('/set-task-description', methods=['POST'])
+def set_task_description():
+    task_id = json.loads(request.form['task_id'])
+    user_id = json.loads(request.form['user_id'])
+    text = json.loads(request.form['text'])
+
+    database.set_task_description(task_id, user_id, text)
+
+    return {
+        'status': 'ok'
+    }
+
 
 @app.route('/decompose', methods=['POST'])
 def decompose_task():

@@ -1,6 +1,7 @@
 from typing import Literal
 
 from dav_tools import database
+from task import Task, TaskCreationMode
 import task
 
 
@@ -87,7 +88,127 @@ def _update_tree_ts(tree_id: int, connection: database.PostgreSQLConnection):
     connection.execute(update_tree_ts, {'tree_id': tree_id})
 
 
-def load_task(task_id: int) -> task.Task:
+def set_task_name(task_id, user_id, name):
+    get_task_data = database.sql.SQL('''
+        SELECT
+            parent_id,
+            tree_id,
+            order_n,
+            creation_mode,
+            description,
+            solved
+        FROM {schema}.tasks
+        WHERE task_id = {task_id}
+        ''').format(
+            schema=database.sql.Identifier(schema),
+            task_id=database.sql.Placeholder('task_id'),
+        )
+
+    update_old_task = database.sql.SQL('''
+        UPDATE {schema}.tasks
+        SET
+            deleted = TRUE
+        WHERE
+            task_id = {task_id}
+        ''').format(
+            schema=database.sql.Identifier(schema),
+            task_id=database.sql.Placeholder('task_id'),
+        )
+
+    with db.connect() as c:
+        # get task data
+        c.execute(get_task_data, {
+            'task_id': task_id
+        })
+
+        parent_id, tree_id, order_n, creation_mode, description, solved = c.fetch_one()
+
+        # update creation mode if needed
+        if creation_mode == TaskCreationMode.AI:
+            creation_mode = TaskCreationMode.MIXED
+
+        # update old task
+        c.execute(update_old_task, {
+            'task_id': task_id
+        })
+
+        c.insert(schema, 'tasks', {
+            'parent_id': parent_id,
+            'is_edit_from': task_id,
+            'tree_id': tree_id,
+            'order_n': order_n,
+            'user_id': user_id,
+            'creation_mode': creation_mode,
+            'name': name,
+            'description': description,
+            'solved': solved,
+        })
+
+        _update_tree_ts(tree_id, c)
+
+        c.commit()
+
+def set_task_description(task_id, user_id, description):
+    get_task_data = database.sql.SQL('''
+        SELECT
+            parent_id,
+            tree_id,
+            order_n,
+            creation_mode,
+            name,
+            solved
+        FROM {schema}.tasks
+        WHERE task_id = {task_id}
+        ''').format(
+            schema=database.sql.Identifier(schema),
+            task_id=database.sql.Placeholder('task_id'),
+        )
+
+    update_old_task = database.sql.SQL('''
+        UPDATE {schema}.tasks
+        SET
+            deleted = TRUE
+        WHERE
+            task_id = {task_id}
+        ''').format(
+            schema=database.sql.Identifier(schema),
+            task_id=database.sql.Placeholder('task_id'),
+        )
+
+    with db.connect() as c:
+        # get task data
+        c.execute(get_task_data, {
+            'task_id': task_id
+        })
+
+        parent_id, tree_id, order_n, creation_mode, name, solved = c.fetch_one()
+
+        # update creation mode if needed
+        if creation_mode == TaskCreationMode.AI:
+            creation_mode = TaskCreationMode.MIXED
+
+        # update old task
+        c.execute(update_old_task, {
+            'task_id': task_id
+        })
+
+        c.insert(schema, 'tasks', {
+            'parent_id': parent_id,
+            'is_edit_from': task_id,
+            'tree_id': tree_id,
+            'order_n': order_n,
+            'user_id': user_id,
+            'creation_mode': creation_mode,
+            'name': name,
+            'description': description,
+            'solved': solved,
+        })
+
+        _update_tree_ts(tree_id, c)
+
+        c.commit()
+
+def load_task(task_id: int) -> Task:
     query_get_task_info = database.sql.SQL('''SELECT tree_id, path FROM {schema}.v_trees WHERE task_id = {task_id} AND deleted = FALSE''').format(
         schema=database.sql.Identifier(schema),
         task_id=database.sql.Placeholder('task_id')
@@ -106,7 +227,7 @@ def load_task(task_id: int) -> task.Task:
     return tree.get_subtask_from_path(path)
 
 
-def load_tree(tree_id: int) -> tuple[task.Task, any]:
+def load_tree(tree_id: int) -> tuple[Task, any]:
     base_query = '''
         SELECT
             path,
@@ -164,7 +285,7 @@ def load_tree(tree_id: int) -> tuple[task.Task, any]:
         return task.from_node_list(result), last_update
 
 
-def load_tree_with_implementations(tree_id: int) -> task.Task:
+def load_tree_with_implementations(tree_id: int) -> Task:
     pass
 
 
