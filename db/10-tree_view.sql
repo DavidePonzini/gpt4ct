@@ -43,6 +43,8 @@ CREATE VIEW v_trees AS
       tasks t
     INNER JOIN 
       tree_cte cte ON t.parent_id = cte.task_id
+    WHERE
+      t.deleted = FALSE
   )
 
   SELECT 

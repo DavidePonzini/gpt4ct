@@ -33,46 +33,6 @@ def create_tree(name: str, description: str, user_id: str) -> int:
 
         return tree_id
 
-
-def add_nodes(tree_id: int, parent_id: int, nodes: list[tuple[str, str]], user_id: str, creation_mode: Literal['manual', 'ai', 'mixed'], tokens: tuple[int, int] | None = None):
-    '''Adds a new node as the last child of `parent_id` for tree `tree_id`'''
-    with db.connect() as c:
-        # find max order n
-        select_max_order_n = '''
-            SELECT MAX(order_n)
-            FROM {schema}.tasks
-            WHERE parent_id = {parent_id} AND deleted = FALSE
-            '''
-        
-        select_max_order_n = database.sql.SQL(select_max_order_n).format(
-            schema=database.sql.Identifier(schema),
-            parent_id=database.sql.Placeholder('parent_id')
-        )
-
-        c.execute(select_max_order_n, {'parent_id': parent_id})
-        max_order_n = c.fetch_one()[0]
-        order_n = max_order_n + 1 if max_order_n is not None else 0
-
-        # insert new nodes
-        for node in nodes:
-            c.insert(schema, 'tasks', {
-                'parent_id': parent_id,
-                'tree_id': tree_id,
-                'order_n': order_n,
-                'user_id': user_id,
-                'name': node[0],
-                'description': node[1],
-                'creation_mode': creation_mode,
-            })
-
-            order_n += 1
-
-        # update last_update_ts
-        _update_tree_ts(tree_id, c)        
-
-        # save all operations
-        c.commit()
-
 def _update_tree_ts(tree_id: int, connection: database.PostgreSQLConnection):
     update_tree_ts = '''
         UPDATE {schema}.trees
@@ -88,7 +48,7 @@ def _update_tree_ts(tree_id: int, connection: database.PostgreSQLConnection):
     connection.execute(update_tree_ts, {'tree_id': tree_id})
 
 
-def set_children_of_task(user_id: str, parent_id: int, tasks: list[dict], new_task_creation_mode: Literal['manual', 'ai', 'mixed'],) -> None:
+def set_children_of_task(user_id: str, parent_id: int, tasks: list[dict], new_task_creation_mode: Literal['manual', 'ai', 'mixed'], tokens: tuple[int, int] | None = None) -> None:
     get_tree_id = database.sql.SQL('''SELECT tree_id FROM {schema}.tasks WHERE task_id = {task_id}''').format(
         schema=database.sql.Identifier(schema),
         task_id=database.sql.Placeholder('task_id'),

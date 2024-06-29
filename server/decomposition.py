@@ -23,14 +23,17 @@ def decompose(task: Task, user_id: str):
     usage = message.usage[-1]
 
     # add subtasks to tree
-    for subtask in subtasks:
-        database.add_nodes(task.tree_id,
-                           task.task_id,
-                           [(subtask['name'], subtask['description'])],
-                           user_id,
-                           TaskCreationMode.AI,
-                           (usage.prompt_tokens, usage.completion_tokens),
-            )
+    database.set_children_of_task(
+        user_id=user_id,
+        parent_id=task.task_id,
+        tasks=[{
+            'name': subtask['name'],
+            'description': subtask['description'],
+            'task_id': None,
+        } for subtask in subtasks],
+        new_task_creation_mode=TaskCreationMode.AI,
+        tokens=(usage.prompt_tokens, usage.completion_tokens),
+    )
 
     print_price(usage)
 
