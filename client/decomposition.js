@@ -490,6 +490,9 @@ function manual_decomposition(item) {
         manual_decomposition_add_button(null, '', '');
     }
 
+    // Make the list sortable
+    $("#task-decomposition-manual-tasks").sortable().disableSelection();
+
     // Bind functionality to "add subtask" button
     $('#task-decomposition-manual-add-subtask').unbind().on('click', () => manual_decomposition_add_button(null, '', ''));
 
@@ -502,10 +505,11 @@ function manual_decomposition_add_button(task_id, name, description) {
     
     let div_title = $('<div style="display: flex"></div>');
     let label1 = $('<label class="form-label"><b>Name:</b></label>');
-    let close = $('<button type="button" class="btn-close" aria-label="Close" style="margin: 0 0 0 auto;"></button>');
+    let sort = $('<i class="fa-solid fa-sort" style="margin: 0 0 0 auto; padding: .25em"></i>');
+    let close = $('<button type="button" class="btn-close" aria-label="Close" style="margin: 0 0 0 .5em;"></button>');
     close.on('click', () => div.remove());
 
-    div_title.append(label1).append(close)
+    div_title.append(label1).append(sort).append(close);
 
     let input1 = $('<input type="text" class="form-control">');
     input1.val(name);
@@ -536,6 +540,9 @@ function submit_manual_decomposition(item) {
             'description': description,
         })
     }    
+
+    // Mark this task for expansion after update
+    expanded_tasks.push(item.data.task_id);
 
     hide_buttons();
     
