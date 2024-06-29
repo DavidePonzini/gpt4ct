@@ -288,41 +288,11 @@ function onNodeClick(event, item) {
 
     // Set name
     let name = $('#task-name');
-    name.val(item.data.name);
-    name.unbind().on('change', function() {
-        let text = name.val();
-
-        $.ajax({
-            type: 'POST',
-            url: `http://${SERVER_ADDR}/set-task-name`,
-            data: {
-                'task_id': JSON.stringify(item.data.task_id),
-                'user_id': JSON.stringify(user_id),
-                'text': JSON.stringify(text),
-            },
-            success: update,
-            error: console.error
-        });
-    });
+    name.text(item.data.name);
 
     // Set description
     let description = $('#task-description');
-    description.val(item.data.description);
-    description.unbind().on('change', function() {
-        let text = description.val();
-
-        $.ajax({
-            type: 'POST',
-            url: `http://${SERVER_ADDR}/set-task-description`,
-            data: {
-                'task_id': JSON.stringify(item.data.task_id),
-                'user_id': JSON.stringify(user_id),
-                'text': JSON.stringify(text),
-            },
-            success: update,
-            error: console.error
-        });
-    });
+    description.text(item.data.description);
     
     // Set implementation, if available
     let impl = $('#task-implementation');
@@ -506,21 +476,23 @@ function generate_decomposition(item) {
 }
 
 function manual_decomposition(item) {
+    if (!check_user_id())
+        return;
+
     // Clear the list
     $('#task-decomposition-manual-tasks > div').remove();
     
-    for (let subtask of item.data.subtasks) {
-        manual_decomposition_add_button(subtask.name, subtask.description);
-    }
+    for (let subtask of item.data.subtasks)
+        manual_decomposition_add_button(subtask.task_id, subtask.name, subtask.description);
 
     // Bind functionality to "add subtask" button
-    $('#task-decomposition-manual-add-subtask').unbind().on('click', () => manual_decomposition_add_button('', ''));
+    $('#task-decomposition-manual-add-subtask').unbind().on('click', () => manual_decomposition_add_button(null, '', ''));
 
     $('#task-decomposition-manual-submit').unbind().on('click', () => submit_manual_decomposition(item));
     $('#task-decomposition-manual').show();
 }
 
-function manual_decomposition_add_button(name, description) {
+function manual_decomposition_add_button(task_id, name, description) {
     let div = $('<div class="list-group-item list-group-item-action list-group-item-light"></div>');
     
     let div_title = $('<div style="display: flex"></div>');
@@ -532,6 +504,7 @@ function manual_decomposition_add_button(name, description) {
 
     let input1 = $('<input type="text" class="form-control">');
     input1.val(name);
+    input1.attr('task_id', task_id);        // task_id is embedded here for simplicity 
 
     let label2 = $('<label class="form-label mt-3"><b>Description:</b></label>');
     let input2 = $('<textarea class="form-control" rows="3"></textarea>');
@@ -544,19 +517,36 @@ function manual_decomposition_add_button(name, description) {
 }
 
 function submit_manual_decomposition(item) {
-    item.data.clear_subtasks();
+    let subtasks = [];
 
     let elems = $('#task-decomposition-manual-tasks > div');
     for (let elem of elems) {
         let name = $(elem).find('input').val();
+        let task_id = $(elem).find('input').attr('task_id');
         let description = $(elem).find('textarea').val();
 
-        item.data.add_subtask(name, description)
+        subtasks.push({
+            'task_id': task_id ? task_id : null,
+            'name': name,
+            'description': description,
+        })
     }    
 
     hide_buttons();
-    show_children(item.data);
-    draw();
+    
+    $.ajax({
+        type: 'POST',
+        url: `http://${SERVER_ADDR}/update-tasks`,
+        data: {
+            'parent_id': JSON.stringify(item.data.task_id),
+            'user_id': JSON.stringify(user_id),
+            'tasks': JSON.stringify(subtasks),
+        },
+        success: update,
+        error: console.error
+    });
+    
+
 }
 
 

@@ -54,13 +54,13 @@ def load_tree():
         'status': 'error'
     }
 
-@app.route('/set-task-name', methods=['POST'])
-def set_task_name():
-    task_id = json.loads(request.form['task_id'])
+@app.route('/update-tasks', methods=['POST'])
+def update_tasks():
     user_id = json.loads(request.form['user_id'])
-    text = json.loads(request.form['text'])
+    parent_id = json.loads(request.form['parent_id'])
+    tasks = json.loads(request.form['tasks'])
 
-    database.set_task_name(task_id, user_id, text)
+    database.set_children_of_task(user_id, parent_id, tasks)
 
     return {
         'status': 'ok'

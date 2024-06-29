@@ -88,13 +88,25 @@ def _update_tree_ts(tree_id: int, connection: database.PostgreSQLConnection):
     connection.execute(update_tree_ts, {'tree_id': tree_id})
 
 
-def set_task_name(task_id, user_id, name):
+def set_children_of_task(user_id: str, parent_id: int, tasks: list[dict], task_creation_mode: Literal['manual', 'ai', 'mixed'],) -> None:
+    get_tree_id = database.sql.SQL('''SELECT tree_id FROM {schema}.nodes WHERE task_id = {task_id}''').format(
+        task_id=database.sql.Placeholder('task_id')
+    )
+
+    delete_children = database.sql.SQL('''
+        UPDATE {schema}.tasks
+        SET deleted = TRUE
+        WHERE parent_id = {parent_id}
+        ''').format(
+            schema=database.sql.Identifier(schema),
+            parent_id=database.sql.Placeholder('parent_id'),
+        )
+
     get_task_data = database.sql.SQL('''
         SELECT
-            parent_id,
-            tree_id,
             order_n,
             creation_mode,
+            name,
             description,
             solved
         FROM {schema}.tasks
@@ -104,105 +116,75 @@ def set_task_name(task_id, user_id, name):
             task_id=database.sql.Placeholder('task_id'),
         )
 
-    update_old_task = database.sql.SQL('''
+    only_set_order = database.sql.SQL('''
         UPDATE {schema}.tasks
         SET
-            deleted = TRUE
+            deleted = FALSE,
+            order_n = {order_n}
         WHERE
             task_id = {task_id}
         ''').format(
             schema=database.sql.Identifier(schema),
+            order_n=database.sql.Placeholder('order_n'),
             task_id=database.sql.Placeholder('task_id'),
         )
 
     with db.connect() as c:
-        # get task data
-        c.execute(get_task_data, {
-            'task_id': task_id
+        # get tree id
+        c.execute(get_tree_id, {
+            'task_id': parent_id
         })
+        tree_id = c.fetch_one()
+        if tree_id is None:
+            return
+        tree_id = tree_id[0]
 
-        parent_id, tree_id, order_n, creation_mode, description, solved = c.fetch_one()
-
-        # update creation mode if needed
-        if creation_mode == TaskCreationMode.AI:
-            creation_mode = TaskCreationMode.MIXED
-
-        # update old task
-        c.execute(update_old_task, {
-            'task_id': task_id
-        })
-
-        c.insert(schema, 'tasks', {
+        # remove all children of parent
+        c.execute(delete_children, {
             'parent_id': parent_id,
-            'is_edit_from': task_id,
-            'tree_id': tree_id,
-            'order_n': order_n,
-            'user_id': user_id,
-            'creation_mode': creation_mode,
-            'name': name,
-            'description': description,
-            'solved': solved,
         })
 
-        _update_tree_ts(tree_id, c)
+        # re-add all tasks in the given order
+        for i, task in enumerate(tasks):
+            if task['task_id'] is None:
+                # if task_id is not set, it's a new task
+                c.insert(schema, 'tasks', {
+                    'parent_id': parent_id,
+                    'tree_id': tree_id,
+                    'order_n': i,
+                    'user_id': user_id,
+                    'creation_mode': task_creation_mode,
+                    'name': task['name'],
+                    'description': task['description'],
+                })
+            else:
+                # if task already exists, get its data
+                c.execute(get_task_data, {
+                    'task_id': task['task_id']
+                })
+                order_n, creation_mode, name, description, solved = c.fetch_one()
 
-        c.commit()
+                # if the only change is the order, don't replace the task
+                if task['name'] == name and task['description'] == description:
+                    c.execute(only_set_order, {
+                        'task_id': task['task_id'],
+                        'order_n': i,
+                    })
+                else:
+                    # update creation mode if needed
+                    if creation_mode == TaskCreationMode.AI:
+                        creation_mode = TaskCreationMode.MIXED
 
-def set_task_description(task_id, user_id, description):
-    get_task_data = database.sql.SQL('''
-        SELECT
-            parent_id,
-            tree_id,
-            order_n,
-            creation_mode,
-            name,
-            solved
-        FROM {schema}.tasks
-        WHERE task_id = {task_id}
-        ''').format(
-            schema=database.sql.Identifier(schema),
-            task_id=database.sql.Placeholder('task_id'),
-        )
-
-    update_old_task = database.sql.SQL('''
-        UPDATE {schema}.tasks
-        SET
-            deleted = TRUE
-        WHERE
-            task_id = {task_id}
-        ''').format(
-            schema=database.sql.Identifier(schema),
-            task_id=database.sql.Placeholder('task_id'),
-        )
-
-    with db.connect() as c:
-        # get task data
-        c.execute(get_task_data, {
-            'task_id': task_id
-        })
-
-        parent_id, tree_id, order_n, creation_mode, name, solved = c.fetch_one()
-
-        # update creation mode if needed
-        if creation_mode == TaskCreationMode.AI:
-            creation_mode = TaskCreationMode.MIXED
-
-        # update old task
-        c.execute(update_old_task, {
-            'task_id': task_id
-        })
-
-        c.insert(schema, 'tasks', {
-            'parent_id': parent_id,
-            'is_edit_from': task_id,
-            'tree_id': tree_id,
-            'order_n': order_n,
-            'user_id': user_id,
-            'creation_mode': creation_mode,
-            'name': name,
-            'description': description,
-            'solved': solved,
-        })
+                    c.insert(schema, 'tasks', {
+                        'is_edit_from': task['task_id'],
+                        'parent_id': parent_id,
+                        'tree_id': tree_id,
+                        'order_n': i,
+                        'user_id': user_id,
+                        'creation_mode': creation_mode,
+                        'name': task['name'],
+                        'description': task['description'],
+                    })
 
         _update_tree_ts(tree_id, c)
 
