@@ -83,29 +83,6 @@ function new_tree() {
     $('#new-tree-modal').modal('hide');
 }
 
-function save_to_server() {
-    if (!tree_id) {
-        alert('This tree cannot be saved.')
-        return
-    }
-
-    $.ajax({
-        type: 'POST',
-        url: `http://${SERVER_ADDR}/save-tree`,
-        data: {
-            'user_id': JSON.stringify(user_id),
-            'tree_id': JSON.stringify(tree_id),
-            'tree': JSON.stringify(tree_data),
-        },
-        success: function(d) {
-            set_tree_id(d.tree_id);
-
-            alert('Save successful');
-        },
-        error: console.error
-    });
-}
-
 function load_from_server(cb = () => {}) {
     let tree_id = +prompt('Insert tree ID:');
     load_from_server_id(tree_id, cb);
