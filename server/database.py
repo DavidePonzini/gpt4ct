@@ -306,7 +306,7 @@ def solve_task(task_id: int, solved: bool) -> None:
         ''').format(
             schema=database.sql.Identifier(schema),
             solved=database.sql.Placeholder('solved'),
-            task_ids=database.sql.Placeholder('task_id'),
+            task_id=database.sql.Placeholder('task_id'),
         )
     
     db.execute(query, {
