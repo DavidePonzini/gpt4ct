@@ -31,6 +31,13 @@ nav {
     border-color: magenta;
 }
 
+#task-decomposition-manual-tasks {
+    padding: 1rem;
+    border: 1px solid transparent;
+    background-color: #cff4fc;
+    border-color: #b6effb
+}
+
 footer {
     border-top: 1px solid gray;
 }

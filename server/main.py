@@ -54,6 +54,7 @@ def load_tree():
         'status': 'error'
     }
 
+
 @app.route('/update-tasks', methods=['POST'])
 def update_tasks():
     user_id = json.loads(request.form['user_id'])
@@ -66,15 +67,6 @@ def update_tasks():
         'status': 'ok'
     }
 
-@app.route('/delete-tasks', methods=['POST'])
-def delete_tasks():
-    task_ids = json.loads(request.form['task_ids'])
-
-    database.delete_tasks(task_ids)
-
-    return {
-        'status': 'ok'
-    }
 
 @app.route('/solve', methods=['POST'])
 def solve():

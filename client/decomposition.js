@@ -482,8 +482,13 @@ function manual_decomposition(item) {
     // Clear the list
     $('#task-decomposition-manual-tasks > div').remove();
     
-    for (let subtask of item.data.subtasks)
-        manual_decomposition_add_button(subtask.task_id, subtask.name, subtask.description);
+    let subtasks = item.data.subtasks;
+    if (subtasks.length) {
+        for (let subtask of subtasks)
+            manual_decomposition_add_button(subtask.task_id, subtask.name, subtask.description);
+    } else {
+        manual_decomposition_add_button(null, '', '');
+    }
 
     // Bind functionality to "add subtask" button
     $('#task-decomposition-manual-add-subtask').unbind().on('click', () => manual_decomposition_add_button(null, '', ''));
@@ -592,15 +597,13 @@ function hide_buttons() {
 function delete_children(item) {
     hide_buttons();
 
-    let ids = [];
-    for (let subtask of item.data.subtasks)
-        ids.push(subtask.task_id);
-
     $.ajax({
         type: 'POST',
-        url: `http://${SERVER_ADDR}/delete-tasks`,
+        url: `http://${SERVER_ADDR}/update-tasks`,
         data: {
-            'task_ids': JSON.stringify(ids),
+            'parent_id': JSON.stringify(item.data.task_id),
+            'user_id': JSON.stringify(user_id),
+            'tasks': [],
         },
         success: update,
         error: console.error
