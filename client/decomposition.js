@@ -109,7 +109,7 @@ function init(tree_json, _tree_id, _last_update, _expanded_tasks = []) {
     last_update = _last_update;
     expanded_tasks = _expanded_tasks;
     
-    update();
+    draw();
 
     // Useful for debugging, should be eventually removed
     window.data = tree;
@@ -124,7 +124,7 @@ function set_tree_id(id) {
         $('#task-button').text(`Task`);
 }
 
-function update() {
+function draw() {
     const svg_width = $('#tree').innerWidth();
 
     const margin = {
@@ -300,7 +300,7 @@ function onNodeClick(event, item) {
                 'user_id': JSON.stringify(user_id),
                 'text': JSON.stringify(text),
             },
-            success: () => load_from_server_id(tree_id),
+            success: update,
             error: console.error
         });
     });
@@ -319,7 +319,7 @@ function onNodeClick(event, item) {
                 'user_id': JSON.stringify(user_id),
                 'text': JSON.stringify(text),
             },
-            success: () => load_from_server_id(tree_id),
+            success: update,
             error: console.error
         });
     });
@@ -405,7 +405,7 @@ function prepare_feedback_decomposition(item) {
                     item.data.requires_feedback_decomposition = false;
                     $('#task-feedback-decomposition').hide();
 
-                    update();
+                    draw();
                 },
                 error: console.error
             });
@@ -493,16 +493,16 @@ function generate_decomposition(item) {
         // show this task after refresh
         expanded_tasks.push(task.task_id);
 
-        load_from_server_id(tree_id);
+        update();
     }, function(e) {
         console.error(e);
         task.running = false;
         alert('error, see console for info');
-        update();
+        draw();
     });
 
     item.data.running = true;
-    update();
+    draw();
 }
 
 function manual_decomposition(item) {
@@ -556,7 +556,7 @@ function submit_manual_decomposition(item) {
 
     hide_buttons();
     show_children(item.data);
-    update();
+    draw();
 }
 
 
@@ -564,7 +564,7 @@ function delete_implementation(item) {
     item.data.remove_implementation();
 
     hide_buttons();
-    update();
+    draw();
 }
 
 
@@ -579,16 +579,16 @@ function implement_task(item, language) {
 
         set_tree_id(d.tree_id);
 
-        update();
+        draw();
     }, function(e) {
         console.error(e);
         item.data.running = false;
         alert('error, see console for info');
-        update();
+        draw();
     });
 
     item.data.running = true;
-    update();
+    draw();
 }
 
 function show_task_data_modal() {
@@ -612,7 +612,7 @@ function delete_children(item) {
         data: {
             'task_ids': JSON.stringify(ids),
         },
-        success: () => load_from_server_id(tree_id),
+        success: update,
         error: console.error
     });
 }
@@ -627,7 +627,7 @@ function solve(item, solved) {
             'task_id': JSON.stringify(item.data.task_id),
             'solved': JSON.stringify(solved)
         },
-        success: () => load_from_server_id(tree_id),
+        success: update,
         error: console.error
     });
 }
@@ -636,28 +636,44 @@ function show_children(task) {
     hide_buttons();
 
     task.show_children(false, (t) => expanded_tasks.push(t.task_id));
-    update();
+    draw();
 }
 
 function hide_children(task) {
     hide_buttons();
 
     task.hide_children(false, (t) => expanded_tasks.splice(expanded_tasks.indexOf(t.task_id)));
-    update();
+    draw();
 }
 
 function show_all_children() {
     tree_data.show_children(true, (t) => expanded_tasks.push(t.task_id));
-    update();
+    draw();
 window.expanded_tasks = expanded_tasks;
 }
 
 function hide_all_children() {
     tree_data.hide_children(true, (t) => expanded_tasks.splice(expanded_tasks.indexOf(t.task_id)));
+    draw();
+}
+
+function check_for_update() {
+    if (!tree_id)
+        return;
+
+    // TODO: check if server.last_edit > local.last_edit
+
     update();
 }
 
+function update() {
+    if (!tree_id)
+        return;
 
+    load_from_server_id(tree_id);
+}
+
+window.draw = draw;
 window.update = update;
 window.new_tree = new_tree;
 window.load = load_from_server;
