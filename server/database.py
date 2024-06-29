@@ -150,7 +150,7 @@ def set_children_of_task(user_id: str, parent_id: int, tasks: list[dict], new_ta
         c.commit()
 
 def load_task(task_id: int) -> Task:
-    query_get_task_info = database.sql.SQL('''SELECT tree_id, path FROM {schema}.v_trees WHERE task_id = {task_id} AND deleted = FALSE''').format(
+    query_get_task_info = database.sql.SQL('''SELECT tree_id, path FROM {schema}.v_trees WHERE task_id = {task_id}''').format(
         schema=database.sql.Identifier(schema),
         task_id=database.sql.Placeholder('task_id')
     )
@@ -181,7 +181,6 @@ def load_tree(tree_id: int) -> tuple[Task, any]:
         FROM {schema}.v_trees
         WHERE
             tree_id = {tree_id}
-            AND deleted = FALSE 
         '''
 
     query_tree_data = database.sql.SQL(base_query).format(
