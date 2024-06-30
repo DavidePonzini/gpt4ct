@@ -418,14 +418,6 @@ function show_buttons(item) {
         button_decompose.hide();
     }
 
-    // Add subtask: only available on unsolved tasks
-    let button_add_subtask = $('#add-subtask');
-    if (!item.data.is_solved()) {
-        button_add_subtask.show().unbind().on('click', () => add_subtask(item));
-    } else {
-        button_add_subtask.hide();
-    }
-
     // Implement: only available on unsolved tasks that can be implemented
     let button_implement = $('#implement');
     if (!item.data.is_solved() && item.data.can_be_implemented()) {

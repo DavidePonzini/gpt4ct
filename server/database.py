@@ -171,13 +171,19 @@ def load_task(task_id: int) -> Task:
 def load_tree(tree_id: int) -> tuple[Task, any]:
     base_query = '''
         SELECT
+            tree_id,
             path,
+            level,
             task_id,
-            user_id,
+            parent_id,
+            task_user_id,
+            implementation_user_id,
             creation_mode,
+            solved,
             name,
             description,
-            solved
+            implementation,
+            implementation_language
         FROM {schema}.v_trees
         WHERE
             tree_id = {tree_id}
@@ -195,6 +201,7 @@ def load_tree(tree_id: int) -> tuple[Task, any]:
     )
 
     with db.connect() as c:
+        # check if tree exists (by getting its last update)
         c.execute(query_last_update, {
             'tree_id': tree_id
         })
@@ -205,6 +212,7 @@ def load_tree(tree_id: int) -> tuple[Task, any]:
         
         last_update = last_update[0]
 
+        # get tree data
         c.execute(query_tree_data, {
             'tree_id': tree_id
         })
@@ -212,14 +220,20 @@ def load_tree(tree_id: int) -> tuple[Task, any]:
         result = c.fetch_all()
 
         result = [{
-            'path':             task[0],
-            'task_id':          task[1],
-            'user_id':          task[2],
-            'creation_mode':    task[3],
-            'name':             task[4],
-            'description':      task[5],
-            'solved':           task[6],
-            'tree_id':          tree_id,
+            'tree_id':                  task[ 0],
+            'path':                     task[ 1],
+            'level':                    task[ 2],
+            'task_id':                  task[ 3],
+            'parent_id':                task[ 4],
+            'task_user_id':             task[ 5],
+            'implementation_user_id':   task[ 6],
+            'creation_mode':            task[ 7],
+            'solved':                   task[ 8],
+            'name':                     task[ 9],
+            'description':              task[10],
+            'implementation_id':        task[11],
+            'implementation':           task[12],
+            'implementation_language':  task[13],
         } for task in result]
 
         return task.from_node_list(result), last_update
@@ -240,10 +254,6 @@ def solve_task(task_id: int, solved: bool) -> None:
         'solved': solved,
     })
 
-def load_tree_with_implementations(tree_id: int) -> Task:
-    pass
-
-
 def check_user_exists(user_id: str):
     base_query = 'SELECT COUNT(*) FROM {schema}.users WHERE user_id = {user_id}'
 
@@ -258,4 +268,30 @@ def check_user_exists(user_id: str):
 
     return result[0][0] == 1
 
+def set_implementation(task: Task, user_id: str, implementation: str, language: str, additional_prompt: str | None, tokens: tuple[int, int]):
+    query_delete_implementations = database.sql.SQL('''
+        UPDATE {schema}.implementations
+        SET deleted = TRUE
+        WHERE task_id = {task_id}
+        ''').format(
+            schema=database.sql.Identifier(schema),
+            task_id=database.sql.Placeholder('task_id'),
+        )
+    
+    with db.connect() as c:
+        # delete old implementations
+        c.execute(query_delete_implementations, {
+            'task_id': task.task_id,
+        })
 
+        # add new implementation
+        c.insert(schema, 'implementations', {
+            'task_id': task.task_id,
+            'is_edit_from': task.implementation_id,
+            'additional_prompt': additional_prompt,
+            'user_id': user_id,
+            'implementation': implementation,
+            'implementation_language': language,
+            'tokens_in': tokens[0],
+            'tokens_out': tokens[1],
+        })

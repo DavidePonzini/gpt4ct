@@ -1,10 +1,11 @@
 const SERVER_ADDR = '15.237.153.101:5000';
 
 class Task {
-    constructor(tree_id, task_id, user_id, creation_mode, name, description, solved = false) {
+    constructor(tree_id, task_id, task_user_id, creation_mode, name, description, solved = false,
+        implementation_id = null, implementation = null, implementation_language = null, implementation_user_id) {
         this.tree_id = tree_id;
         this.task_id = task_id;
-        this.user_id = user_id;
+        this.task_user_id = task_user_id;
         
         this.name = name;
         this.description = description;
@@ -15,6 +16,11 @@ class Task {
         this.creation_mode = creation_mode;
 
         this.solved = solved;
+
+        this.implementation_id = implementation_id;
+        this.implementation = implementation;
+        this.implementation_language = implementation_language;
+        this.implementation_user_id = implementation_user_id;
 
         // only needed for ui, no need to store these properties on server
         this.children = null;
@@ -29,8 +35,8 @@ class Task {
         return this.parent.path().concat(my_id);
     }
 
-    needs_feedback() {
-        return this.requires_feedback_decomposition || this.requires_feedback_implementation;
+    needs_feedback(user_id) {
+        return user_id && this.task_user_id && user_id == this.task_user_id;
     }
 
     is_root() {
@@ -106,20 +112,6 @@ class Task {
         return true;
     }
 
-    /**
-     * Remove implemenation from current task and all tasks above it (since it would be invalid)
-     */
-    remove_implementation() {
-        this.implementation = null;
-        this.implementation_id = null;
-        this.implementation_language = null;
-
-        this.requires_feedback_implementation = false;
-
-        if (this.parent)
-            this.parent.remove_implementation()
-    }
-
     toJSON() {
         return {
             name: this.name,
@@ -141,13 +133,7 @@ class Task {
         };
     }
 
-    clear_subtasks() {
-        this.subtasks = [];
-        this.children = [];
-        this.requires_feedback_decomposition = false;
-    }
-
-    generate_decomposition(user_id, cb, cb_error = console.error) {
+    generate_decomposition(user_id, cb = () => {}, cb_error = console.error) {
         let this_task = this;
 
         $.ajax({
@@ -157,67 +143,28 @@ class Task {
                 'task_id': JSON.stringify(this_task.task_id),
                 'user_id': JSON.stringify(user_id),
             },
-            success: function(d) {
-                try {
-                    cb();
-                } catch (e) {
-                    cb_error(d);
-                    throw e;
-                }
-            },
+            success: cb,
             error: cb_error
         });
     }
 
-    copy_subtasks(task) {
-        this.subtasks = task.subtasks;
-        this.subtasks.forEach(t => t.parent = this);
-    }
-
-    generate_implementation(tree_id, user_id, language, cb, cb_error = console.error) {
+    generate_implementation(user_id, language, additional_instructions = null, cb = () => {}, cb_error = console.error) {
         if (!this.can_be_implemented()) {
             throw Error('This task cannot be implemented');
         }
         
         let this_task = this;
 
-        let root_task = this;
-        while(!root_task.is_root())
-            root_task = root_task.parent;
-
         $.ajax({
             type: 'POST',
             url: `http://${SERVER_ADDR}/implement`,
             data: {
-                'tree': JSON.stringify(root_task),
-                'tree_id': JSON.stringify(tree_id),
-                'user_id': JSON.stringify(user_id),
                 'task_id': JSON.stringify(this_task.path()),
                 'language': JSON.stringify(language),
+                'user_id': JSON.stringify(user_id),
+                'additional_instructions': JSON.stringify(additional_instructions),
             },
-            success: function(d) {
-                try {
-                    let data = d;
-                    
-                    if (data.status && data.status == 'invalid_request') {
-                        throw Error(data.message);
-                    }
-                    
-                    this_task.implementation_language = language;
-                    this_task.implementation = data.implementation;
-                    this_task.implementation_id = data.implementation_id;
-                    this_task.requires_feedback_implementation = true;
-
-                    // remove all implementations above (which would now be invalid)
-                    if (this_task.parent)
-                        this_task.parent.remove_implementation()
-
-                    cb(data);
-                } catch (e) {
-                    cb_error(d);
-                    throw e;
-                }
-            },
+            success: cb,
             error: cb_error
         });
     }
@@ -230,11 +177,15 @@ class Task {
         const task = new Task(
             data.tree_id,
             data.task_id,
-            data.user_id,
+            data.task_user_id,
             data.creation_mode,
             data.name,
             data.description,
-            data.solved
+            data.solved,
+            data.implementation_id,
+            data.implementation,
+            data.implementation_language,
+            data.implementation_user_id,
         );
 
         if (parent) {
@@ -252,38 +203,5 @@ class Task {
             task.show_children();
 
         return task; // Return the constructed Task instance
-    }
-
-    add_subtask(name, description) {
-        let child = new Task(name, description);
-        child.parent = this;
-
-        this.subtasks.push(child);
-        
-        return child;
-    }
-
-    remove_subtask(name) {
-        let idx = this.subtasks.findIndex(subtask => subtask.name == name);
-        if(idx !== -1)
-            this.subtasks.splice(idx, 1);
-    }
-
-    solve() {
-        this.solved = true;
-
-        // if the task is solved without an implementation, it means it doesn't need one
-        if (!this.implementation)
-            this.implementation = false;
-
-        for (let subtask of this.subtasks)
-            subtask.solve();
-    }
-
-    unsolve() {
-        this.solved = false;
-
-        if (this.parent)
-            this.parent.unsolve();
     }
 }

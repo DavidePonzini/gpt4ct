@@ -4,6 +4,11 @@ from openai import OpenAI
 client = OpenAI()
 
 
+class MessageRole:
+    USER = 'user'
+    ASSISTANT = 'assistant'
+    SYSTEM = 'system'
+
 class Message:
     def __init__(self) -> None:
         self.messages = []

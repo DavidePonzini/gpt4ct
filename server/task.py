@@ -11,9 +11,10 @@ class Task:
     Represents a single task, and its decomposition in subtasks
     '''
 
-    def __init__(self, tree_id: int, task_id: int, user_id: int, creation_mode: str, name: str, description: str, solved: bool = False) -> None:
+    def __init__(self, tree_id: int, task_id: int, task_user_id: int, creation_mode: str, name: str, description: str, solved: bool = False,
+                 implementation_id: int | None = None, implementation: str | None = None, implementation_language: str | None = None, implementation_user_id: str | None = None) -> None:
         self.task_id = task_id
-        self.user_id = user_id
+        self.task_user_id = task_user_id
         self.tree_id = tree_id
 
         self.name = name
@@ -25,6 +26,12 @@ class Task:
         self.creation_mode = creation_mode
 
         self.solved = solved
+
+        self.implementation_id = implementation_id
+        self.implementation = implementation
+        self.implementation_language = implementation_language
+        self.implementation_user_id = implementation_user_id
+        assert (self. implementation_id is None and self.implementation is None and self.implementation_language is None and self.implementation_user_id is None) or (self.implementation_id is not None and self.implementation is not None and self.implementation_language is not None and self.implementation_user_id is not None)
 
 
     def is_root(self):
@@ -47,7 +54,7 @@ class Task:
         '''
         return {
             'task_id': self.task_id,
-            'user_id': self.user_id,
+            'task_user_id': self.task_user_id,
             'tree_id': self.tree_id,
 
             'name': self.name,
@@ -57,6 +64,12 @@ class Task:
             'creation_mode': self.creation_mode,
 
             'solved': self.solved,
+
+            'implementation_id': self.implementation_id,
+            'implementation': self.implementation,
+            'implementation_language': self.implementation_language,
+            'implementation_user_id': self.implementation_user_id,
+
         }
     
     def to_json(self) -> str:
@@ -113,30 +126,6 @@ class Task:
             
             cb(sibling)
 
-    
-# def from_dict(data) -> Task:
-#     task = Task(data['name'], data['description'])
-
-#     for subtask_data in data['subtasks']:
-#         subtask = from_dict(subtask_data)  # Recursively create subtasks
-#         task.subtasks.append(subtask)
-#         subtask.parent = task
-
-#     # Set other properties
-#     task.solved = data['solved']
-
-#     task.decomposition_id = data['decomposition_id']
-#     task.requires_feedback_decomposition = data['requires_feedback_decomposition']
-
-#     task.implementation = data['implementation']
-#     task.implementation_id = data['implementation_id']
-#     task.implementation_language = data['implementation_language']
-#     task.requires_feedback_implementation = data['requires_feedback_implementation']
-
-#     return task
-
-# def from_json(data: str) -> Task:
-#     return from_dict(json.loads(data))
 
 def from_node_list(data: list[dict]) -> Task | None:
     '''Load a task from a node list'''
@@ -150,11 +139,15 @@ def from_node_list(data: list[dict]) -> Task | None:
     root_task = Task(
         tree_id=root_node['tree_id'],
         task_id=root_node['task_id'],
-        user_id=root_node['user_id'],
+        task_user_id=root_node['task_user_id'],
         creation_mode=root_node['creation_mode'],
         name=root_node['name'],
         description=root_node['description'],
-        solved=root_node['solved'])
+        solved=root_node['solved'],
+        implementation_id=root_node['implementation_id'],
+        implementation=root_node['implementation'],
+        implementation_language=root_node['implementation_language'],
+        implementation_user_id=root_node['implementation_user_id'])
     
     # add all children
     for node in data[1:]:
@@ -164,11 +157,15 @@ def from_node_list(data: list[dict]) -> Task | None:
         child = Task(
             tree_id=node['tree_id'],
             task_id=node['task_id'],
-            user_id=node['user_id'],
+            task_user_id=node['user_id'],
             creation_mode=node['creation_mode'],
             name=node['name'],
             description=node['description'],
-            solved=node['solved'])
+            solved=node['solved'],
+            implementation_id=node['implementation_id'],
+            implementation=node['implementation'],
+            implementation_language=node['implementation_language'],
+            implementation_user_id=node['implementation_user_id'])
         
         t.add_subtask(child)
 

@@ -28,7 +28,9 @@ Provide the answer as a string.'''
 
     @staticmethod
     def prompt(task: Task, language: str):
-#         return f'''Implement, using {language}, the task "{task.name}" ({task.description}).
-# If possible, use the functions you previously developed. You don\'t need to write their implementation again.'''
         return f'''Implement, using {language}, the task "{task.name}" ({task.description}).
 If possible, use the functions you previously developed. You also need to write their implementation again.'''
+    
+    @staticmethod
+    def prompt_refine(task: Task, language: str, instructions: str):
+        return instructions

@@ -20,7 +20,6 @@ def login():
         'user': database.check_user_exists(user_id)
     }
 
-
 @app.route('/create-tree', methods=['POST'])
 def create_tree():
     user_id = json.loads(request.form['user_id'])
@@ -36,7 +35,6 @@ def create_tree():
         'tree': tree.to_json(),
         'last_update': last_update
     }
-
 
 @app.route('/load-tree', methods=['POST'])
 def load_tree():
@@ -54,7 +52,6 @@ def load_tree():
         'status': 'error'
     }
 
-
 @app.route('/update-tasks', methods=['POST'])
 def update_tasks():
     user_id = json.loads(request.form['user_id'])
@@ -66,7 +63,6 @@ def update_tasks():
     return {
         'status': 'ok'
     }
-
 
 @app.route('/solve', methods=['POST'])
 def solve():
@@ -95,51 +91,26 @@ def decompose_task():
         'status': 'ok'
     }
 
-
 @app.route('/implement', methods=['POST'])
-def implement_task():
-    tree = task.from_json(request.form['tree'])
-    tree_id = json.loads(request.form['tree_id'])
-    user_id = json.loads(request.form['user_id'])
+def implement():
     task_id = json.loads(request.form['task_id'])
     language = json.loads(request.form['language'])
+    user_id = json.loads(request.form['user_id'])
+    additional_instructions = json.loads(request.form['additional_instructions'])
 
-    current_task = tree.get_subtask_from_path(task_id)
+    task = database.load_task(task_id)
 
-    return decomposition.implement(
-        tree_id=tree_id,
+    decomposition.implement(
+        task=task,
+        language=language,
         user_id=user_id,
-        task=current_task,
-        language=language
+        additional_prompt=additional_instructions,
     )
 
+    return {
+        'status': 'ok'
+    }
 
-# @app.route('/feedback-decomposition', methods=['POST'])
-# def feedback_decomposition():
-#     decomposition_id = json.loads(request.form['decomposition_id'])
-
-#     user_id = json.loads(request.form['user_id'])
-
-#     q1 = json.loads(request.form['q1'])
-#     q2 = json.loads(request.form['q2'])
-#     q3 = json.loads(request.form['q3'])
-#     q4 = json.loads(request.form['q4'])
-#     comments = json.loads(request.form['comments'])
-
-#     database.log_feedback_decomposition(
-#         decomposition_id=decomposition_id,
-#         user_id=user_id,
-#         q1=q1,
-#         q2=q2,
-#         q3=q3,
-#         q4=q4,
-#         comments=comments
-#     )
-
-    # return {
-    #     'status': 'ok'
-    # }
-    
 
 if __name__ == '__main__':
     app.run(

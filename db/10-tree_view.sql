@@ -49,13 +49,20 @@ CREATE VIEW v_trees AS
     level,
     task_id,
     parent_id,
-    user_id,
+    t.user_id AS task_user_id,
+    i.user_id as implementation_user_id,
     creation_mode,
+    solved,
     name,
     description,
-    solved
-  FROM 
-    tree_cte
+    implementation_id,
+    implementation,
+    implementation_language
+  FROM
+    tree_cte t
+    LEFT JOIN implementations i USING(task_id)
+  WHERE
+    i.deleted = FALSE OR i.deleted IS NULL
   ORDER BY 
     tree_id, path;
 

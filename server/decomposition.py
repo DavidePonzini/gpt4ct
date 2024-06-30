@@ -1,13 +1,13 @@
-from chatgpt import Message, print_price
+from chatgpt import Message, print_price, MessageRole
 import database
 from task import Task, TaskCreationMode
 import json
 import prompts
 
 
-def decompose(task: Task, user_id: str):
+def decompose(task: Task, user_id: str) -> None:
     message = Message()
-    message.add_message('system', prompts.Decomposition.instructions)
+    message.add_message(MessageRole.SYSTEM, prompts.Decomposition.instructions)
     
     # Add all parents, up to root
     task.for_each_parent(lambda t: _add_decomposition_step(message, t))
@@ -38,9 +38,9 @@ def decompose(task: Task, user_id: str):
     print_price(usage)
 
 
-def implement(tree_id: int, user_id: str, task: Task, language: str):
+def implement(task: Task, user_id: str, language: str, additional_prompt: str | None = None) -> None:
     message = Message()
-    message.add_message('system', prompts.Decomposition.instructions)
+    message.add_message(MessageRole.SYSTEM, prompts.Decomposition.instructions)
 
     # Add all parents, up to root, and all childrens
     task.for_each_parent(lambda t: _add_decomposition_step(message, t))
@@ -48,47 +48,42 @@ def implement(tree_id: int, user_id: str, task: Task, language: str):
                         where=lambda t: len(t.subtasks) > 0)
 
     # Add implementation instructions
-    message.add_message('system', prompts.Implementation.instructions)
+    message.add_message(MessageRole.SYSTEM, prompts.Implementation.instructions)
 
     # Add siblings' implementations
     task.for_each_sibling(lambda t: _add_implementation_step(message, t, t.implementation_language), 
                           where=lambda t: t.implementation is not None and t.implementation != False)
 
     # Add children implementations
-    task.for_each_child(lambda t: _add_implementation_step(message, t, t.implementation_language),
-                        where=lambda t: t.implementation != False)
+    task.for_each_child(lambda t: _add_implementation_step(message, t, t.implementation_language))
 
-    # Ask for final implemenation
-    message.add_message('user', prompts.Implementation.prompt(task, language))
+    # Ask for this task's implementation
+    message.add_message(MessageRole.USER, prompts.Implementation.prompt(task, language))
+
+    # If this task has already been implemented, add its implementation and the additional request
+    if additional_prompt is not None and task.implementation is not None:
+        message.add_message(MessageRole.ASSISTANT, task.implementation)
+        message.add_message(MessageRole.USER, prompts.Implementation.prompt_refine(task, language, additional_prompt))
+
     # message.print()
 
     # Get the result
     answer = message.generate_answer(require_json=False, add_to_messages=False)
 
     task.implementation = answer
-
     usage = message.usage[-1]
-    implementation_id, tree_id = database.log_implementation(
-        tree_id=tree_id,
-        user_id=user_id,
-        decomposition_id=task.decomposition_id,
-        task=task,
-        language=language,
-        answer=answer,
-        usage=usage)
     
-    task.implementation_id = implementation_id
-    task.requires_feedback_implementation = True
-
-    database.save_tree(tree_id, user_id, task)
+    database.set_implementation(
+        task=task,
+        user_id=user_id,
+        implementation=answer,
+        language=language,
+        additional_prompt=additional_prompt,
+        tokens=(usage.prompt_tokens, usage.completion_tokens),
+    )
 
     print_price(usage)
 
-    return {
-        'implementation': answer,
-        'implementation_id': implementation_id,
-        'tree_id': tree_id,
-    }
 
 def _add_decomposition_step(message: Message, t: Task):
     '''
@@ -96,8 +91,8 @@ def _add_decomposition_step(message: Message, t: Task):
     Messages include both the user's prompt and the assistant's answer containing all `t`'s subtasks
     '''
 
-    message.add_message('user', prompts.Decomposition.prompt(t))
-    message.add_message('assistant', json.dumps({
+    message.add_message(MessageRole.USER, prompts.Decomposition.prompt(t))
+    message.add_message(MessageRole.ASSISTANT, json.dumps({
         'result': [
             {
                 'name': subtask.name,
@@ -109,12 +104,12 @@ def _add_decomposition_step(message: Message, t: Task):
 
 def _add_implementation_step(message: Message, t: Task, language: str):
     '''
-    Add a two-message step for the decomposition of node `t`.
+    Add a two-message step for the implementation of node `t`.
     Messages include both the user's prompt and the assistant's answer containing all `t`'s subtasks
     '''
 
     if t.implementation == False:
         return        
 
-    message.add_message('user', prompts.Implementation.prompt(t, language))
-    message.add_message('assistant', t.implementation)
+    message.add_message(MessageRole.USER, prompts.Implementation.prompt(t, language))
+    message.add_message(MessageRole.ASSISTANT, t.implementation)
