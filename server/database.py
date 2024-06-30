@@ -267,18 +267,15 @@ def solve_task(task_id: int, user_id: str, solved: bool) -> None:
         UPDATE {schema}.tasks
         SET solved = {solved}
         WHERE task_id = {task_id}
-        AND user_id = {user_id}
         ''').format(
             schema=database.sql.Identifier(schema),
             solved=database.sql.Placeholder('solved'),
             task_id=database.sql.Placeholder('task_id'),
-            user_id=database.sql.Placeholder('user_id'),
         )
     with db.connect() as c:
         c.execute(query, {
             'task_id': task_id,
             'solved': solved,
-            'user_id': user_id,
         })
 
 def get_user_data(user_id: str) -> dict[str, any] | None:
