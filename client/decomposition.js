@@ -322,7 +322,7 @@ function onNodeClick(event, item) {
     $('#task-decomposition-manual').hide();
 
     // Show decomposition feedback, if needed
-    if (item.data.requires_feedback_decomposition && !window.disable_feedback) {
+    if (feedback_list.includes(item.data.task_id) && !window.disable_feedback) {
         $('#task-feedback-decomposition').show();
         prepare_feedback_decomposition(item);
     } else {
@@ -341,8 +341,6 @@ function prepare_feedback_decomposition(item) {
     let questions = $('#task-feedback-decomposition select');
     questions.val(0);
 
-    $('#task-feedback-decomposition textarea').val('');
-    
     $('#task-feedback-decomposition-submit').prop('disabled', false).unbind().on('click', function() {
         if (!check_user_id())
             return;
@@ -364,27 +362,20 @@ function prepare_feedback_decomposition(item) {
         if (!missing_anwer) {
             let q1 = $('#task-feedback-decomposition-q1').val();
             let q2 = $('#task-feedback-decomposition-q2').val();
-            let q3 = $('#task-feedback-decomposition-q3').val();
-            let q4 = $('#task-feedback-decomposition-q4').val();
-            let comments = $('#task-feedback-decomposition-comments').val();
 
             $.ajax({
                 type: 'POST',
-                url: `http://${SERVER_ADDR}/feedback-decomposition`,
+                url: `http://${SERVER_ADDR}/feedback`,
                 data: {
-                    'decomposition_id': JSON.stringify(item.data.decomposition_id),
+                    'task_id': JSON.stringify(item.data.task_id),
                     'user_id': JSON.stringify(user_id),
                     'q1': JSON.stringify(q1),
                     'q2': JSON.stringify(q2),
-                    'q3': JSON.stringify(q3),
-                    'q4': JSON.stringify(q4),
-                    'comments': JSON.stringify(comments)
                 },
                 success: function(d) {
-                    item.data.requires_feedback_decomposition = false;
                     $('#task-feedback-decomposition').hide();
 
-                    draw();
+                    update();
                 },
                 error: console.error
             });

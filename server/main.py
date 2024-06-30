@@ -119,6 +119,19 @@ def implement():
 def get_leaderboard():
     return database.get_leaderboard()
 
+@app.route('/feedback', methods=['POST'])
+def feedback():
+    task_id = json.loads(request.form['task_id'])
+    user_id = json.loads(request.form['user_id'])
+    q1 = json.loads(request.form['q1'])
+    q2 = json.loads(request.form['q2'])
+
+    database.save_feedback(task_id, user_id, q1, q2)
+
+    return {
+        'status': 'ok'
+    }
+
 
 if __name__ == '__main__':
     app.run(

@@ -94,59 +94,28 @@
                     <div id="task-feedback-decomposition">
                         <hr>
                         <div class="alert alert-info">
-                            <h5>Feedback (decomposition):</h5>
-                            <p>Indica quanto sei d'accordo con ciascuna di queste affermazioni:</p>
+                            <h5>Feedback:</h5>
                             <div class="mb-3">
-                                <label class="form-label rating">"La decomposizione generata è corretta."</label>
+                                <label class="form-label rating">Indica da chi credi sia stato generato questo task:</label>
                                 <select class="form-select" id="task-feedback-decomposition-q1">
                                     <option value="0" selected>-- Select a value --</option>
-                                    <option value="1">Fortemente d'accordo</option>
-                                    <option value="2">D'accordo</option>
-                                    <option value="3">Né d'accordo né in disaccordo</option>
-                                    <option value="4">In disaccordo</option>
-                                    <option value="5">Fortemente in disaccordo</option>
+                                    <option value="1">Da una persona</option>
+                                    <option value="2">Dall'AI, senza ulteriori modifiche</option>
+                                    <option value="3">Dall'AI, con modifiche fatte da una persona</option>
                                   </select>
                                   <div class="invalid-feedback">You need to select a value</div>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label rating">"I task generati risolvono completamente il problema di partenza."</label>
+                                <label class="form-label rating">Come definiresti la qualità di questo task nel complesso dell'intero problema?</label>
                                 <select class="form-select" id="task-feedback-decomposition-q2">
                                     <option value="0" selected>-- Select a value --</option>
-                                    <option value="1">Fortemente d'accordo</option>
-                                    <option value="2">D'accordo</option>
-                                    <option value="3">Né d'accordo né in disaccordo</option>
-                                    <option value="4">In disaccordo</option>
-                                    <option value="5">Fortemente in disaccordo</option>
+                                    <option value="1">Eccellente</option>
+                                    <option value="2">Buona</option>
+                                    <option value="3">Accettabile</option>
+                                    <option value="4">Bassa</option>
+                                    <option value="5">Pessima</option>
                                   </select>
                                   <div class="invalid-feedback">You need to select a value</div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label rating">"Sarei riuscito a decomporre questo problema senza l'aiuto dello strumento."</label>
-                                <select class="form-select"  id="task-feedback-decomposition-q3">
-                                    <option value="0" selected>-- Select a value --</option>
-                                    <option value="1">Fortemente d'accordo</option>
-                                    <option value="2">D'accordo</option>
-                                    <option value="3">Né d'accordo né in disaccordo</option>
-                                    <option value="4">In disaccordo</option>
-                                    <option value="5">Fortemente in disaccordo</option>
-                                  </select>
-                                  <div class="invalid-feedback">You need to select a value</div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label rating">"Avrei risolto la decomposizione in modo diverso."</label>
-                                <select class="form-select"  id="task-feedback-decomposition-q4">
-                                    <option value="0" selected>-- Select a value --</option>
-                                    <option value="1">Fortemente d'accordo</option>
-                                    <option value="2">D'accordo</option>
-                                    <option value="3">Né d'accordo né in disaccordo</option>
-                                    <option value="4">In disaccordo</option>
-                                    <option value="5">Fortemente in disaccordo</option>
-                                  </select>
-                                  <div class="invalid-feedback">You need to select a value</div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-check-label" for="task-feedback-decomposition-comments">Comments (optional)</label>
-                                <textarea class="form-control" id="task-feedback-decomposition-comments" rows="3" maxlength="2000" placeholder="Additional feedback"></textarea>
                             </div>
                             <button type="submit" id="task-feedback-decomposition-submit" class="btn btn-primary">Submit</button>
                         </div>

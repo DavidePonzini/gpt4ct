@@ -356,6 +356,45 @@ def get_leaderboard():
         'rank': row[2],
     } for row in result]
 
+def save_feedback(task_id, user_id, creation_mode, quality):    
+    if creation_mode == 1:
+        creation_mode = TaskCreationMode.MANUAL
+    elif creation_mode == 2:
+        creation_mode = TaskCreationMode.AI
+    else:
+        creation_mode = TaskCreationMode.MIXED
+
+    t = load_task(task_id, user_id)
+
+    with db.connect() as c:
+        c.insert(schema, 'feedback_tasks', {
+            'task_id': task_id,
+            'user_id': user_id,
+            'creation_mode': creation_mode,
+            'quality': quality
+        })
+
+        _add_credits(user_id, Credits.Feedback.GIVE_FEEDBACK, c)
+        if creation_mode == t.creation_mode:
+            _add_credits(user_id, Credits.Feedback.GUESS_CREATION_MODE, c)
+
+        if quality == 1:
+            _add_credits(t.task_user_id, Credits.Feedback.TaskRank.EXCELLENT, c)
+        elif quality == 2:
+            _add_credits(t.task_user_id, Credits.Feedback.TaskRank.GOOD, c)
+        elif quality == 3:
+            _add_credits(t.task_user_id, Credits.Feedback.TaskRank.OK, c)
+        elif quality == 4:
+            _add_credits(t.task_user_id, Credits.Feedback.TaskRank.BAD, c)
+        else:
+            _add_credits(t.task_user_id, Credits.Feedback.TaskRank.TERRIBLE, c)
+
+    _update_tree_ts(t.tree_id, c)
+
+    c.commit()
+
+
+
 def _add_credits(user_id: str, credits: int, connection: database.PostgreSQLConnection) -> None:
     query = database.sql.SQL('''
                              UPDATE {schema}.users
