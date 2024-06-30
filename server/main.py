@@ -69,10 +69,11 @@ def update_tasks():
 
 @app.route('/solve', methods=['POST'])
 def solve():
+    user_id = json.loads(request.form['user_id'])
     task_id = json.loads(request.form['task_id'])
     solved = json.loads(request.form['solved'])
 
-    database.solve_task(task_id, solved)
+    database.solve_task(task_id, user_id, solved)
 
     return {
         'status': 'ok'
