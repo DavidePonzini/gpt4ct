@@ -159,7 +159,7 @@ class Task {
             type: 'POST',
             url: `http://${SERVER_ADDR}/implement`,
             data: {
-                'task_id': JSON.stringify(this_task.path()),
+                'task_id': JSON.stringify(this_task.task_id),
                 'language': JSON.stringify(language),
                 'user_id': JSON.stringify(user_id),
                 'additional_instructions': JSON.stringify(additional_instructions),
