@@ -199,6 +199,8 @@ def load_tree(tree_id: int, user_id: str) -> tuple[Task, any, list[int]]:
             FROM {schema}.tasks
             WHERE
                 tree_id = {tree_id}
+                AND solved
+                AND user_id <> {user_id}
                 AND task_id NOT IN (
                     SELECT task_id
                     FROM {schema}.feedback_tasks

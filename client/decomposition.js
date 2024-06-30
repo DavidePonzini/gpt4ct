@@ -99,9 +99,9 @@ function load_from_server_id(tree_id, cb = () => {}) {
             if (d.status && d.status == 'error') {
                 alert('Invalid tree ID.');
                 return;
-            } 
+            }
 
-            init(d.tree, tree_id, d.last_update, expanded_tasks, d.feedback_list);
+            init(d.tree, tree_id, d.last_update, d.feedback_list, expanded_tasks);
 
             cb();
         },

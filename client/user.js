@@ -26,6 +26,8 @@ function login() {
                 $('#user-id').text(user_id);
                 $('#credits').text(d.user.credits);
                 $('#ranking').text(d.user.rank);
+
+                $('#nav-task-button').show();
                 
                 return;
             }
