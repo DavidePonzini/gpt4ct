@@ -12,12 +12,12 @@ app = Flask(__name__)
 CORS(app)
 
 
-@app.route('/login', methods=['POST'])
+@app.route('/get-user', methods=['POST'])
 def login():
     user_id = json.loads(request.form['user_id'])
 
     return {
-        'user': database.check_user_exists(user_id)
+        'user': database.get_user_data(user_id)
     }
 
 @app.route('/create-tree', methods=['POST'])

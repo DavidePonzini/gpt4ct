@@ -1,8 +1,9 @@
 from typing import Literal
 
 from dav_tools import database
-from task import Task, TaskCreationMode
 import task
+from task import Task, TaskCreationMode
+from gamification import Credits
 
 
 schema = 'problem_decomposition'
@@ -29,24 +30,11 @@ def create_tree(name: str, description: str, user_id: str) -> int:
             'description': description,
         })
 
+        _add_credits(user_id, Credits.Decomposition.CREATE_TREE, c)
+
         c.commit()
 
         return tree_id
-
-def _update_tree_ts(tree_id: int, connection: database.PostgreSQLConnection):
-    update_tree_ts = '''
-        UPDATE {schema}.trees
-        SET last_update_ts = NOW()
-        WHERE tree_id = {tree_id}
-        '''
-    
-    update_tree_ts = database.sql.SQL(update_tree_ts).format(
-        schema=database.sql.Identifier(schema),
-        tree_id=database.sql.Placeholder('tree_id')
-    )
-
-    connection.execute(update_tree_ts, {'tree_id': tree_id})
-
 
 def set_children_of_task(user_id: str, parent_id: int, tasks: list[dict], new_task_creation_mode: Literal['manual', 'ai', 'mixed'], tokens: tuple[int, int] | None = None) -> None:
     get_tree_id = database.sql.SQL('''SELECT tree_id FROM {schema}.tasks WHERE task_id = {task_id}''').format(
@@ -147,6 +135,7 @@ def set_children_of_task(user_id: str, parent_id: int, tasks: list[dict], new_ta
                         'description': task['description'],
                     })
 
+        _add_credits(user_id, Credits.Decomposition.DECOMPOSE, c)
         _update_tree_ts(tree_id, c)
 
         c.commit()
@@ -251,25 +240,37 @@ def solve_task(task_id: int, solved: bool) -> None:
             solved=database.sql.Placeholder('solved'),
             task_id=database.sql.Placeholder('task_id'),
         )
+    with db.connect() as c:
+        c.execute(query, {
+            'task_id': task_id,
+            'solved': solved,
+        })
+
+def get_user_data(user_id: str) -> dict[str, any] | None:
+    query = database.sql.SQL('''
+                             SELECT
+                                credits,
+                                rank
+                             FROM
+                                {schema}.v_leaderboard
+                             WHERE
+                                user_id = {user_id}
+                             ''').format(
+                                 schema=database.sql.Identifier(schema),
+                                 user_id=database.sql.Placeholder('user_id')
+                             )
     
-    db.execute(query, {
-        'task_id': task_id,
-        'solved': solved,
-    })
-
-def check_user_exists(user_id: str):
-    base_query = 'SELECT COUNT(*) FROM {schema}.users WHERE user_id = {user_id}'
-
-    query = database.sql.SQL(base_query).format(
-        schema=database.sql.Identifier(schema),
-        user_id = database.sql.Placeholder('user_id')
-    )
-
     result = db.execute_and_fetch(query, {
         'user_id': user_id
     })
 
-    return result[0][0] == 1
+    if len(result) == 1:
+        return {
+            'credits':  result[0][0],
+            'rank':     result[0][1],
+        }
+    
+    return None
 
 def set_implementation(task: Task, user_id: str, implementation: str, language: str, additional_prompt: str | None, tokens: tuple[int, int]):
     query_delete_implementations = database.sql.SQL('''
@@ -299,6 +300,7 @@ def set_implementation(task: Task, user_id: str, implementation: str, language: 
             'tokens_out': tokens[1],
         })
 
+        _add_credits(user_id, Credits.Implementation.IMPLEMENT, c)
         _update_tree_ts(task.tree_id, c)
 
         c.commit()
@@ -321,3 +323,33 @@ def get_leaderboard():
         'credits': row[1],
         'rank': row[2],
     } for row in result]
+
+def _add_credits(user_id: str, credits: int, connection: database.PostgreSQLConnection) -> None:
+    query = database.sql.SQL('''
+                             UPDATE {schema}.users
+                             SET credits = credits + {credits}
+                             WHERE user_id = {user_id}
+                             ''').format(
+                                 schema=database.sql.Identifier(schema),
+                                 credits=database.sql.Placeholder('credits'),
+                                 user_id=database.sql.Placeholder('user_id'),
+                            )
+    
+    connection.execute(query, {
+        'credits': credits,
+        'user_id': user_id,
+    }, commit=False)
+
+def _update_tree_ts(tree_id: int, connection: database.PostgreSQLConnection):
+    query = database.sql.SQL('''
+                             UPDATE {schema}.trees
+                             SET last_update_ts = NOW()
+                             WHERE tree_id = {tree_id}
+                             ''').format(
+                                 schema=database.sql.Identifier(schema),
+                                 tree_id=database.sql.Placeholder('tree_id')
+                            )
+
+    connection.execute(query, {
+        'tree_id': tree_id
+    }, commit=False)

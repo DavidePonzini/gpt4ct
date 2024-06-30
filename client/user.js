@@ -11,22 +11,21 @@ function login() {
 
     $.ajax({
         type: 'POST',
-        url: `http://${SERVER_ADDR}/login`,
+        url: `http://${SERVER_ADDR}/get-user`,
         data: {
             'user_id': JSON.stringify(uid),
         },
         success: function(d) {
             let data = d;
             
-            if (data.status && data.status == 'invalid_request') {
-                throw Error(data.message);
-            }
-            
             if (data.user) {
                 user_id = uid;
             
                 $('#login').hide();
-                update_user_data();
+    
+                $('#user-id').text(user_id);
+                $('#credits').text(d.user.credits);
+                $('#ranking').text(d.user.rank);
                 
                 return;
             }
@@ -41,10 +40,23 @@ function update_user_data() {
     if (!check_user_id())
         return;
 
-    $('#user-id').text(user_id);
-    $('#credits').text(100);
-    $('#ranking').text(1);
-
+    $.ajax({
+        type: 'POST',
+        url: `http://${SERVER_ADDR}/get-user`,
+        data: {
+            'user_id': JSON.stringify(uid),
+        },
+        success: function(d) {
+            let data = d;
+            
+            if (data.user) {
+                $('#credits').text(d.user.credits);
+                $('#ranking').text(d.user.rank);
+                
+                return;
+            }
+        }
+    });
 }
 
 function check_user_id() {
@@ -69,7 +81,7 @@ function show_leaderboard() {
             for (let row of d) {
                 let tr = $('<tr></tr>');
                 if (user_id && user_id == row.user_id) {
-                    tr.addClass('current-user');
+                    tr.addClass('table-secondary');
                 }
 
                 let col_rank = $('<th scope="row"></tr>');
