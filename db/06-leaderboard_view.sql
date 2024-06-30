@@ -8,7 +8,7 @@ CREATE VIEW v_leaderboard AS
   SELECT
     user_id,
     credits,
-    RANK() OVER (ORDER BY credits DESC) AS rank
+    DENSE_RANK() OVER (ORDER BY credits DESC) AS rank
   FROM
     users
   ORDER BY
