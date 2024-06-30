@@ -356,10 +356,10 @@ def get_leaderboard():
         'rank': row[2],
     } for row in result]
 
-def save_feedback(task_id, user_id, creation_mode, quality):    
-    if creation_mode == 1:
+def save_feedback(task_id, user_id, creation_mode_guess: int, quality: int):    
+    if int(creation_mode_guess) == 1:
         creation_mode = TaskCreationMode.MANUAL
-    elif creation_mode == 2:
+    elif int(creation_mode_guess) == 2:
         creation_mode = TaskCreationMode.AI
     else:
         creation_mode = TaskCreationMode.MIXED
