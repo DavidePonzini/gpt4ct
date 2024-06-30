@@ -660,6 +660,7 @@ function update() {
         return;
 
     load_from_server_id(tree_id);
+    update_user_data();
 }
 
 window.draw = draw;
