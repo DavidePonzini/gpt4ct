@@ -389,9 +389,9 @@ def save_feedback(task_id, user_id, creation_mode, quality):
         else:
             _add_credits(t.task_user_id, Credits.Feedback.TaskRank.TERRIBLE, c)
 
-    _update_tree_ts(t.tree_id, c)
+        _update_tree_ts(t.tree_id, c)
 
-    c.commit()
+        c.commit()
 
 
 
