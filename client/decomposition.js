@@ -622,6 +622,7 @@ function solve(item, solved) {
         type: 'POST',
         url: `http://${SERVER_ADDR}/solve`,
         data: {
+            'user_id': JSON.stringify(user_id),
             'task_id': JSON.stringify(item.data.task_id),
             'solved': JSON.stringify(solved)
         },
