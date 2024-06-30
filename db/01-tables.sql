@@ -66,7 +66,7 @@ CREATE TABLE implementations (
   implementation_id SERIAL NOT NULL PRIMARY KEY,
 
   task_id INTEGER REFERENCES tasks(task_id) NOT NULL,
-  is_edit_from INTEGER REFERENCES implementation(implementation_id) DEFAULT NULL,
+  is_edit_from INTEGER REFERENCES implementations(implementation_id) DEFAULT NULL,
   additional_prompt VARCHAR(1000) DEFAULT NULL,
 
   deleted BOOLEAN NOT NULL DEFAULT FALSE,
