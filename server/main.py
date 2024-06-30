@@ -83,7 +83,7 @@ def decompose_task():
     task_id = json.loads(request.form['task_id'])
     user_id = json.loads(request.form['user_id'])
 
-    current_task = database.load_task(task_id)
+    current_task = database.load_task(task_id, user_id)
 
     decomposition.decompose(
         task=current_task,
@@ -101,7 +101,7 @@ def implement():
     user_id = json.loads(request.form['user_id'])
     additional_instructions = json.loads(request.form['additional_instructions'])
 
-    task = database.load_task(task_id)
+    task = database.load_task(task_id, user_id)
 
     decomposition.implement(
         task=task,

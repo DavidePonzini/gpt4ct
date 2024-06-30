@@ -140,7 +140,7 @@ def set_children_of_task(user_id: str, parent_id: int, tasks: list[dict], new_ta
 
         c.commit()
 
-def load_task(task_id: int) -> Task:
+def load_task(task_id: int, user_id: str) -> Task:
     query_get_task_info = database.sql.SQL('''SELECT tree_id, path FROM {schema}.v_trees WHERE task_id = {task_id}''').format(
         schema=database.sql.Identifier(schema),
         task_id=database.sql.Placeholder('task_id')
@@ -155,7 +155,7 @@ def load_task(task_id: int) -> Task:
     
     tree_id, path = result[0]
     
-    tree, last_update = load_tree(tree_id)
+    tree, last_update, feedback_list = load_tree(tree_id, user_id)
     return tree.get_subtask_from_path(path)
 
 
