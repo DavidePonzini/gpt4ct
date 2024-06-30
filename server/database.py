@@ -201,16 +201,14 @@ def load_tree(tree_id: int, user_id: str) -> tuple[Task, any, list[int]]:
                 tree_id = {tree_id}
                 AND task_id NOT IN (
                     SELECT task_id
-                    FROM {schema2}.feedback_tasks
+                    FROM {schema}.feedback_tasks
                     WHERE user_id = {user_id}
                 )
-        '''.format(
+        ''').format(
             schema=database.sql.Identifier(schema),
-            schema2=database.sql.Identifier(schema),
             tree_id=database.sql.Placeholder('tree_id'),
             user_id=database.sql.Placeholder('user_id'),
         )
-    )
 
     with db.connect() as c:
         # check if tree exists (by getting its last update)
