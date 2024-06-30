@@ -111,7 +111,7 @@ def set_children_of_task(user_id: str, parent_id: int, tasks: list[dict], new_ta
                     'parent_id': parent_id,
                     'tree_id': tree_id,
                     'order_n': i,
-                    'user_id': user_id,
+                    'task_user_id': user_id,
                     'creation_mode': new_task_creation_mode,
                     'name': task['name'],
                     'description': task['description'],
@@ -139,7 +139,7 @@ def set_children_of_task(user_id: str, parent_id: int, tasks: list[dict], new_ta
                         'parent_id': parent_id,
                         'tree_id': tree_id,
                         'order_n': i,
-                        'user_id': user_id,
+                        'task_user_id': user_id,
                         'creation_mode': creation_mode,
                         'name': task['name'],
                         'description': task['description'],
@@ -296,3 +296,7 @@ def set_implementation(task: Task, user_id: str, implementation: str, language: 
             'tokens_in': tokens[0],
             'tokens_out': tokens[1],
         })
+
+        _update_tree_ts(task.tree_id, c)
+
+        c.commit()
