@@ -276,7 +276,7 @@ function draw() {
     let feedback_count = $('g.feedback-required').length;
     let feedback_button = $('#feedback-count');
     if (feedback_count > 0  && !window.disable_feedback) {
-        feedback_button.text(`You need to provide feedback for ${feedback_count} task(s)`)
+        feedback_button.text(`You can provide feedback for ${feedback_count} task(s)`)
         feedback_button.show();
     } else {
         feedback_button.hide();
