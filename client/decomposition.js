@@ -4,6 +4,7 @@ import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 let tree_data = null;
 let tree_id = null;
 let last_update = null;
+let feedback_list = [];
 let expanded_tasks = [];
 
 const svg = d3.select('#tree');
@@ -33,7 +34,7 @@ $(document).ready(function() {
     // Make dummy tree
     let tree = new Task(null, null, null, null, 'Load an existing task or create a new one', '');
 
-    init(JSON.stringify(tree.toJSON()), null, null);
+    init(JSON.stringify(tree.toJSON()));
     show_all_children(tree);
 })
 
@@ -59,7 +60,7 @@ function new_tree() {
                 throw Error(data.message);
             }
             
-            init(data.tree, data.tree_id, data.last_update);
+            init(data.tree, data.tree_id, data.last_update, data.feedback_list);
         },
         error: console.error
     });
@@ -68,6 +69,9 @@ function new_tree() {
 }
 
 function load_from_server(cb = () => {}) {
+    if (!check_user_id())
+        return;
+
     let tree_id = +prompt('Insert tree ID:');
     if (!tree_id)
         return;
@@ -76,6 +80,9 @@ function load_from_server(cb = () => {}) {
 }
 
 function load_from_server_id(tree_id, cb = () => {}) {
+    if (!check_user_id())
+        return;
+
     if (isNaN(tree_id)) {
         alert('Invalid ID format, please try again.');
         return;
@@ -85,6 +92,7 @@ function load_from_server_id(tree_id, cb = () => {}) {
         type: 'POST',
         url: `http://${SERVER_ADDR}/load-tree`,
         data: {
+            'user_id': JSON.stringify(user_id),
             'tree_id': JSON.stringify(tree_id),
         },
         success: function(d) {
@@ -93,7 +101,7 @@ function load_from_server_id(tree_id, cb = () => {}) {
                 return;
             } 
 
-            init(d.tree, tree_id, d.last_update, expanded_tasks);
+            init(d.tree, tree_id, d.last_update, expanded_tasks, d.feedback_list);
 
             cb();
         },
@@ -101,12 +109,13 @@ function load_from_server_id(tree_id, cb = () => {}) {
     });
 }
 
-function init(tree_json, _tree_id, _last_update, _expanded_tasks = []) {
+function init(tree_json, _tree_id = null, _last_update = null, _feedback_list = [], _expanded_tasks = []) {
     let tree = Task.load_from_json(tree_json, null, _expanded_tasks);
 
     tree_data = tree;
     set_tree_id(_tree_id);
     last_update = _last_update;
+    feedback_list = _feedback_list;
     expanded_tasks = _expanded_tasks;
     
     draw();
@@ -156,7 +165,7 @@ function draw() {
         .classed('implemented', d => d.data.implementation)
         .classed('solved', d => d.data.is_solved())
         .classed('running', d => d.data.running)
-        .classed('feedback-required', d => d.data.needs_feedback() && !window.disable_feedback)
+        .classed('feedback-required', d => feedback_list.includes(d.data.task_id) && !window.disable_feedback)
         .attr('transform', d => `translate(${d.x + width/2 + margin.left}, ${d.y + margin.top})`)
         .on('click', onNodeClick);
     nodesG_enter.append('circle')
@@ -189,7 +198,7 @@ function draw() {
         .classed('implemented', d => d.data.implementation)
         .classed('solved', d => d.data.is_solved())
         .classed('running', d => d.data.running)
-        .classed('feedback-required', d => d.data.needs_feedback() && !window.disable_feedback)
+        .classed('feedback-required', d => feedback_list.includes(d.data.task_id) && !window.disable_feedback)
         .attr('transform', d => `translate(${d.x + width/2 + margin.left}, ${d.y + margin.top})`)
         .on('click', onNodeClick);
     nodesG_update.select('text')
@@ -227,7 +236,7 @@ function draw() {
         .classed('explored', d => d.target.data.is_explored())
         .classed('implemented', d => d.target.data.implementation)
         .classed('solved', d => d.target.data.is_solved())
-        .classed('feedback-required', d => d.target.data.needs_feedback() && !window.disable_feedback)
+        .classed('feedback-required', d => feedback_list.includes(d.target.data.task_id) && !window.disable_feedback)
         .attr('d', d3.linkVertical()
         .source(d => [
             d.source.x + width/2 + margin.left,
@@ -248,7 +257,7 @@ function draw() {
         .classed('explored', d => d.target.data.is_explored())
         .classed('implemented', d => d.target.data.implementation)
         .classed('solved', d => d.target.data.is_solved())
-        .classed('feedback-required', d => d.target.data.needs_feedback() && !window.disable_feedback)
+        .classed('feedback-required', d => feedback_list.includes(d.target.data.task_id) && !window.disable_feedback)
         .attr('d', d3.linkVertical()
         .source(d => [
             d.source.x + width/2 + margin.left,
@@ -599,7 +608,7 @@ function delete_children(item) {
         data: {
             'parent_id': JSON.stringify(item.data.task_id),
             'user_id': JSON.stringify(user_id),
-            'tasks': [],
+            'tasks': JSON.stringify([]),
         },
         success: update,
         error: console.error

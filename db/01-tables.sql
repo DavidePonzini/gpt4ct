@@ -10,7 +10,7 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA problem_decomposition GRANT ALL ON SEQUENCES 
 SET search_path TO problem_decomposition;
 
 
-CREATE TYPE node_generation_mode AS ENUM ('manual', 'ai', 'mixed');
+CREATE TYPE task_generation_mode AS ENUM ('manual', 'ai', 'mixed');
 
 
 CREATE TABLE users (
@@ -39,7 +39,7 @@ CREATE TABLE tasks (
   deleted BOOLEAN NOT NULL DEFAULT FALSE,
 
   user_id VARCHAR(32) REFERENCES users(user_id) NOT NULL,
-  creation_mode node_generation_mode NOT NULL,
+  creation_mode task_generation_mode NOT NULL,
   creation_ts TIMESTAMP NOT NULL DEFAULT NOW(),
 
   name VARCHAR(1000) NOT NULL,
@@ -83,13 +83,13 @@ CREATE TABLE implementations (
   tokens_out DECIMAL(6) NOT NULL
 );
 
-CREATE TABLE feedback_nodes (
+CREATE TABLE feedback_tasks (
   -- primary key
   task_id INTEGER REFERENCES tasks(task_id) NOT NULL,
   user_id VARCHAR(32) REFERENCES users(user_id) NOT NULL,
 
-  q1 DECIMAL(1) NOT NULL, -- ai/manual/mixed
-  q2 DECIMAL(1) NOT NULL, -- decomposition quality (1-5)
+  creation_mode task_generation_mode NOT NULL, -- ai/manual/mixed
+  quality DECIMAL(1) NOT NULL, -- decomposition quality (1-5)
   feedback_ts TIMESTAMP NOT NULL DEFAULT NOW(),
 
   PRIMARY KEY(task_id, user_id)

@@ -29,23 +29,26 @@ def create_tree():
 
     tree_id = database.create_tree(name, description, user_id)
 
-    tree, last_update = database.load_tree(tree_id)
+    tree, last_update, feedback_list = database.load_tree(tree_id, user_id)
     return {
         'tree_id': tree_id,
         'tree': tree.to_json(),
-        'last_update': last_update
+        'last_update': last_update,
+        'feedback_list': feedback_list,
     }
 
 @app.route('/load-tree', methods=['POST'])
 def load_tree():
     tree_id = json.loads(request.form['tree_id'])
+    user_id = json.loads(request.form['user_id'])
     
-    tree, last_update = database.load_tree(tree_id)
+    tree, last_update, feedback_list = database.load_tree(tree_id, user_id)
 
     if tree is not None:
         return {
             'tree': tree.to_json(),
-            'last_update': last_update
+            'last_update': last_update,
+            'feedback_list': feedback_list,
         }
     
     return {

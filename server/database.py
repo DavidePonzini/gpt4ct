@@ -159,8 +159,9 @@ def load_task(task_id: int) -> Task:
     return tree.get_subtask_from_path(path)
 
 
-def load_tree(tree_id: int) -> tuple[Task, any]:
-    base_query = '''
+def load_tree(tree_id: int, user_id: str) -> tuple[Task, any, list[int]]:
+    query_tree_data = database.sql.SQL(
+        '''
         SELECT
             tree_id,
             path,
@@ -180,16 +181,34 @@ def load_tree(tree_id: int) -> tuple[Task, any]:
         WHERE
             tree_id = {tree_id}
         '''
-
-    query_tree_data = database.sql.SQL(base_query).format(
+    ).format(
         schema=database.sql.Identifier(schema),
         tree_id=database.sql.Placeholder('tree_id')
     )
 
-    query_last_update = '''SELECT last_update_ts FROM {schema}.trees WHERE tree_id = {tree_id}'''
-    query_last_update = database.sql.SQL(query_last_update).format(
+    query_last_update = database.sql.SQL(
+        '''SELECT last_update_ts FROM {schema}.trees WHERE tree_id = {tree_id}'''
+    ).format(
         schema=database.sql.Identifier(schema),
         tree_id=database.sql.Placeholder('tree_id')
+    )
+
+    query_feedback = database.sql.SQL(
+        '''
+            SELECT task_id
+            FROM {schema}.tasks
+            WHERE
+                tree_id = {tree_id}
+                AND task_id NOT IN (
+                    SELECT task_id
+                    FROM {schema}.feedback_tasks
+                    WHERE user_id = {user_id}
+                )
+        '''.format(
+            schema=database.sql.Identifier(schema),
+            tree_id=database.sql.Placeholder('tree_id'),
+            user_id=database.sql.Placeholder('user_id'),
+        )
     )
 
     with db.connect() as c:
@@ -206,7 +225,7 @@ def load_tree(tree_id: int) -> tuple[Task, any]:
 
         # get tree data
         c.execute(query_tree_data, {
-            'tree_id': tree_id
+            'tree_id': tree_id,
         })
 
         result = c.fetch_all()
@@ -228,7 +247,16 @@ def load_tree(tree_id: int) -> tuple[Task, any]:
             'implementation_language':  task[13],
         } for task in result]
 
-        return task.from_node_list(result), last_update
+        # get tasks feedback can be provided for
+        c.execute(query_feedback, {
+            'tree_id': tree_id,
+            'user_id': user_id,
+        })
+
+        feedback_list = c.fetch_all()
+        feedback_list = [row[0] for row in feedback_list]
+
+        return task.from_node_list(result), last_update, feedback_list
 
 def solve_task(task_id: int, solved: bool) -> None:
     query = database.sql.SQL('''
