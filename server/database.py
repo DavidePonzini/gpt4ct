@@ -182,6 +182,7 @@ def load_tree(tree_id: int) -> tuple[Task, any]:
             solved,
             name,
             description,
+            implementation_id,
             implementation,
             implementation_language
         FROM {schema}.v_trees
