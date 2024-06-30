@@ -311,7 +311,7 @@ def get_leaderboard():
             rank
         FROM {schema}.v_leaderboard;
         ''').format(
-            schema=schema
+            schema=database.sql.Identifier(schema),
         )
     
     result = db.execute_and_fetch(query)
