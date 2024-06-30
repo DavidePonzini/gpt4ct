@@ -63,7 +63,7 @@
                         <span id="ranking">N/A</span>
                     </span>
                 </div>
-                <button class="btn btn-outline-primary mx-1" type="button" onclick="">Leaderboard</button>
+                <button class="btn btn-outline-primary mx-1" type="button" onclick="show_leaderboard()">Leaderboard</button>
             </div>
         </div>
     </nav>
@@ -189,7 +189,7 @@
     </div>
 
     <!-- Modal - new tree -->
-    <div class="modal fade" id="new-tree-modal" tabindex="-1" aria-labelledby="new-task-header" aria-hidden="true">
+    <div class="modal fade" id="new-tree-modal" tabindex="-1" aria-labelledby="leaderboard-header" aria-hidden="true">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
@@ -210,6 +210,33 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" onclick="new_tree()">Create</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal - leaderboard -->
+    <div class="modal fade" id="leaderboard-modal" tabindex="-1" aria-labelledby="new-task-header" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="leaderboard-header">Leaderboard</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table">
+                        <thead>
+                          <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Username</th>
+                            <th scope="col">Credits</th>
+                          </tr>
+                        </thead>
+                        <tbody id="leaderboard"></tbody>
+                      </table>
+                </div>
+                <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>

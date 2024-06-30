@@ -36,7 +36,7 @@ class Task {
     }
 
     needs_feedback(user_id) {
-        return user_id && this.task_user_id && user_id == this.task_user_id;
+        return user_id && this.task_user_id && user_id != this.task_user_id;
     }
 
     is_root() {

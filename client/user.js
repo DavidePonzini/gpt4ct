@@ -55,3 +55,38 @@ function check_user_id() {
 
     return true;
 }
+
+function show_leaderboard() {
+    $.ajax({
+        type: 'GET',
+        url: `http://${SERVER_ADDR}/leaderboard`,
+        success: function(d) {
+            let data = d;
+
+            let leaderboard = $('#leaderboard');
+            leaderboard.empty();
+
+            for (let row of d) {
+                let tr = $('<tr></tr>');
+                if (user_id && user_id == row.user_id) {
+                    tr.addClass('current-user');
+                }
+
+                let col_rank = $('<th scope="row"></tr>');
+                col_rank.text(row.rank);
+
+                let col_username = $('<td></td>');
+                col_username.text(row.user_id);
+
+                let col_credits = $('<td></td>');
+                col_credits.text(row.credits);
+
+                tr.append(col_rank).append(col_username).append(col_credits);
+                leaderboard.append(tr);
+            }
+
+            $('#leaderboard-modal').modal('show');
+        },
+        error: console.error
+    });
+}

@@ -47,8 +47,15 @@ CREATE TABLE tasks (
 
   solved BOOLEAN NOT NULL DEFAULT FALSE,
 
+  -- usage
+  tokens_in DECIMAL(6) DEFAULT NULL,
+  tokens_out DECIMAL(6) DEFAULT NULL,
+
   -- order_n = null iff deleted = true 
   CHECK ((deleted = TRUE AND order_n IS NULL) OR (deleted = FALSE AND order_n IS NOT NULL)),
+
+  -- only ai-generated tasks have a cost
+  CHECK ((creation_mode = 'ai' AND tokens_in IS NOT NULL AND tokens_out IS NOT NULL) OR (creation_mode <> 'ai' AND tokens_in IS NULL AND tokens_out IS NULL)), 
   
   -- no duplicate order_n for the same parent_id
   UNIQUE (parent_id, order_n)
@@ -81,11 +88,8 @@ CREATE TABLE feedback_nodes (
   task_id INTEGER REFERENCES tasks(task_id) NOT NULL,
   user_id VARCHAR(32) REFERENCES users(user_id) NOT NULL,
 
-  q1 DECIMAL(1) NOT NULL,
-  q2 DECIMAL(1) NOT NULL,
-  q3 DECIMAL(1) NOT NULL,
-  q4 DECIMAL(1) NOT NULL,
-  comments VARCHAR(2000),
+  q1 DECIMAL(1) NOT NULL, -- ai/manual/mixed
+  q2 DECIMAL(1) NOT NULL, -- decomposition quality (1-5)
   feedback_ts TIMESTAMP NOT NULL DEFAULT NOW(),
 
   PRIMARY KEY(task_id, user_id)

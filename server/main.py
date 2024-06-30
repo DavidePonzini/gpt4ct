@@ -111,6 +111,10 @@ def implement():
         'status': 'ok'
     }
 
+@app.route('/leaderboard', methods=['GET'])
+def get_leaderboard():
+    return database.get_leaderboard()
+
 
 if __name__ == '__main__':
     app.run(

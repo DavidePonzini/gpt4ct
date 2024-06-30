@@ -115,6 +115,8 @@ def set_children_of_task(user_id: str, parent_id: int, tasks: list[dict], new_ta
                     'creation_mode': new_task_creation_mode,
                     'name': task['name'],
                     'description': task['description'],
+                    'tokens_in': tokens[0] if new_task_creation_mode == TaskCreationMode.AI else None,
+                    'tokens_out': tokens[1] if new_task_creation_mode == TaskCreationMode.AI else None,
                 })
             else:
                 # if task already exists, get its data
@@ -300,3 +302,22 @@ def set_implementation(task: Task, user_id: str, implementation: str, language: 
         _update_tree_ts(task.tree_id, c)
 
         c.commit()
+
+def get_leaderboard():
+    query = database.sql.SQL('''
+        SELECT
+            user_id,
+            credits,
+            rank
+        FROM {schema}.v_leaderboard;
+        ''').format(
+            schema=schema
+        )
+    
+    result = db.execute_and_fetch(query)
+
+    return [{
+        'user_id': row[0],
+        'credits': row[1],
+        'rank': row[2],
+    } for row in result]
