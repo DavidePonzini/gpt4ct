@@ -547,7 +547,11 @@ function submit_manual_decomposition(item) {
             'tasks': JSON.stringify(subtasks),
         },
         success: update,
-        error: console.error
+        error: function(e) {
+            console.error(e);
+            item.data.running = false;
+            alert('error, see console for info');
+        }
     });
     
 
@@ -568,17 +572,10 @@ function implement_task(item, language) {
     if (!check_user_id())
         return;    
 
-    item.data.generate_implementation(tree_id, user_id, language, function(d) {
-        item.data.running = false;
-
-        set_tree_id(d.tree_id);
-
-        draw();
-    }, function(e) {
+    item.data.generate_implementation(user_id, language, null, update, function(e) {
         console.error(e);
         item.data.running = false;
         alert('error, see console for info');
-        draw();
     });
 
     item.data.running = true;
