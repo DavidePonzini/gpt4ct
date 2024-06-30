@@ -44,7 +44,7 @@ function update_user_data() {
         type: 'POST',
         url: `http://${SERVER_ADDR}/get-user`,
         data: {
-            'user_id': JSON.stringify(uid),
+            'user_id': JSON.stringify(user_id),
         },
         success: function(d) {
             let data = d;

@@ -52,10 +52,11 @@ def implement(task: Task, user_id: str, language: str, additional_prompt: str | 
 
     # Add siblings' implementations
     task.for_each_sibling(lambda t: _add_implementation_step(message, t, t.implementation_language), 
-                          where=lambda t: t.implementation is not None and t.implementation != False)
+                          where=lambda t: t.implementation is not None)
 
     # Add children implementations
-    task.for_each_child(lambda t: _add_implementation_step(message, t, t.implementation_language))
+    task.for_each_child(lambda t: _add_implementation_step(message, t, t.implementation_language),
+                        where=lambda t: t.implementation is not None)
 
     # Ask for this task's implementation
     message.add_message(MessageRole.USER, prompts.Implementation.prompt(task, language))

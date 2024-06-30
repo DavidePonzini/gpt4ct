@@ -103,8 +103,11 @@ class Task {
     }
 
     can_be_implemented() {
-        // Only leaves and nodes with all theirs children already implemented can be implemented
+        // Only leaves and nodes with all theirs children already implemented can be implemented. Solved tasks count as implemented
         for (let child of this.subtasks) {
+            if (child.solved)
+                continue;
+
             if (!child.implementation || !child.can_be_implemented())
                 return false;
         }
