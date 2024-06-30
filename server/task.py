@@ -157,7 +157,7 @@ def from_node_list(data: list[dict]) -> Task | None:
         child = Task(
             tree_id=node['tree_id'],
             task_id=node['task_id'],
-            task_user_id=node['user_id'],
+            task_user_id=node['task_user_id'],
             creation_mode=node['creation_mode'],
             name=node['name'],
             description=node['description'],
