@@ -172,6 +172,23 @@ class Task {
         });
     }
 
+    delete_implementation() {
+        let this_task = this;
+
+        $.ajax({
+            type: 'POST',
+            url: `http://${SERVER_ADDR}/implement`,
+            data: {
+                'task_id': JSON.stringify(this_task.task_id),
+                'language': JSON.stringify(null),
+                'user_id': JSON.stringify(user_id),
+                'additional_instructions': JSON.stringify(null),
+            },
+            success: cb,
+            error: cb_error
+        });
+    }
+
     static load_from_json(data, parent = null, expanded_tasks = []) {
         return Task.load_tree(JSON.parse(data), parent, expanded_tasks);
     }

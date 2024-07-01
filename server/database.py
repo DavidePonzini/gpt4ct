@@ -304,7 +304,7 @@ def get_user_data(user_id: str) -> dict[str, any] | None:
     
     return None
 
-def set_implementation(task: Task, user_id: str, implementation: str, language: str, additional_prompt: str | None, tokens: tuple[int, int]):
+def set_implementation(task: Task, user_id: str, implementation: str | None, language: str | None, additional_prompt: str | None, tokens: tuple[int, int] | None):
     query_delete_implementations = database.sql.SQL('''
         UPDATE {schema}.implementations
         SET deleted = TRUE
@@ -320,19 +320,21 @@ def set_implementation(task: Task, user_id: str, implementation: str, language: 
             'task_id': task.task_id,
         })
 
-        # add new implementation
-        c.insert(schema, 'implementations', {
-            'task_id': task.task_id,
-            'is_edit_from': task.implementation_id,
-            'additional_prompt': additional_prompt,
-            'user_id': user_id,
-            'implementation': implementation,
-            'implementation_language': language,
-            'tokens_in': tokens[0],
-            'tokens_out': tokens[1],
-        })
+        if implementation is not None:
+            # add new implementation
+            c.insert(schema, 'implementations', {
+                'task_id': task.task_id,
+                'is_edit_from': task.implementation_id,
+                'additional_prompt': additional_prompt,
+                'user_id': user_id,
+                'implementation': implementation,
+                'implementation_language': language,
+                'tokens_in': tokens[0],
+                'tokens_out': tokens[1],
+            })
 
-        _add_score(user_id, Credits.Implementation.IMPLEMENT, c)
+            _add_score(user_id, Credits.Implementation.IMPLEMENT, c)
+
         _update_tree_ts(task.tree_id, c)
 
         c.commit()

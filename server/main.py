@@ -104,12 +104,22 @@ def implement():
 
     task = database.load_task(task_id, user_id)
 
-    decomposition.implement(
-        task=task,
-        language=language,
-        user_id=user_id,
-        additional_prompt=additional_instructions,
-    )
+    if language is None:
+        database.set_implementation(
+            task=task,
+            user_id=user_id,
+            implementation=None,
+            language=None,
+            additional_prompt=None,
+            tokens=None
+        )
+    else:
+        decomposition.implement(
+            task=task,
+            language=language,
+            user_id=user_id,
+            additional_prompt=additional_instructions,
+        )
 
     return {
         'status': 'ok'
