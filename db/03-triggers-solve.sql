@@ -2,6 +2,12 @@ BEGIN TRANSACTION;
 
 SET search_path TO problem_decomposition;
 
+-- Drop existing triggers and functions if they exist
+DROP TRIGGER IF EXISTS trg_mark_subtasks_solved ON tasks;
+DROP TRIGGER IF EXISTS trg_mark_parents_unsolved ON tasks;
+DROP FUNCTION IF EXISTS mark_subtasks_solved();
+DROP FUNCTION IF EXISTS mark_parents_unsolved();
+
 -- Trigger function to mark all subtasks as solved
 CREATE OR REPLACE FUNCTION mark_subtasks_solved() RETURNS TRIGGER AS $$
 BEGIN
@@ -11,30 +17,28 @@ BEGIN
     WHERE parent_id = NEW.task_id
     AND solved = FALSE;
 
-    -- Recursively apply the trigger to subtasks
-    PERFORM mark_subtasks_solved()
-    FROM tasks
-    WHERE parent_id = NEW.task_id
-    AND solved = FALSE;
-
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
 -- Trigger function to mark all parent tasks as unsolved
 CREATE OR REPLACE FUNCTION mark_parents_unsolved() RETURNS TRIGGER AS $$
+DECLARE
+    parent_task RECORD;
 BEGIN
     -- Recursively update all parent tasks
-    UPDATE tasks
-    SET solved = FALSE
-    WHERE task_id = NEW.parent_id
-    AND solved = TRUE;
+    FOR parent_task IN
+        SELECT * FROM tasks WHERE task_id = NEW.parent_id
+    LOOP
+        UPDATE tasks
+        SET solved = FALSE
+        WHERE task_id = parent_task.task_id
+        AND solved = TRUE;
 
-    -- Recursively apply the trigger to parent tasks
-    PERFORM mark_parents_unsolved()
-    FROM tasks
-    WHERE task_id = NEW.parent_id
-    AND solved = TRUE;
+        -- Continue the recursion up the hierarchy
+        NEW.parent_id := parent_task.parent_id;
+        PERFORM mark_parents_unsolved();
+    END LOOP;
 
     RETURN NEW;
 END;
