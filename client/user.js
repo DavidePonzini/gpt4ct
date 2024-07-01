@@ -24,8 +24,12 @@ function login() {
                 $('#login').hide();
     
                 $('#user-id').text(user_id);
-                $('#credits').text(d.user.credits);
                 $('#ranking').text(d.user.rank);
+                $('#credits').text(d.user.credits);
+                $('#feedback-received').text(d.user.feedback_received);
+                $('#feedback-excellent').text(d.user.feedback_excellent);
+                $('#feedback-good').text(d.user.feedback_good);
+                $('#correct-guesses').text(d.user.correct_guesses);
 
                 $('#nav-task-button').show();
                 
@@ -52,9 +56,13 @@ function update_user_data() {
             let data = d;
             
             if (data.user) {
-                $('#credits').text(d.user.credits);
                 $('#ranking').text(d.user.rank);
-                
+                $('#credits').text(d.user.credits);
+                $('#feedback-received').text(d.user.feedback_received);
+                $('#feedback-excellent').text(d.user.feedback_excellent);
+                $('#feedback-good').text(d.user.feedback_good);
+                $('#correct-guesses').text(d.user.correct_guesses);
+
                 return;
             }
         }
@@ -95,7 +103,30 @@ function show_leaderboard() {
                 let col_credits = $('<td></td>');
                 col_credits.text(row.credits);
 
-                tr.append(col_rank).append(col_username).append(col_credits);
+                let col_feedback_given = $('<td></td>');
+                col_feedback_given.text(row.feedback_given);
+
+                let col_feedback_received = $('<td></td>');
+                col_feedback_received.text(row.feedback_received);
+
+                let col_tasks_excellent = $('<td></td>');
+                col_tasks_excellent.text(row.feedback_excellent);
+
+                let col_tasks_good = $('<td></td>');
+                col_tasks_good.text(row.feedback_good);
+
+                let col_correct_guesses = $('<td></td>');
+                col_correct_guesses.text(row.correct_guesses);
+
+                tr.append(col_rank)
+                    .append(col_username)
+                    .append(col_credits)
+                    .append(col_feedback_given)
+                    .append(col_feedback_received)
+                    .append(col_tasks_excellent)
+                    .append(col_tasks_good)
+                    .append(col_correct_guesses)
+                    ;
                 leaderboard.append(tr);
             }
 

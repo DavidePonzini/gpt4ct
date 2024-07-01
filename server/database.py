@@ -281,8 +281,12 @@ def solve_task(task_id: int, user_id: str, solved: bool) -> None:
 def get_user_data(user_id: str) -> dict[str, any] | None:
     query = database.sql.SQL('''
                              SELECT
+                                rank,
                                 credits,
-                                rank
+                                feedback_received,
+                                feedback_excellent,
+                                feedback_good,
+                                correct_guesses
                              FROM
                                 {schema}.v_leaderboard
                              WHERE
@@ -298,8 +302,12 @@ def get_user_data(user_id: str) -> dict[str, any] | None:
 
     if len(result) == 1:
         return {
-            'credits':  result[0][0],
-            'rank':     result[0][1],
+            'rank':                 result[0][0],
+            'credits':              result[0][1],
+            'feedback_received':    result[0][2],
+            'feedback_excellent':   result[0][3],
+            'feedback_good':        result[0][4],
+            'correct_guesses':      result[0][5],
         }
     
     return None
@@ -342,9 +350,14 @@ def set_implementation(task: Task, user_id: str, implementation: str | None, lan
 def get_leaderboard():
     query = database.sql.SQL('''
         SELECT
+            rank,
             user_id,
             credits,
-            rank
+            feedback_given,
+            feedback_received,
+            feedback_excellent,
+            feedback_good,
+            correct_guesses
         FROM {schema}.v_leaderboard;
         ''').format(
             schema=database.sql.Identifier(schema),
@@ -353,9 +366,14 @@ def get_leaderboard():
     result = db.execute_and_fetch(query)
 
     return [{
-        'user_id': row[0],
-        'credits': row[1],
-        'rank': row[2],
+        'rank':                 row[0],
+        'user_id':              row[1],
+        'credits':              row[2],
+        'feedback_given':       row[3],
+        'feedback_received':    row[4],
+        'feedback_excellent':   row[5],
+        'feedback_good':        row[6],
+        'correct_guesses':      row[7],
     } for row in result]
 
 def save_feedback(task_id, user_id, creation_mode_guess: int, quality: int, decomposition_quality: int):   

@@ -50,16 +50,31 @@
                     <button class="btn btn-outline-light hidden" id="feedback-count" type="button" onclick="alert('To provide feedback, click on the tasks highlighted in magenta.')"></button>
                 </div>
                 <div class="navbar-text">
-                    <span class="mx-1">
+                    <span class="mx-2">
                         <i class="fa-solid fa-user"></i>
                         <span id="user-id">Not logged in</span>
                     </span>
-                    <span class="mx-1">
+                    <span class="mx-2">
                         <i class="fa-solid fa-gem"></i>
                         <span id="credits">N/A</span>
                     </span>
-                    <span class="mx-1">
+                    <span class="mx-2">
                         <i class="fa-solid fa-ranking-star"></i>
+                        <span id="ranking">N/A</span>
+                    </span>
+                    <span class="mx-2">
+                        <i class="fa-solid fa-comment"></i>
+                        <span id="feedback_received">N/A</span>
+                        (
+                        <span id="feedback-excellent">--</span>
+                        <i class="fa-solid fa-medal" style="color: gold;"></i>
+                        |
+                        <span id="feedback-good">--</span>
+                        <i class="fa-solid fa-medal" style="color: silver;"></i>
+                        )
+                    </span>
+                    <span class="mx-2">
+                        <i class="fa-solid fa-circle-check"></i>
                         <span id="ranking">N/A</span>
                     </span>
                 </div>
@@ -211,7 +226,12 @@
                           <tr>
                             <th scope="col">#</th>
                             <th scope="col">Username</th>
-                            <th scope="col">Credits</th>
+                            <th scope="col">Score</th>
+                            <th scope="col">Feedback given</th>
+                            <th scope="col">Feedback received</th>
+                            <th scope="col">Excellent tasks</th>
+                            <th scope="col">Good tasks</th>
+                            <th scope="col">Task generations guessed</th>
                           </tr>
                         </thead>
                         <tbody id="leaderboard"></tbody>
