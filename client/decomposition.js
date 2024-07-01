@@ -578,7 +578,7 @@ function delete_implementation(item) {
 
 function implement_task(item, language) {
     hide_buttons();
-    
+
     if (!check_user_id())
         return;    
 

@@ -30,7 +30,7 @@ def create_tree(name: str, description: str, user_id: str) -> int:
             'description': description,
         })
 
-        _add_credits(user_id, Credits.Decomposition.CREATE_TREE, c)
+        _add_score(user_id, Credits.Decomposition.CREATE_TREE, c)
 
         c.commit()
 
@@ -135,7 +135,7 @@ def set_children_of_task(user_id: str, parent_id: int, tasks: list[dict], new_ta
                         'description': task['description'],
                     })
 
-        _add_credits(user_id, Credits.Decomposition.DECOMPOSE, c)
+        _add_score(user_id, Credits.Decomposition.DECOMPOSE, c)
         _update_tree_ts(tree_id, c)
 
         c.commit()
@@ -332,7 +332,7 @@ def set_implementation(task: Task, user_id: str, implementation: str, language: 
             'tokens_out': tokens[1],
         })
 
-        _add_credits(user_id, Credits.Implementation.IMPLEMENT, c)
+        _add_score(user_id, Credits.Implementation.IMPLEMENT, c)
         _update_tree_ts(task.tree_id, c)
 
         c.commit()
@@ -383,52 +383,141 @@ def save_feedback(task_id, user_id, creation_mode_guess: int, quality: int, deco
             'decomposition_quality': decomposition_quality,
         })
 
-        _add_credits(user_id, Credits.Feedback.GIVE_FEEDBACK, c)
+        _add_feedback(user_id, c)
         if creation_mode == t.creation_mode:
-            _add_credits(user_id, Credits.Feedback.GUESS_CREATION_MODE, c)
+            _add_correct_guess(user_id, c)
 
         if quality == 1:
-            _add_credits(t.task_user_id, Credits.Feedback.TaskRank.EXCELLENT, c)
+            _add_quality_excellent(t.task_user_id, c)
         elif quality == 2:
-            _add_credits(t.task_user_id, Credits.Feedback.TaskRank.GOOD, c)
+            _add_quality_good(t.task_user_id, c)
         elif quality == 3:
-            _add_credits(t.task_user_id, Credits.Feedback.TaskRank.OK, c)
+            _add_score(t.task_user_id, Credits.Feedback.TaskRank.OK, c)
         elif quality == 4:
-            _add_credits(t.task_user_id, Credits.Feedback.TaskRank.BAD, c)
+            _add_score(t.task_user_id, Credits.Feedback.TaskRank.BAD, c)
         else:
-            _add_credits(t.task_user_id, Credits.Feedback.TaskRank.TERRIBLE, c)
+            _add_score(t.task_user_id, Credits.Feedback.TaskRank.TERRIBLE, c)
 
         _update_tree_ts(t.tree_id, c)
 
         c.commit()
 
+def _add_feedback(user_id_from: str, user_id_to: str, connection: database.PostgreSQLConnection) -> None:
+    query_from = database.sql.SQL(
+        '''
+            UPDATE {schema}.users
+            SET feedback_given = feedback_given + 1
+            WHERE user_id = {user_id}
+        '''
+    ).format(
+        schema=database.sql.Identifier(schema),
+        user_id=database.sql.Placeholder('user_id'),
+    )
 
+    query_to = database.sql.SQL(
+        '''
+            UPDATE {schema}.users
+            SET feedback_received = feedback_received + 1
+            WHERE user_id = {user_id}
+        '''
+    ).format(
+        schema=database.sql.Identifier(schema),
+        user_id=database.sql.Placeholder('user_id'),
+    )
 
-def _add_credits(user_id: str, credits: int, connection: database.PostgreSQLConnection) -> None:
-    query = database.sql.SQL('''
-                             UPDATE {schema}.users
-                             SET credits = credits + {credits}
-                             WHERE user_id = {user_id}
-                             ''').format(
-                                 schema=database.sql.Identifier(schema),
-                                 credits=database.sql.Placeholder('credits'),
-                                 user_id=database.sql.Placeholder('user_id'),
-                            )
-    
+    connection.execute(query_from, {
+        'user_id': user_id_from,
+    })
+
+    connection.execute(query_to, {
+        'user_id': user_id_to,
+    })
+
+    _add_score(user_id_from, Credits.Feedback.GIVE_FEEDBACK, connection)
+
+def _add_correct_guess(user_id: str, connection: database.PostgreSQLConnection) -> None:
+    query = database.sql.SQL(
+        '''
+            UPDATE {schema}.users
+            SET correct_guesses = correct_guesses + 1
+            WHERE user_id = {user_id}
+        '''
+    ).format(
+        schema=database.sql.Identifier(schema),
+        user_id=database.sql.Placeholder('user_id'),
+    )
+
     connection.execute(query, {
-        'credits': credits,
+        'user_id': user_id,
+    })
+
+    _add_score(user_id, Credits.Feedback.GUESS_CREATION_MODE, connection)
+
+def _add_quality_excellent(user_id: str, connection: database.PostgreSQLConnection) -> None:
+    query = database.sql.SQL(
+        '''
+            UPDATE {schema}.users
+            SET feedback_excellent = feedback_excellent + 1
+            WHERE user_id = {user_id}
+        '''
+    ).format(
+        schema=database.sql.Identifier(schema),
+        user_id=database.sql.Placeholder('user_id'),
+    )
+
+    connection.execute(query, {
+        'user_id': user_id,
+    })
+
+    _add_score(user_id, Credits.Feedback.TaskRank.EXCELLENT, connection)
+
+def _add_quality_good(user_id: str, connection: database.PostgreSQLConnection) -> None:
+    query = database.sql.SQL(
+        '''
+            UPDATE {schema}.users
+            SET feedback_good = feedback_good + 1
+            WHERE user_id = {user_id}
+        '''
+    ).format(
+        schema=database.sql.Identifier(schema),
+        user_id=database.sql.Placeholder('user_id'),
+    )
+
+    connection.execute(query, {
+        'user_id': user_id,
+    })
+
+    _add_score(user_id, Credits.Feedback.TaskRank.GOOD, connection)
+
+def _add_score(user_id: str, score: int, connection: database.PostgreSQLConnection) -> None:
+    query = database.sql.SQL(
+        '''
+            UPDATE {schema}.users
+            SET credits = credits + {credits}
+            WHERE user_id = {user_id}
+        '''
+    ).format(
+        schema=database.sql.Identifier(schema),
+        credits=database.sql.Placeholder('credits'),
+        user_id=database.sql.Placeholder('user_id'),
+    )
+
+    connection.execute(query, {
+        'credits': score,
         'user_id': user_id,
     }, commit=False)
 
 def _update_tree_ts(tree_id: int, connection: database.PostgreSQLConnection):
-    query = database.sql.SQL('''
-                             UPDATE {schema}.trees
-                             SET last_update_ts = NOW()
-                             WHERE tree_id = {tree_id}
-                             ''').format(
-                                 schema=database.sql.Identifier(schema),
-                                 tree_id=database.sql.Placeholder('tree_id')
-                            )
+    query = database.sql.SQL(
+        '''
+            UPDATE {schema}.trees
+            SET last_update_ts = NOW()
+            WHERE tree_id = {tree_id}
+        '''
+    ).format(
+        schema=database.sql.Identifier(schema),
+        tree_id=database.sql.Placeholder('tree_id')
+    )
 
     connection.execute(query, {
         'tree_id': tree_id
