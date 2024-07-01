@@ -1,10 +1,10 @@
 class Credits:
     class Decomposition:
-        DECOMPOSE = -1
-        CREATE_TREE = -1
+        DECOMPOSE = 0
+        CREATE_TREE = 0
     
     class Implementation:
-        IMPLEMENT = -1
+        IMPLEMENT = 0
 
     class Feedback:
         GIVE_FEEDBACK = +3
