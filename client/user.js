@@ -78,6 +78,16 @@ function check_user_id() {
     return true;
 }
 
+function to_percent(num, tot) {
+    let n = +num;
+    let t = +tot;
+
+    if (t == 0)
+        return '0 (0%)';
+
+    return `${n} (${(n / t).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:0})})`;
+}
+
 function show_leaderboard() {
     $.ajax({
         type: 'GET',
@@ -110,13 +120,13 @@ function show_leaderboard() {
                 col_feedback_received.text(row.feedback_received);
 
                 let col_tasks_excellent = $('<td></td>');
-                col_tasks_excellent.text(row.feedback_excellent);
+                col_tasks_excellent.text(to_percent(row.feedback_excellent, row.feedback_received));
 
                 let col_tasks_good = $('<td></td>');
-                col_tasks_good.text(row.feedback_good);
+                col_tasks_good.text(to_percent(row.feedback_good, row.feedback_received));
 
                 let col_correct_guesses = $('<td></td>');
-                col_correct_guesses.text(row.correct_guesses);
+                col_correct_guesses.text(to_percent(row.correct_guesses, row.feedback_given));
 
                 tr.append(col_rank)
                     .append(col_username)
