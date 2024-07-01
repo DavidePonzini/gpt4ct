@@ -569,10 +569,13 @@ function submit_manual_decomposition(item) {
 
 
 function delete_implementation(item) {
-    item.data.remove_implementation();
+    item.data.remove_implementation(update, function(e) {
+        console.error(e);
+        item.data.running = false;
+        alert('error, see console for info');
+    });
 
     hide_buttons();
-    draw();
 }
 
 
