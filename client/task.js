@@ -172,7 +172,7 @@ class Task {
         });
     }
 
-    remove_implementation(cb = () => {}, cb_error = console.error) {
+    remove_implementation(user_id, cb = () => {}, cb_error = console.error) {
         let this_task = this;
 
         $.ajax({

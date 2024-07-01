@@ -569,7 +569,7 @@ function submit_manual_decomposition(item) {
 
 
 function delete_implementation(item) {
-    item.data.remove_implementation(update, function(e) {
+    item.data.remove_implementation(user_id, update, function(e) {
         console.error(e);
         item.data.running = false;
         alert('error, see console for info');
