@@ -385,7 +385,7 @@ def save_feedback(task_id, user_id, creation_mode_guess: int, quality: int, deco
             'decomposition_quality': decomposition_quality,
         })
 
-        _add_feedback(user_id, c)
+        _add_feedback(user_id, t.task_user_id, c)
         if creation_mode == t.creation_mode:
             _add_correct_guess(user_id, c)
 
