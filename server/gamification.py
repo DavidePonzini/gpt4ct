@@ -8,7 +8,7 @@ class Credits:
 
     class Feedback:
         GIVE_FEEDBACK = +3
-        GUESS_CREATION_MODE = +20
+        GUESS_CREATION_MODE = +10
         
         class TaskRank:
             EXCELLENT = +10

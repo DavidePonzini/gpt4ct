@@ -297,7 +297,7 @@ function onNodeClick(event, item) {
 
     // Set name
     let name = $('#task-name');
-    name.text(`${item.data.name} (${item.data.creation_mode})`);
+    name.text(`${item.data.name}`);
 
     // Set description
     let description = $('#task-description');
