@@ -172,7 +172,7 @@ class Task {
         });
     }
 
-    delete_implementation() {
+    remove_implementation() {
         let this_task = this;
 
         $.ajax({
