@@ -348,7 +348,8 @@ def set_implementation(task: Task, user_id: str, implementation: str | None, lan
         c.commit()
 
 def get_leaderboard():
-    query = database.sql.SQL('''
+    query = database.sql.SQL(
+        '''
         SELECT
             rank,
             user_id,
@@ -358,7 +359,8 @@ def get_leaderboard():
             feedback_excellent,
             feedback_good,
             correct_guesses
-        FROM {schema}.v_leaderboard;
+        FROM {schema}.v_leaderboard
+        WHERE credits > 0
         ''').format(
             schema=database.sql.Identifier(schema),
         )
