@@ -89,7 +89,8 @@ CREATE TABLE feedback_tasks (
   user_id VARCHAR(32) REFERENCES users(user_id) NOT NULL,
 
   creation_mode task_generation_mode NOT NULL, -- ai/manual/mixed
-  quality DECIMAL(1) NOT NULL, -- decomposition quality (1-5)
+  quality DECIMAL(1) NOT NULL, -- task quality (1-5)
+  decomposition_quality DECIMAL(1), -- decomposition quality (1-5 | NULL)
   feedback_ts TIMESTAMP NOT NULL DEFAULT NOW(),
 
   PRIMARY KEY(task_id, user_id)

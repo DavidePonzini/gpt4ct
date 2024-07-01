@@ -12,7 +12,7 @@ DROP FUNCTION IF EXISTS mark_parents_unsolved();
 CREATE OR REPLACE FUNCTION mark_subtasks_solved() RETURNS TRIGGER AS $$
 BEGIN
     -- Recursively update all subtasks
-    UPDATE tasks
+    UPDATE problem_decomposition.tasks
     SET solved = TRUE
     WHERE parent_id = NEW.task_id
     AND solved = FALSE;
@@ -28,16 +28,16 @@ DECLARE
 BEGIN
     -- Recursively update all parent tasks
     FOR parent_task IN
-        SELECT * FROM tasks WHERE task_id = NEW.parent_id
+        SELECT * FROM problem_decomposition.tasks WHERE task_id = NEW.parent_id
     LOOP
-        UPDATE tasks
+        UPDATE problem_decomposition.tasks
         SET solved = FALSE
         WHERE task_id = parent_task.task_id
         AND solved = TRUE;
 
         -- Continue the recursion up the hierarchy
         NEW.parent_id := parent_task.parent_id;
-        PERFORM mark_parents_unsolved();
+        -- PERFORM mark_parents_unsolved();
     END LOOP;
 
     RETURN NEW;

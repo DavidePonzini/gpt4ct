@@ -323,8 +323,8 @@ function onNodeClick(event, item) {
 
     // Show decomposition feedback, if needed
     if (feedback_list.includes(item.data.task_id) && !window.disable_feedback) {
-        $('#task-feedback-decomposition').show();
         prepare_feedback_decomposition(item);
+        $('#task-feedback-decomposition').show();
     } else {
         $('#task-feedback-decomposition').hide();
     }
@@ -340,6 +340,14 @@ function prepare_feedback_decomposition(item) {
     // Reset all select options
     let questions = $('#task-feedback-decomposition select');
     questions.val(0);
+
+    // hide question about decomposition if task has no children
+    if (!item.data.has_children()) {
+        $('#task-feedback-decomposition-q3').val(-1);
+        $('#task-feedback-decomposition-q3-all').hide();
+    } else {
+        $('#task-feedback-decomposition-q3-all').show();
+    }
 
     $('#task-feedback-decomposition-submit').prop('disabled', false).unbind().on('click', function() {
         if (!check_user_id())
@@ -362,6 +370,7 @@ function prepare_feedback_decomposition(item) {
         if (!missing_anwer) {
             let q1 = $('#task-feedback-decomposition-q1').val();
             let q2 = $('#task-feedback-decomposition-q2').val();
+            let q3 = $('#task-feedback-decomposition-q3').val();
 
             $.ajax({
                 type: 'POST',
@@ -371,6 +380,7 @@ function prepare_feedback_decomposition(item) {
                     'user_id': JSON.stringify(user_id),
                     'q1': JSON.stringify(q1),
                     'q2': JSON.stringify(q2),
+                    'q3': JSON.stringify(q2),
                 },
                 success: function(d) {
                     $('#task-feedback-decomposition').hide();

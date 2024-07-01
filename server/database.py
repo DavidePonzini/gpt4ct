@@ -356,9 +356,14 @@ def get_leaderboard():
         'rank': row[2],
     } for row in result]
 
-def save_feedback(task_id, user_id, creation_mode_guess: int, quality: int):   
+def save_feedback(task_id, user_id, creation_mode_guess: int, quality: int, decomposition_quality: int):   
     creation_mode_guess = int(creation_mode_guess)
     quality = int(quality)
+    decomposition_quality = int(decomposition_quality)
+    
+    # -1 means there is no decomposition
+    if decomposition_quality == -1:
+        decomposition_quality = None
 
     if creation_mode_guess == 1:
         creation_mode = TaskCreationMode.MANUAL
@@ -374,7 +379,8 @@ def save_feedback(task_id, user_id, creation_mode_guess: int, quality: int):
             'task_id': task_id,
             'user_id': user_id,
             'creation_mode': creation_mode,
-            'quality': quality
+            'quality': quality,
+            'decomposition_quality': decomposition_quality,
         })
 
         _add_credits(user_id, Credits.Feedback.GIVE_FEEDBACK, c)

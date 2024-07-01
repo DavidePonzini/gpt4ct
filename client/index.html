@@ -101,13 +101,25 @@
                                     <option value="0" selected>-- Select a value --</option>
                                     <option value="1">Da una persona</option>
                                     <option value="2">Dall'AI, senza ulteriori modifiche</option>
-                                    <option value="3">Dall'AI, con modifiche fatte da una persona</option>
+                                    <option value="3">Dall'AI, con successive modifiche fatte da una persona</option>
                                   </select>
                                   <div class="invalid-feedback">You need to select a value</div>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label rating">Come definiresti la qualità di questo task nel complesso dell'intero problema?</label>
+                                <label class="form-label rating">Come definiresti la qualità <i>(pertinenza, descrizione ed implementazione (se presente))</i> di questo task nel complesso dell'intero problema?</label>
                                 <select class="form-select" id="task-feedback-decomposition-q2">
+                                    <option value="0" selected>-- Select a value --</option>
+                                    <option value="1">Eccellente</option>
+                                    <option value="2">Buona</option>
+                                    <option value="3">Accettabile</option>
+                                    <option value="4">Bassa</option>
+                                    <option value="5">Pessima</option>
+                                  </select>
+                                  <div class="invalid-feedback">You need to select a value</div>
+                            </div>
+                            <div class="mb-3" id="task-feedback-decomposition-q3-all">
+                                <label class="form-label rating">Come definiresti la qualità <i>(pertinenza e completezza)</i> della decomposizione di questo task?</label>
+                                <select class="form-select" id="task-feedback-decomposition-q3">
                                     <option value="0" selected>-- Select a value --</option>
                                     <option value="1">Eccellente</option>
                                     <option value="2">Buona</option>

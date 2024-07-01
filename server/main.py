@@ -125,8 +125,9 @@ def feedback():
     user_id = json.loads(request.form['user_id'])
     q1 = json.loads(request.form['q1'])
     q2 = json.loads(request.form['q2'])
+    q3 = json.loads(request.form['q3'])
 
-    database.save_feedback(task_id, user_id, q1, q2)
+    database.save_feedback(task_id, user_id, q1, q2, q3)
 
     return {
         'status': 'ok'
