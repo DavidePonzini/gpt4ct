@@ -15,7 +15,7 @@ CREATE TYPE task_generation_mode AS ENUM ('manual', 'ai', 'mixed');
 
 CREATE TABLE users (
   user_id VARCHAR(32) PRIMARY KEY,
-  credits DECIMAL(10) NOT NULL DEFAULT 0
+  credits DECIMAL(10) NOT NULL DEFAULT 50
 );
 
 CREATE TABLE trees (
