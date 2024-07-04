@@ -16,7 +16,6 @@ CREATE OR REPLACE VIEW v_costs AS (
   SELECT
     'Implementation' AS type,
     user_id,
-    SUM(prompt_tokens) AS tokens_in,
     SUM(tokens_in) AS tokens_in,
     SUM(tokens_out) AS tokens_out,
     SUM(tokens_in) / 1000000 * .50 + SUM(tokens_out) / 1000000 * 1.50 AS cost

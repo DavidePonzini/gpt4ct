@@ -38,7 +38,7 @@ function login() {
 
             alert(`User "${uid}" does not exist. Try again.`);
         },
-        error: console.error
+        error: () => alert('Could not connect to server.')
     });
 }
 
