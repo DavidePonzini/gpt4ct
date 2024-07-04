@@ -61,12 +61,8 @@
     stroke: green;
 }
 
-[state=solved]:not(.has-children) circle {
+[state=solved] circle {
     fill: yellowgreen;
-}
-
-[state=solved].has-children circle {
-    fill: green;
 }
 
 .feedback-required circle {
