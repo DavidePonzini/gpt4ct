@@ -3,9 +3,19 @@
     transition: .1s ease-in-out;
 }
 
-.node text {
+.node-label {
     font: 12px sans-serif;
     text-anchor: start;
+}
+
+.node-icon {
+    text-anchor: middle;
+    fill: white;
+}
+
+.node foreignObject {
+    align-content: center;
+    text-align: center;
 }
 
 /* ---------- Links ---------- */
@@ -15,58 +25,48 @@
 }
 
 .link-leaf {
-    stroke: #aaa;
     stroke-dasharray: 3, 3;
 }
 
-.link-internal {
-    stroke: steelblue;
+/* ---------- Node status ---------- */
+[state=new] circle, [state=new].link {
+    stroke: orange;
 }
 
-/* ---------- Node status ---------- */
-.has-children.decomposed circle {
-    stroke: orange;
+[state=new]:not(.has-children) circle {
     fill: white;
 }
 
-.has-children.implemented circle {
-    
-}
-
-.unexplored.link {
-    stroke: orange;
-}
-
-.explored circle {
-    stroke: orange;
+[state=new].has-children circle {
     fill: orange;
 }
 
-.explored.link {
+[state=implemented] circle {
     stroke: orange;
 }
 
-.implemented circle {
-    stroke: steelblue;
-    fill: steelblue;
-}
-
-.implemented.explored circle {
-    stroke: steelblue;
-    fill: steelblue;
-}
-
-.implemented.link {
+[state=implemented].link {
     stroke: steelblue;
 }
 
-.solved circle {
+[state=implemented]:not(.has-children) circle {
+    fill: white;
+}
+
+[state=implemented].has-children circle {
+    fill: orange;
+}
+
+[state=solved] circle, [state=solved].link {
     stroke: green;
+}
+
+[state=solved]:not(.has-children) circle {
     fill: yellowgreen;
 }
 
-.solved.link {
-    stroke: green;
+[state=solved].has-children circle {
+    fill: green;
 }
 
 .feedback-required circle {
@@ -76,6 +76,16 @@
 
 .feedback-required.link {
     stroke: magenta!important;
+}
+
+/* ---------- Icons ---------- */
+.node-icon-implementation {
+    color: blue;
+    font-size: 9pt;
+}
+
+.node-icon-expand {
+    color: coral;
 }
 
 
@@ -95,6 +105,10 @@
     stroke: #0d6efd;
     stroke-width: 2px;
     fill: #f4f4f4;
+}
+
+.running foreignObject {
+    display: none;
 }
 
 @keyframes loading_circle {

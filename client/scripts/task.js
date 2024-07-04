@@ -60,18 +60,24 @@ class Task {
         return this.solved;
     }
 
-    is_explored() {
-        // Node has been explored (decomposed) but not marked as solved
-        return this.subtasks.length && !this.is_solved();
-    }
-
-    is_unexplored() {
-        // Node has neither been explored (decomposed) or marked as solved
-        return !this.subtasks.length && !this.is_solved();
-    }
-
     has_children() {
-        return this.subtasks.length;
+        return !!this.subtasks.length;
+    }
+
+    get_state() {
+        /*
+        - new (decomposition in progress)
+        - implemented
+        - solved
+         */
+
+        if (this.solved)
+            return 'solved'
+
+        if (this.implementation)
+            return 'implemented'
+
+        return 'new'
     }
 
     show_children(recursive = false, cb_expanded = (c) => {}) {

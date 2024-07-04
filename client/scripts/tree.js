@@ -27,7 +27,17 @@ svg.call(zoom);
 function focus_root() {
     svg.transition()
         .duration(750)
-        .call(zoom.transform, d3.zoomIdentity);
+        .call(zoom.transform,
+            d3.zoomIdentity
+        );
+}
+
+function focus_on(item) {
+    // svg.transition()
+    //     .duration(750)
+    //     .call(zoom.transform,
+    //         d3.zoomIdentity.translate(-item.x, -item.y)
+    //     );
 }
 
 $(document).ready(function() {
@@ -137,14 +147,14 @@ function draw() {
     const svg_width = $('#tree').innerWidth();
 
     const margin = {
-        left: 50,
-        right: 200,
+        left: 0,
+        right: 0,
         top: 50,
         bottom: 200
     };
 
     const width = svg_width - margin.left - margin.right;
-    const max_label_length = 150;
+    const max_label_length = 130;
 
     const treeLayout = d3.tree(null).nodeSize([200, 200]);
     const treeData = treeLayout(d3.hierarchy(tree_data, d => d.children));
@@ -155,22 +165,21 @@ function draw() {
     let nodes = g.selectAll('.node')
         .data(treeData.descendants())
 
-    // Nodes - Enter
+    // Nodes - enter
     let nodesG_enter = nodes.enter().append('g')
         .classed('node', true)
         .classed('node-internal', d => !d.data.is_leaf())
         .classed('node-leaf', d => d.data.is_leaf())
         .classed('has-children', d => d.data.has_children())
-        .classed('explored', d => d.data.is_explored())
-        .classed('implemented', d => d.data.implementation)
-        .classed('solved', d => d.data.is_solved())
         .classed('running', d => d.data.running)
         .classed('feedback-required', d => feedback_list.includes(d.data.task_id) && !window.disable_feedback)
-        .attr('transform', d => `translate(${d.x + width/2 + margin.left}, ${d.y + margin.top})`)
-        .on('click', onNodeClick);
+        .attr('state', d => d.data.get_state())
+        .attr('transform', d => `translate(${d.x + width/2 + margin.left}, ${d.y + margin.top})`);
     nodesG_enter.append('circle')
-        .attr('r', 10);
+        .attr('r', 10)
+        .on('click', open_node_menu);
     nodesG_enter.append('text')
+        .classed('node-label', true)
         .attr('dx', 18)
         .attr('dy', '.31em')
         .each(function (d) {
@@ -188,20 +197,39 @@ function draw() {
                 elem.text(name + '...');
             }
         });
-
-    // Nodes - Update
+    nodesG_enter.append('foreignObject')
+        .classed('node-icon-expand', true)
+        .classed('fa fa-square-caret-down', d => d.data.is_leaf())
+        .classed('fa-regular fa-square-caret-up', d => !d.data.is_leaf())
+        .classed('hidden', d => !d.data.has_children())
+        .on('click', (e, d) => d.data.is_leaf() ? show_children(d.data, d) : hide_children(d.data, d))
+        .attr('width', 20)
+        .attr('height', 20)
+        .attr('x', -35)
+        .attr('y', -10)
+    nodesG_enter.append('foreignObject')
+        .classed('node-icon-implementation', true)
+        .classed('fa', true)
+        .classed('fa-code', true)
+        .classed('hidden', d => !d.data.implementation)
+        .on('click', open_node_menu)       // needed since it's on top of the circle
+        .attr('width', 20)
+        .attr('height', 20)
+        .attr('x', -10)
+        .attr('y', -10)
+    
+    // Nodes - update
     let nodesG_update = nodes
         .classed('node-internal', d => !d.data.is_leaf())
         .classed('node-leaf', d => d.data.is_leaf())
         .classed('has-children', d => d.data.has_children())
-        .classed('explored', d => d.data.is_explored())
-        .classed('implemented', d => d.data.implementation)
-        .classed('solved', d => d.data.is_solved())
         .classed('running', d => d.data.running)
         .classed('feedback-required', d => feedback_list.includes(d.data.task_id) && !window.disable_feedback)
-        .attr('transform', d => `translate(${d.x + width/2 + margin.left}, ${d.y + margin.top})`)
-        .on('click', onNodeClick);
-    nodesG_update.select('text')
+        .attr('state', d => d.data.get_state())
+        .attr('transform', d => `translate(${d.x + width/2 + margin.left}, ${d.y + margin.top})`);
+    nodesG_update.select('circle')
+        .on('click', open_node_menu);
+    nodesG_update.select('.node-label')
         .each(function (d) {
             let name = d.data.name;
             let elem = d3.select(this);
@@ -217,6 +245,14 @@ function draw() {
                 elem.text(name + '...');
             }
         });
+    nodesG_update.select('.node-icon-expand')
+    .classed('fa fa-square-caret-down', d => d.data.is_leaf())
+    .classed('fa-regular fa-square-caret-up', d => !d.data.is_leaf())
+    .classed('hidden', d => !d.data.has_children())
+    .on('click', (e, d) => d.data.is_leaf() ? show_children(d.data, d) : hide_children(d.data, d));
+    nodesG_update.select('.node-icon-implementation')
+        .classed('hidden', d => !d.data.implementation)
+        .on('click', open_node_menu);       // needed since it's on top of the circle
 
     // Nodes - Exit
     nodes.exit().remove('g');
@@ -233,10 +269,8 @@ function draw() {
         .classed('link-internal', d => !d.target.data.is_leaf())
         .classed('link-leaf', d => d.target.data.is_leaf())
         .classed('has-children', d => d.target.data.has_children())
-        .classed('explored', d => d.target.data.is_explored())
-        .classed('implemented', d => d.target.data.implementation)
-        .classed('solved', d => d.target.data.is_solved())
         .classed('feedback-required', d => feedback_list.includes(d.target.data.task_id) && !window.disable_feedback)
+        .attr('state', d => d.target.data.get_state())
         .attr('d', d3.linkVertical()
         .source(d => [
             d.source.x + width/2 + margin.left,
@@ -254,10 +288,8 @@ function draw() {
         .classed('link-internal', d => !d.target.data.is_leaf())
         .classed('link-leaf', d => d.target.data.is_leaf())
         .classed('has-children', d => d.target.data.has_children())
-        .classed('explored', d => d.target.data.is_explored())
-        .classed('implemented', d => d.target.data.implementation)
-        .classed('solved', d => d.target.data.is_solved())
         .classed('feedback-required', d => feedback_list.includes(d.target.data.task_id) && !window.disable_feedback)
+        .attr('state', d => d.target.data.get_state())
         .attr('d', d3.linkVertical()
         .source(d => [
             d.source.x + width/2 + margin.left,
@@ -284,16 +316,14 @@ function draw() {
 
 }
 
-function onNodeClick(event, item) {
+function open_node_menu(event, item) {
     // Prevent any action if API is generating output
-    if ($('.running').length > 0) {
+    if ($('.running').length > 0)
         return;
-    }
 
     // Prevent any action for sample tree
-    if (!tree_id) {
+    if (!tree_id)
         return;
-    }
 
     // Set name
     let name = $('#task-name');
@@ -402,13 +432,13 @@ function prepare_feedback_decomposition(item) {
  */
 function show_buttons(item) {
     // Show/hide decomposition: only available on decomposed tasks
-    let button_show_decomposition = $('#show-decomposition');
-    button_show_decomposition.text(item.data.is_leaf() ? 'Show decomposition' : 'Hide decomposition');
-    if (item.data.has_children()) {
-        button_show_decomposition.show().unbind().on('click', () => item.data.is_leaf() ? show_children(item.data) : hide_children(item.data));
-    } else {
-        button_show_decomposition.hide();
-    }
+    // let button_show_decomposition = $('#show-decomposition');
+    // button_show_decomposition.text(item.data.is_leaf() ? 'Show decomposition' : 'Hide decomposition');
+    // if (item.data.has_children()) {
+    //     button_show_decomposition.show().unbind().on('click', () => item.data.is_leaf() ? show_children(item.data) : hide_children(item.data));
+    // } else {
+    //     button_show_decomposition.hide();
+    // }
 
     // Decompose: only available for unsolved tasks
     let button_decompose = $('#decompose');
@@ -615,18 +645,27 @@ function solve(item, solved) {
     });
 }
 
-function show_children(task) {
-    hide_buttons();
+function show_children(task, item = null) {
+    // hide_buttons();
 
     task.show_children(false, (t) => expanded_tasks.push(t.task_id));
+
     draw();
+
+    if (item)
+        focus_on(item);
+
 }
 
-function hide_children(task) {
-    hide_buttons();
+function hide_children(task, item = null) {
+    // hide_buttons();
 
     task.hide_children(false, (t) => expanded_tasks.splice(expanded_tasks.indexOf(t.task_id)));
+    
     draw();
+
+    if (item)
+        focus_on(item);    
 }
 
 function show_all_children() {
