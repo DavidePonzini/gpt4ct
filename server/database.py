@@ -333,13 +333,12 @@ def _delete_implementation(task_id: str, connection: database.PostgreSQLConnecti
 def set_implementation(task: Task, user_id: str, implementation: str | None, language: str | None, additional_prompt: str | None, tokens: tuple[int, int] | None):
     
     with db.connect() as c:
-        # delete old implementations
+        # delete old implementations, up to root
         _delete_implementation(task.task_id, c)
+        task.for_each_parent(lambda t: _delete_implementation(t.task_id, c))
+
 
         if implementation is not None:
-            # delete parent implementations
-            task.for_each_parent(lambda t: _delete_implementation(t.task_id, c))
-
             # add new implementation
             c.insert(schema, 'implementations', {
                 'task_id': task.task_id,
