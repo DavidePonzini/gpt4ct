@@ -86,6 +86,9 @@ def set_children_of_task(user_id: str, parent_id: int, tasks: list[dict], new_ta
             return
         tree_id = tree_id[0]
 
+        # remove parent implementation
+        _delete_implementation(parent_id, c)
+
         # remove all children of parent
         c.execute(delete_children, {
             'parent_id': parent_id,
@@ -312,7 +315,7 @@ def get_user_data(user_id: str) -> dict[str, any] | None:
     
     return None
 
-def set_implementation(task: Task, user_id: str, implementation: str | None, language: str | None, additional_prompt: str | None, tokens: tuple[int, int] | None):
+def _delete_implementation(task_id: str, connection: database.PostgreSQLConnection) -> None:
     query_delete_implementations = database.sql.SQL('''
         UPDATE {schema}.implementations
         SET deleted = TRUE
@@ -322,15 +325,20 @@ def set_implementation(task: Task, user_id: str, implementation: str | None, lan
             task_id=database.sql.Placeholder('task_id'),
         )
     
+    connection.execute(query_delete_implementations, {
+        'task_id': task_id
+    })
+    
+
+def set_implementation(task: Task, user_id: str, implementation: str | None, language: str | None, additional_prompt: str | None, tokens: tuple[int, int] | None):
+    
     with db.connect() as c:
         # delete old implementations
-        c.execute(query_delete_implementations, {
-            'task_id': task.task_id,
-        })
+        _delete_implementation(task.task_id, c)
 
         if implementation is not None:
             # delete parent implementations
-            task.for_each_parent(lambda t: c.execute(query_delete_implementations, {'task_id': t.task_id}))
+            task.for_each_parent(lambda t: _delete_implementation(t.task_id, c))
 
             # add new implementation
             c.insert(schema, 'implementations', {
