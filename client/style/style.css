@@ -47,6 +47,14 @@ footer {
     text-align: center;
 }
 
+#implementation-box {
+    background-color: #f3f3f3;
+}
+
+#implementation-prompt {
+    padding: 0 1rem 1rem;
+}
+
 /* Social */
 .social {
     margin-left: 4px;
