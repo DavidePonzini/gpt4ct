@@ -8,11 +8,6 @@
     text-anchor: start;
 }
 
-/* .node.node-internal circle {
-    stroke: steelblue;
-    fill: steelblue;
-} */
-
 /* ---------- Links ---------- */
 .link {
     fill: none;
@@ -29,9 +24,13 @@
 }
 
 /* ---------- Node status ---------- */
-.unexplored circle {
+.has-children.decomposed circle {
     stroke: orange;
     fill: white;
+}
+
+.has-children.implemented circle {
+    
 }
 
 .unexplored.link {
