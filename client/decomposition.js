@@ -416,14 +416,6 @@ function show_buttons(item) {
         button_decompose.show();
         $('#decompose-manual').unbind().on('click', () => manual_decomposition(item));
         $('#decompose-ai').unbind().on('click', () => generate_decomposition(item));
-
-        // Delete decomposition: available on nodes that have children
-        let button_delete = $('#delete-decomposition');
-        if (item.data.has_children()) {
-            button_delete.show().unbind().on('click', () => delete_children(item));
-        } else {
-            button_delete.hide();
-        }
     } else {
         button_decompose.hide();
     }
@@ -433,6 +425,10 @@ function show_buttons(item) {
     if (!item.data.is_solved() && item.data.can_be_implemented()) {
         button_implement.show();
         $('#implement-py').unbind().on('click', () => implement_task(item, 'python'));
+        $('#implement-c').unbind().on('click', () => implement_task(item, 'c'));
+        $('#implement-cpp').unbind().on('click', () => implement_task(item, 'c++'));
+        $('#implement-cs').unbind().on('click', () => implement_task(item, 'c#'));
+        $('#implement-java').unbind().on('click', () => implement_task(item, 'java'));
         $('#implement-js').unbind().on('click', () => implement_task(item, 'javascript'));
         $('#implement-delete').unbind().on('click', () => delete_implementation(item));
     } else {
@@ -601,22 +597,6 @@ function show_task_data_modal() {
 
 function hide_buttons() {
     $('#task-data').modal('hide');
-}
-
-function delete_children(item) {
-    hide_buttons();
-
-    $.ajax({
-        type: 'POST',
-        url: `http://${SERVER_ADDR}/update-tasks`,
-        data: {
-            'parent_id': JSON.stringify(item.data.task_id),
-            'user_id': JSON.stringify(user_id),
-            'tasks': JSON.stringify([]),
-        },
-        success: update,
-        error: console.error
-    });
 }
 
 function solve(item, solved) {

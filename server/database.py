@@ -329,6 +329,9 @@ def set_implementation(task: Task, user_id: str, implementation: str | None, lan
         })
 
         if implementation is not None:
+            # delete parent implementations
+            task.for_each_parent(lambda t: c.execute(query_delete_implementations, {'task_id': t.task_id}))
+
             # add new implementation
             c.insert(schema, 'implementations', {
                 'task_id': task.task_id,
