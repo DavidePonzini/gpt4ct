@@ -9,16 +9,16 @@ VALUES
     ('test'),
     ('giovanna'),
     ('giorgio'),
-    ('phd1'),
-    ('phd2'),
-    ('phd3'),
-    ('phd4'),
-    ('phd5'),
-    ('phd6'),
-    ('phd7'),
-    ('phd8'),
-    ('phd9'),
-    ('phd10')
+    ('user1'),
+    ('user2'),
+    ('user3'),
+    ('user4'),
+    ('user5'),
+    ('user6'),
+    ('user7'),
+    ('user8'),
+    ('user9'),
+    ('user10')
 ON CONFLICT (user_id) DO NOTHING;
 
 COMMIT;
