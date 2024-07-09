@@ -47,11 +47,11 @@ footer {
     text-align: center;
 }
 
-#implementation-box {
+#task-implementation-box {
     background-color: #f3f3f3;
 }
 
-#implementation-prompt {
+#task-implementation-prompt {
     padding: 0 1rem 1rem;
 }
 

@@ -364,9 +364,42 @@ function open_node_menu(event, item) {
         // highligth element (since the same html elem will be used, we need to unset data-highlighted)
         impl_text.removeAttr('data-highlighted');
         hljs.highlightElement(impl_text[0]);
+
+        // Implementation edit
+        let impl_prompt = $('#task-implementation-prompt-text');
+        let impl_button = $('#task-implementation-prompt-send');
+
+        // Reset each time implementation prompt text
+        impl_prompt.val('');
+
+        // Function to enable/disable the button based on input value
+        const toggleButtonState = () => {
+            impl_button.prop('disabled', impl_prompt.val().trim() === '');
+        };
+
+        // Initial button state
+        toggleButtonState();
+
+        // Bind impl edit
+        impl_prompt.unbind().on('input', () => {
+            toggleButtonState();
+        }).keydown(({key}) => {
+            if (key === 'Enter' && impl_prompt.val().trim() !== '') {
+                impl_button.click(); // Trigger button click on Enter
+            }
+        });
+
+        // Bind impl edit button 
+        impl_button.unbind().on('click', function() {
+            let text = impl_prompt.val().trim();
+            if (text !== '') {
+                generate_implementation(item, item.data.implementation_language, text);
+            }
+        });
     } else {
         impl.hide()
     }
+
 
     // Hide manual decomposition prompt
     $('#task-decomposition-manual').hide();
@@ -474,12 +507,12 @@ function show_buttons(item) {
     let button_implement = $('#implement');
     if (!item.data.is_solved() && item.data.can_be_implemented()) {
         button_implement.show();
-        $('#implement-py').unbind().on('click', () => implement_task(item, 'python'));
-        $('#implement-c').unbind().on('click', () => implement_task(item, 'c'));
-        $('#implement-cpp').unbind().on('click', () => implement_task(item, 'c++'));
-        $('#implement-cs').unbind().on('click', () => implement_task(item, 'c#'));
-        $('#implement-java').unbind().on('click', () => implement_task(item, 'java'));
-        $('#implement-js').unbind().on('click', () => implement_task(item, 'javascript'));
+        $('#implement-py').unbind().on('click', () => generate_implementation(item, 'python'));
+        $('#implement-c').unbind().on('click', () => generate_implementation(item, 'c'));
+        $('#implement-cpp').unbind().on('click', () => generate_implementation(item, 'c++'));
+        $('#implement-cs').unbind().on('click', () => generate_implementation(item, 'c#'));
+        $('#implement-java').unbind().on('click', () => generate_implementation(item, 'java'));
+        $('#implement-js').unbind().on('click', () => generate_implementation(item, 'javascript'));
         $('#implement-delete').unbind().on('click', () => delete_implementation(item));
     } else {
         button_implement.hide();
@@ -625,13 +658,13 @@ function delete_implementation(item) {
 }
 
 
-function implement_task(item, language) {
+function generate_implementation(item, language, additional_instructions = null) {
     hide_buttons();
 
     if (!check_user_id())
         return;    
 
-    item.data.generate_implementation(user_id, language, null, update, function(e) {
+    item.data.generate_implementation(user_id, language, additional_instructions, update, function(e) {
         console.error(e);
         item.data.running = false;
         alert('error, see console for info');

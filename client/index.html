@@ -152,12 +152,12 @@
                     <div id="task-implementation">
                         <hr>
                         <h5>Implementation:</h5>
-                        <div id="implementation-box">
+                        <div id="task-implementation-box">
                             <pre><code id="task-implementation-text"></code></pre>
                             <hr>
-                            <div class="input-group mb-1" id="implementation-prompt">
-                                <input type="text" class="form-control" id="implementation-prompt-text" placeholder="How would you like to modify this implementation?">
-                                <button class="btn btn-outline-secondary" type="button" id="implementation-prompt-send"><i class="fa-solid fa-play"></i></button>
+                            <div class="input-group mb-1" id="task-implementation-prompt">
+                                <input type="text" autocomplete="off" class="form-control" id="task-implementation-prompt-text" placeholder="How would you like to modify this implementation?">
+                                <button class="btn btn-outline-secondary" type="button" id="task-implementation-prompt-send"><i class="fa-solid fa-play"></i></button>
                             </div>
                         </div>
                     </div>
@@ -205,11 +205,11 @@
                     <form>
                         <div class="mb-3">
                             <label for="new-task-name">Task name:</label>
-                            <input type="text" id="new-task-name" class="form-control" placeholder="Brief description of your problem">
+                            <input autocomplete="off" type="text" id="new-task-name" class="form-control" placeholder="Brief description of your problem">
                         </div>
                         <div class="mb-3">
                             <label for="new-task-description">Task description:</label>
-                            <textarea id="new-task-description" class="form-control" rows="10" placeholder="Detailed description of your problem"></textarea>
+                            <textarea autocomplete="off" id="new-task-description" class="form-control" rows="10" placeholder="Detailed description of your problem"></textarea>
                         </div>
                     </form>
                 </div>

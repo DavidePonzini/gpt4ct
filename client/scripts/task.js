@@ -109,6 +109,10 @@ class Task {
     }
 
     can_be_implemented() {
+        // Prevent root node implementation with no prior decomposition
+        if (this.is_root() && !this.has_children())
+            return false; 
+
         // Only leaves and nodes with all theirs children already implemented can be implemented. Solved tasks count as implemented
         for (let child of this.subtasks) {
             if (child.solved)
