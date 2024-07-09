@@ -197,16 +197,18 @@ function draw() {
                 elem.text(name + '...');
             }
         });
+    // Expand node icon
     nodesG_enter.append('foreignObject')
         .classed('node-icon-expand', true)
-        .classed('fa fa-square-caret-down', d => d.data.is_leaf())
+        .classed('fa-solid fa-square-caret-down', d => d.data.is_leaf())
         .classed('fa-regular fa-square-caret-up', d => !d.data.is_leaf())
         .classed('hidden', d => !d.data.has_children())
         .on('click', (e, d) => d.data.is_leaf() ? show_children(d.data, d) : hide_children(d.data, d))
         .attr('width', 20)
         .attr('height', 20)
-        .attr('x', -35)
-        .attr('y', -10)
+        .attr('x', -10)
+        .attr('y', 15)
+    // Implementation icon
     nodesG_enter.append('foreignObject')
         .classed('node-icon-implementation', true)
         .classed('fa', true)
@@ -246,10 +248,10 @@ function draw() {
             }
         });
     nodesG_update.select('.node-icon-expand')
-    .classed('fa fa-square-caret-down', d => d.data.is_leaf())
-    .classed('fa-regular fa-square-caret-up', d => !d.data.is_leaf())
-    .classed('hidden', d => !d.data.has_children())
-    .on('click', (e, d) => d.data.is_leaf() ? show_children(d.data, d) : hide_children(d.data, d));
+        .classed('fa-solid fa-square-caret-down', d => d.data.is_leaf())
+        .classed('fa-regular fa-square-caret-up', d => !d.data.is_leaf())
+        .classed('hidden', d => !d.data.has_children())
+        .on('click', (e, d) => d.data.is_leaf() ? show_children(d.data, d) : hide_children(d.data, d));
     nodesG_update.select('.node-icon-implementation')
         .classed('hidden', d => !d.data.implementation)
         .on('click', open_node_menu);       // needed since it's on top of the circle
@@ -303,6 +305,14 @@ function draw() {
 
     // Links - Exit
     links.exit().remove('path');
+
+    // -------------------------------------------------------------------------------------------------------------
+    // Raised elements
+    // -------------------------------------------------------------------------------------------------------------
+    
+    // Raise nodes above links
+    g.selectAll('g').raise();
+
 
     // Update feedback counter
     let feedback_count = $('g.feedback-required').length;
