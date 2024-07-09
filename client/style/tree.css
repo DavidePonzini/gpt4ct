@@ -18,6 +18,7 @@
     text-align: center;
 }
 
+
 /* ---------- Links ---------- */
 .link {
     fill: none;
@@ -88,13 +89,21 @@
 
 
 /* ---------- Hover ---------- */
-.node:hover circle {
+.node circle:hover {
     fill: cyan!important;
     stroke: steelblue!important;
 }
 
-.node:hover text {
+.node text:hover {
     fill: steelblue;
+}
+
+.node foreignObject.node-icon-expand {
+    color: gray;
+}
+
+.node foreignObject.node-icon-expand:hover {
+    color: red;
 }
 
 /* ---------- Loading animation ---------- */

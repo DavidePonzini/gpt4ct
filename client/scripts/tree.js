@@ -219,6 +219,16 @@ function draw() {
         .attr('height', 20)
         .attr('x', -10)
         .attr('y', -10)
+    // Implementation icon
+    nodesG_enter.append('foreignObject')
+        .classed('node-icon-comment', true)
+        .classed('fa-regular fa-comment-dots', true)
+        .classed('hidden', d => !feedback_list.includes(d.data.task_id) || window.disable_feedback)
+        .on('click', () => {})       // needed since it's on top of the circle
+        .attr('width', 20)
+        .attr('height', 20)
+        .attr('x', 10)
+        .attr('y', -10)
     
     // Nodes - update
     let nodesG_update = nodes
