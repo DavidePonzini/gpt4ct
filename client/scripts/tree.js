@@ -138,9 +138,9 @@ function set_tree_id(id) {
     tree_id = id;
 
     if (tree_id)
-        $('#task-button').text(`Task [${tree_id}]`);
+        $('#task-button').text(`Tree [${tree_id}]`);
     else
-        $('#task-button').text(`Task`);
+        $('#task-button').text(`Tree`);
 }
 
 function draw() {
