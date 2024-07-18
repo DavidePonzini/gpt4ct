@@ -7,6 +7,11 @@ let last_update = null;
 let feedback_list = [];
 let expanded_tasks = [];
 
+const zoom = d3.zoom().on('zoom', function(e) {
+    $('#task-data').modal('hide');
+    g.attr('transform', e.transform);
+});
+
 const svg = d3.select('#tree');
 const g = svg.append('g');
 
@@ -15,14 +20,20 @@ const SERVER_ADDR = '15.237.153.101:5000';
 window.disable_feedback = false;
 
 
-// --------------------------------------------------------------------------
-// Handle zoom
-let zoom = d3.zoom().on('zoom', function(e) {
-    $('#task-data').modal('hide');
-    g.attr('transform', e.transform);
-});
-svg.call(zoom);
+$(document).ready(function() {
+    // Make dummy tree
+    let tree = new Task(null, null, null, null, 'Load an existing task or create a new one', '');
 
+    // Handle zoom
+    svg.call(zoom);
+
+    // Init tree
+    init(JSON.stringify(tree.toJSON()));
+    show_all_children(tree);
+
+    // Init automatic updates
+    setInterval(check_for_update, 2000);
+})
 
 function focus_root() {
     svg.transition()
@@ -39,14 +50,6 @@ function focus_on(item) {
     //         d3.zoomIdentity.translate(-item.x, -item.y)
     //     );
 }
-
-$(document).ready(function() {
-    // Make dummy tree
-    let tree = new Task(null, null, null, null, 'Load an existing task or create a new one', '');
-
-    init(JSON.stringify(tree.toJSON()));
-    show_all_children(tree);
-})
 
 function new_tree() {
     if (!check_user_id())
@@ -793,8 +796,6 @@ function check_for_update() {
 
             if (ts > last_update)
                 update();
-
-            setTimeout(check_for_update, 2000);
         },
         error: console.error
     });
