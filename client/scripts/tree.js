@@ -30,6 +30,7 @@ $(document).ready(function() {
     // Init tree
     init(JSON.stringify(tree.toJSON()));
     show_all_children(tree);
+    focus_root();
 
     // Init automatic updates
     setInterval(check_for_update, 2000);
