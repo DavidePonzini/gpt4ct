@@ -81,7 +81,7 @@ function new_tree() {
     $('#new-tree-modal').modal('hide');
 }
 
-function load_from_server(cb = () => {}) {
+function load_from_server(focus = false, cb = () => {}) {
     if (!check_user_id())
         return;
 
@@ -89,10 +89,10 @@ function load_from_server(cb = () => {}) {
     if (!tree_id)
         return;
 
-    load_from_server_id(tree_id, cb);
+    load_from_server_id(tree_id, focus, cb);
 }
 
-function load_from_server_id(tree_id, cb = () => {}) {
+function load_from_server_id(tree_id, focus = false, cb = () => {}) {
     if (!check_user_id())
         return;
 
@@ -116,6 +116,9 @@ function load_from_server_id(tree_id, cb = () => {}) {
 
             init(d.tree, tree_id, d.last_update, d.feedback_list, expanded_tasks);
 
+            if (focus)
+                focus_root();
+
             cb();
         },
         error: console.error
@@ -132,8 +135,6 @@ function init(tree_json, _tree_id = null, _last_update = null, _feedback_list = 
     expanded_tasks = _expanded_tasks;
     
     draw();
-    focus_root();
-
     // Useful for debugging, should be eventually removed
     window.data = tree;
 }
@@ -758,7 +759,7 @@ function select_my_trees() {
                         btn.addClass('list-group-item-success');
 
                     btn.text(`[${tree.tree_id}] ${tree.name}`);
-                    btn.on('click', () => load_from_server_id(tree.tree_id, () => modal.modal('hide')));
+                    btn.on('click', () => load_from_server_id(tree.tree_id, true, () => modal.modal('hide')));
 
                     list.append(btn);
                 }
