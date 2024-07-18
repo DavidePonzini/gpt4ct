@@ -747,11 +747,29 @@ function select_my_trees() {
             'user_id': JSON.stringify(user_id),
         },
         success: function(d) {
-            console.log(d)
+            let trees = d.trees;
 
-            let my_trees = $('#my-trees');
-            let btn = $('<button class="list-group-item list-group-item-action"></button>');
-            $('#my-trees-modal').modal('show');
+            if (trees.length) {
+                let list = $('#my-trees');
+                let modal = $('#my-trees-modal');
+                list.empty();
+
+                for (let tree of trees) {
+                    let btn = $('<button class="list-group-item list-group-item-action"></button>');
+                    
+                    if (tree.solved)
+                        btn.addClass('list-group-item-success');
+
+                    btn.text(tree.name);
+                    btn.on('click', () => load_from_server_id(tree.tree_id, () => modal.modal('hide')));
+
+                    list.append(btn);
+                }
+
+                modal.modal('show');
+            } else {
+                alert('You have not created any tree yet');
+            }
         },
         error: console.error
     });
