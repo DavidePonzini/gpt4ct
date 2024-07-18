@@ -39,7 +39,7 @@ function focus_root() {
     svg.transition()
         .duration(750)
         .call(zoom.transform,
-            d3.zoomIdentity
+            d3.zoomIdentity.translate(0, 50)
         );
 }
 
@@ -132,6 +132,7 @@ function init(tree_json, _tree_id = null, _last_update = null, _feedback_list = 
     expanded_tasks = _expanded_tasks;
     
     draw();
+    focus_root();
 
     // Useful for debugging, should be eventually removed
     window.data = tree;
@@ -149,14 +150,7 @@ function set_tree_id(id) {
 function draw() {
     const svg_width = $('#tree').innerWidth();
 
-    const margin = {
-        left: 0,
-        right: 0,
-        top: 50,
-        bottom: 200
-    };
-
-    const width = svg_width - margin.left - margin.right;
+    const width = svg_width;
     const max_label_length = 130;
 
     const treeLayout = d3.tree(null).nodeSize([200, 200]);
@@ -177,7 +171,7 @@ function draw() {
         .classed('running', d => d.data.running)
         .classed('feedback-required', d => feedback_list.includes(d.data.task_id) && !window.disable_feedback)
         .attr('state', d => d.data.get_state())
-        .attr('transform', d => `translate(${d.x + width/2 + margin.left}, ${d.y + margin.top})`);
+        .attr('transform', d => `translate(${d.x + width/2}, ${d.y})`);
     nodesG_enter.append('circle')
         .attr('r', 10)
         .on('click', open_node_menu);
@@ -241,7 +235,7 @@ function draw() {
         .classed('running', d => d.data.running)
         .classed('feedback-required', d => feedback_list.includes(d.data.task_id) && !window.disable_feedback)
         .attr('state', d => d.data.get_state())
-        .attr('transform', d => `translate(${d.x + width/2 + margin.left}, ${d.y + margin.top})`);
+        .attr('transform', d => `translate(${d.x + width/2}, ${d.y})`);
     nodesG_update.select('circle')
         .on('click', open_node_menu);
     nodesG_update.select('.node-label')
@@ -288,12 +282,12 @@ function draw() {
         .attr('state', d => d.target.data.get_state())
         .attr('d', d3.linkVertical()
         .source(d => [
-            d.source.x + width/2 + margin.left,
-            d.source.y + margin.top + 10.5
+            d.source.x + width/2,
+            d.source.y + 10.5
         ])
         .target(d => [
-            d.target.x + width/2 + margin.left,
-            d.target.y + margin.top - 10.5   // 10 = circle radius; .5 = stroke width / 2
+            d.target.x + width/2,
+            d.target.y - 10.5   // 10 = circle radius; .5 = stroke width / 2
         ])
     )
 
@@ -307,12 +301,12 @@ function draw() {
         .attr('state', d => d.target.data.get_state())
         .attr('d', d3.linkVertical()
         .source(d => [
-            d.source.x + width/2 + margin.left,
-            d.source.y + margin.top + 10.5
+            d.source.x + width/2,
+            d.source.y + 10.5
         ])
         .target(d => [
-            d.target.x + width/2 + margin.left,
-            d.target.y + margin.top - 10.5   // 10 = circle radius; .5 = stroke width / 2
+            d.target.x + width/2,
+            d.target.y - 10.5   // 10 = circle radius; .5 = stroke width / 2
         ])
     )
 
