@@ -32,6 +32,7 @@ function login() {
                 $('#correct-guesses').text(d.user.correct_guesses);
 
                 $('#nav-task-button').show();
+                $('#nav-view-button').show();
                 
                 return;
             }

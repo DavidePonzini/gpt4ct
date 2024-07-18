@@ -262,6 +262,39 @@ def load_tree(tree_id: int, user_id: str) -> tuple[Task, any, list[int]]:
 
         return task.from_node_list(result), last_update, feedback_list
 
+def get_user_trees(user_id: str) -> list[dict]:
+    query = database.sql.SQL(
+        '''
+            SELECT
+                tr.tree_id,
+                ta.name,
+                ta.solved
+            FROM
+                {schema}.trees tr
+                JOIN {schema}.tasks ta ON tr.tree_id = ta.tree_id
+            WHERE
+                ta.parent_id is null
+                AND tr.user_id = {user_id}
+            ORDER BY
+                tr.tree_id
+        '''
+    ).format(
+        schema=database.sql.Identifier(schema),
+        user_id=database.sql.Placeholder('user_id')
+    )
+
+    result = db.execute_and_fetch(query, {
+        'user_id': user_id
+    })
+
+    result = [{
+        'tree_id':  row[0],
+        'name':     row[1],
+        'solved':   row[2],
+    } for row in result]
+
+    return result
+
 def solve_task(task_id: int, user_id: str, solved: bool) -> None:
     # TODO: properly check if task has been created by user_id, otherwise return an error message
 

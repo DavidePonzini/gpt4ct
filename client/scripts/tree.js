@@ -507,6 +507,10 @@ function show_buttons(item) {
     let button_implement = $('#implement');
     if (!item.data.is_solved() && item.data.can_be_implemented()) {
         button_implement.show();
+        $('#dont-implement').unbind().on('click', function() {
+            delete_implementation(item);
+            solve(item, true);
+        });
         $('#implement-py').unbind().on('click', () => generate_implementation(item, 'python'));
         $('#implement-c').unbind().on('click', () => generate_implementation(item, 'c'));
         $('#implement-cpp').unbind().on('click', () => generate_implementation(item, 'c++'));
@@ -732,6 +736,30 @@ function hide_all_children() {
     draw();
 }
 
+function select_my_trees() {
+    if (!check_user_id())
+        return;
+
+    $.ajax({
+        type: 'POST',
+        url: `http://${SERVER_ADDR}/my-trees`,
+        data: {
+            'user_id': JSON.stringify(user_id),
+        },
+        success: function(d) {
+            console.log(d)
+
+            let my_trees = $('#my-trees');
+            let btn = $('<button class="list-group-item list-group-item-action"></button>');
+            $('#my-trees-modal').modal('show');
+        },
+        error: console.error
+    });
+
+                        
+
+}
+
 function check_for_update() {
     if (!tree_id)
         return;
@@ -757,3 +785,4 @@ window.load_id = load_from_server_id;
 window.show_all_children = show_all_children;
 window.hide_all_children = hide_all_children;
 window.focus_root = focus_root;
+window.select_my_trees = select_my_trees;

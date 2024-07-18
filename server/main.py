@@ -55,6 +55,16 @@ def load_tree():
         'status': 'error'
     }
 
+@app.route('/my-trees', methods=['POST'])
+def my_trees():
+    user_id = json.loads(request.form['user_id'])
+
+    trees = database.get_user_trees(user_id)
+
+    return {
+        'trees': trees
+    }
+
 @app.route('/update-tasks', methods=['POST'])
 def update_tasks():
     user_id = json.loads(request.form['user_id'])
