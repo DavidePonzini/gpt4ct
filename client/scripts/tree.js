@@ -782,9 +782,22 @@ function check_for_update() {
     if (!tree_id)
         return;
 
-    // TODO: check if server.last_edit > local.last_edit
+    $.ajax({
+        type: 'POST',
+        url: `http://${SERVER_ADDR}/get-tree-last-update`,
+        data: {
+            'tree_id': JSON.stringify(tree_id),
+        },
+        success: function(d) {
+            let ts = d.last_update;
 
-    update();
+            if (ts > last_update)
+                update();
+
+            setTimeout(check_for_update, 2000);
+        },
+        error: console.error
+    });
 }
 
 function update() {

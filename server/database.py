@@ -261,7 +261,7 @@ def load_tree(tree_id: int, user_id: str) -> tuple[Task, any, list[int]]:
 
         return task.from_node_list(result), last_update, feedback_list
 
-def get_tree_last_update_ts(tree_id: int) -> any | None:
+def get_tree_last_update_ts(tree_id: int) -> any:
     query = database.sql.SQL(
         '''
             SELECT last_update_ts
