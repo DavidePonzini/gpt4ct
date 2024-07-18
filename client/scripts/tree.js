@@ -760,7 +760,7 @@ function select_my_trees() {
                     if (tree.solved)
                         btn.addClass('list-group-item-success');
 
-                    btn.text(tree.name);
+                    btn.text(`[${tree.tree_id}] ${tree.name}`);
                     btn.on('click', () => load_from_server_id(tree.tree_id, () => modal.modal('hide')));
 
                     list.append(btn);

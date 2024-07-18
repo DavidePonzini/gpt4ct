@@ -55,6 +55,16 @@ def load_tree():
         'status': 'error'
     }
 
+@app.route('/get-tree-last-update', methods=['POST'])
+def get_tree_last_update():
+    tree_id = json.loads(request.form['tree_id'])
+    
+    last_update = database.get_tree_last_update_ts(tree_id)
+
+    return {
+        'last_update': last_update,
+    }
+
 @app.route('/my-trees', methods=['POST'])
 def my_trees():
     user_id = json.loads(request.form['user_id'])

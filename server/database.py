@@ -161,7 +161,6 @@ def load_task(task_id: int, user_id: str) -> Task:
     tree, last_update, feedback_list = load_tree(tree_id, user_id)
     return tree.get_subtask_from_path(path)
 
-
 def load_tree(tree_id: int, user_id: str) -> tuple[Task, any, list[int]]:
     query_tree_data = database.sql.SQL(
         '''
@@ -262,6 +261,26 @@ def load_tree(tree_id: int, user_id: str) -> tuple[Task, any, list[int]]:
 
         return task.from_node_list(result), last_update, feedback_list
 
+def get_tree_last_update_ts(tree_id: int) -> any | None:
+    query = database.sql.SQL(
+        '''
+            SELECT last_update_ts
+            FROM {schema}.trees
+            WHERE tree_id = {tree_id}
+        '''
+    ).format(
+        schema=database.sql.Identifier(schema),
+        tree_id=database.sql.Placeholder('tree_id'),
+    )
+
+    result = db.execute_and_fetch(query, {
+        'tree_id': tree_id
+    })
+
+    if len(result) == 0:
+        return None
+    return result[0][0]
+
 def get_user_trees(user_id: str) -> list[dict]:
     query = database.sql.SQL(
         '''
@@ -280,7 +299,7 @@ def get_user_trees(user_id: str) -> list[dict]:
         '''
     ).format(
         schema=database.sql.Identifier(schema),
-        user_id=database.sql.Placeholder('user_id')
+        user_id=database.sql.Placeholder('user_id'),
     )
 
     result = db.execute_and_fetch(query, {
@@ -360,8 +379,7 @@ def _delete_implementation(task_id: str, connection: database.PostgreSQLConnecti
     
     connection.execute(query_delete_implementations, {
         'task_id': task_id
-    })
-    
+    })   
 
 def set_implementation(task: Task, user_id: str, implementation: str | None, language: str | None, additional_prompt: str | None, tokens: tuple[int, int] | None):
     
