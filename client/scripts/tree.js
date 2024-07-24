@@ -150,12 +150,14 @@ function set_tree_id(id) {
 }
 
 function draw() {
-    const svg_width = $('#tree').innerWidth();
+    const svg_height = $('#tree').innerHeight();
 
-    const width = svg_width;
+    const padding_x = 100;
+    const padding_y = svg_height / 2;
+
     const max_label_length = 130;
 
-    const treeLayout = d3.tree(null).nodeSize([200, 200]);
+    const treeLayout = d3.tree(null).nodeSize([75, 300]);
     const treeData = treeLayout(d3.hierarchy(tree_data, d => d.children));
 
     // -------------------------------------------------------------------------------------------------------------
@@ -173,22 +175,22 @@ function draw() {
         .classed('running', d => d.data.running)
         .classed('feedback-required', d => feedback_list.includes(d.data.task_id) && !window.disable_feedback)
         .attr('state', d => d.data.get_state())
-        .attr('transform', d => `translate(${d.x + width/2}, ${d.y})`);
+        .attr('transform', d => `translate(${d.y + padding_x}, ${d.x + padding_y})`);
     nodesG_enter.append('circle')
         .attr('r', 10)
         .on('click', open_node_menu);
     nodesG_enter.append('text')
         .classed('node-label', true)
-        .attr('dx', 18)
-        .attr('dy', '.31em')
+        .attr('dx', d => d.data.is_leaf() ? (d.data.has_children() ? 38 : 18) : 0)
+        .attr('dy', d => d.data.is_leaf() ? '.31em' : 30)
+        .style('text-anchor', d => d.data.is_leaf() ? 'start' : 'middle')
         .each(function (d) {
             let name = d.data.name;
             let elem = d3.select(this);
             
             elem.text(name);
 
-            // skip root node, we always have infinite space
-            if (d.data.is_root())
+            if (d.data.is_leaf())
                 return;
 
             while (this.getComputedTextLength() > max_label_length) {
@@ -199,14 +201,14 @@ function draw() {
     // Expand node icon
     nodesG_enter.append('foreignObject')
         .classed('node-icon-expand', true)
-        .classed('fa-solid fa-square-caret-down', d => d.data.is_leaf())
-        .classed('fa-regular fa-square-caret-up', d => !d.data.is_leaf())
+        .classed('fa-solid fa-square-caret-right', d => d.data.is_leaf())
+        .classed('fa-regular fa-square-caret-left', d => !d.data.is_leaf())
         .classed('hidden', d => !d.data.has_children())
         .on('click', (e, d) => d.data.is_leaf() ? show_children(d.data, d) : hide_children(d.data, d))
         .attr('width', 20)
         .attr('height', 20)
-        .attr('x', -10)
-        .attr('y', 15)
+        .attr('x', 15)
+        .attr('y', -10)
     // Implementation icon
     nodesG_enter.append('foreignObject')
         .classed('node-icon-implementation', true)
@@ -237,18 +239,20 @@ function draw() {
         .classed('running', d => d.data.running)
         .classed('feedback-required', d => feedback_list.includes(d.data.task_id) && !window.disable_feedback)
         .attr('state', d => d.data.get_state())
-        .attr('transform', d => `translate(${d.x + width/2}, ${d.y})`);
+        .attr('transform', d => `translate(${d.y + padding_x}, ${d.x + padding_y})`);
     nodesG_update.select('circle')
         .on('click', open_node_menu);
     nodesG_update.select('.node-label')
+        .attr('dx', d => d.data.is_leaf() ? (d.data.has_children() ? 38 : 18) : 0)
+        .attr('dy', d => d.data.is_leaf() ? '.31em' : 30)
+        .style('text-anchor', d => d.data.is_leaf() ? 'start' : 'middle')
         .each(function (d) {
             let name = d.data.name;
             let elem = d3.select(this);
             
             elem.text(name);
 
-            // skip root node, we always have infinite space
-            if (d.data.is_root())
+            if (d.data.is_leaf())
                 return;
 
             while (this.getComputedTextLength() > max_label_length) {
@@ -257,8 +261,8 @@ function draw() {
             }
         });
     nodesG_update.select('.node-icon-expand')
-        .classed('fa-solid fa-square-caret-down', d => d.data.is_leaf())
-        .classed('fa-regular fa-square-caret-up', d => !d.data.is_leaf())
+        .classed('fa-solid fa-square-caret-right', d => d.data.is_leaf())
+        .classed('fa-regular fa-square-caret-left', d => !d.data.is_leaf())
         .classed('hidden', d => !d.data.has_children())
         .on('click', (e, d) => d.data.is_leaf() ? show_children(d.data, d) : hide_children(d.data, d));
     nodesG_update.select('.node-icon-implementation')
@@ -282,14 +286,14 @@ function draw() {
         .classed('has-children', d => d.target.data.has_children())
         .classed('feedback-required', d => feedback_list.includes(d.target.data.task_id) && !window.disable_feedback)
         .attr('state', d => d.target.data.get_state())
-        .attr('d', d3.linkVertical()
+        .attr('d', d3.linkHorizontal()
         .source(d => [
-            d.source.x + width/2,
-            d.source.y + 10.5
+            d.source.y + padding_x + 10.5,
+            d.source.x + padding_y
         ])
         .target(d => [
-            d.target.x + width/2,
-            d.target.y - 10.5   // 10 = circle radius; .5 = stroke width / 2
+            d.target.y + padding_x - 10.5,   // 10 = circle radius; .5 = stroke width / 2
+            d.target.x + padding_y
         ])
     )
 
@@ -301,14 +305,14 @@ function draw() {
         .classed('has-children', d => d.target.data.has_children())
         .classed('feedback-required', d => feedback_list.includes(d.target.data.task_id) && !window.disable_feedback)
         .attr('state', d => d.target.data.get_state())
-        .attr('d', d3.linkVertical()
+        .attr('d', d3.linkHorizontal()
         .source(d => [
-            d.source.x + width/2,
-            d.source.y + 10.5
+            d.source.y + padding_x + 10.5,
+            d.source.x + padding_y
         ])
         .target(d => [
-            d.target.x + width/2,
-            d.target.y - 10.5   // 10 = circle radius; .5 = stroke width / 2
+            d.target.y + padding_x - 10.5,   // 10 = circle radius; .5 = stroke width / 2
+            d.target.x + padding_y
         ])
     )
 
