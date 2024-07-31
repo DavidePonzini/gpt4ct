@@ -42,8 +42,20 @@
     fill: orange;
 }
 
-[state=implemented] circle {
+[state=implementable] circle, [state=implementable].link {
     stroke: orange;
+}
+
+[state=implementable]:not(.has-children) circle {
+    fill: white;
+}
+
+[state=implementable].has-children circle {
+    fill: orange;
+}
+
+[state=implemented] circle {
+    stroke: steelblue;
 }
 
 [state=implemented].link {
@@ -55,7 +67,7 @@
 }
 
 [state=implemented].has-children circle {
-    fill: orange;
+    fill: steelblue;
 }
 
 [state=solved] circle, [state=solved].link {
@@ -77,7 +89,7 @@
 
 /* ---------- Icons ---------- */
 .node-icon-implementation {
-    color: blue;
+    color: steelblue;
     font-size: 9pt;
 }
 

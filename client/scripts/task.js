@@ -67,6 +67,7 @@ class Task {
     get_state() {
         /*
         - new (decomposition in progress)
+        - implementable
         - implemented
         - solved
          */
@@ -76,6 +77,9 @@ class Task {
 
         if (this.implementation)
             return 'implemented'
+
+        if (this.can_be_implemented())
+            return 'implementable'
 
         return 'new'
     }
@@ -113,15 +117,33 @@ class Task {
         if (this.is_root() && !this.has_children())
             return false; 
 
-        // Only leaves and nodes with all theirs children already implemented can be implemented. Solved tasks count as implemented
-        for (let child of this.subtasks) {
-            if (child.solved)
-                continue;
+        // Can be implemented if:
 
-            if (!child.implementation || !child.can_be_implemented())
+        // all children have been implemented or solved
+        for (let child of this.subtasks)
+            if (!child.implementation && !child.solved)
+                return false;
+
+        if (!this.is_root()) {
+            let my_id = this.parent.subtasks.findIndex(d => d === this);
+            let prevs = this.parent.subtasks.slice(0, my_id);
+            let nexts = this.parent.subtasks.slice(my_id + 1);
+
+            // previous siblings have been implemented or solved
+            for (let prev of prevs)
+                if (!prev.implementation && !prev.solved)
+                    return false;
+
+            // nexts siblings have not yet been implemented or solved
+            for (let next of nexts)
+                if (next.implementation || next.solved)
+                    return false;
+
+            // parent has not been implemented or solved
+            if (this.parent.implementation || this.parent.solved)
                 return false;
         }
-
+        
         return true;
     }
 

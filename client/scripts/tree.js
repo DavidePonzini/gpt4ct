@@ -214,21 +214,11 @@ function draw() {
         .classed('node-icon-implementation', true)
         .classed('fa', true)
         .classed('fa-code', true)
-        .classed('hidden', d => !d.data.implementation)
+        .classed('hidden', d => d.data.get_state() != 'implementable')
         .on('click', open_node_menu)       // needed since it's on top of the circle
         .attr('width', 20)
         .attr('height', 20)
         .attr('x', -10)
-        .attr('y', -10)
-    // Implementation icon
-    nodesG_enter.append('foreignObject')
-        .classed('node-icon-comment', true)
-        .classed('fa-regular fa-comment-dots', true)
-        .classed('hidden', d => !feedback_list.includes(d.data.task_id) || window.disable_feedback)
-        .on('click', () => {})       // needed since it's on top of the circle
-        .attr('width', 20)
-        .attr('height', 20)
-        .attr('x', 10)
         .attr('y', -10)
     
     // Nodes - update
@@ -266,7 +256,7 @@ function draw() {
         .classed('hidden', d => !d.data.has_children())
         .on('click', (e, d) => d.data.is_leaf() ? show_children(d.data, d) : hide_children(d.data, d));
     nodesG_update.select('.node-icon-implementation')
-        .classed('hidden', d => !d.data.implementation)
+        .classed('hidden', d => d.data.get_state() != 'implementable')
         .on('click', open_node_menu);       // needed since it's on top of the circle
 
     // Nodes - Exit
