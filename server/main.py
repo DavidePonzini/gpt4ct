@@ -4,7 +4,7 @@ from flask_cors import CORS
 import task
 import json
 
-import server.chatgpt as chatgpt
+import chatgpt as chatgpt
 import database
 
 
