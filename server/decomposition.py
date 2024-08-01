@@ -5,6 +5,9 @@ import prompts
 from dav_tools.chatgpt import Message, print_price, MessageRole, AIModel
 
 
+cost_in = .15
+cost_out = .6
+
 def decompose(task: Task, user_id: str) -> None:
     message = Message()
     message.add_message(MessageRole.SYSTEM, prompts.Decomposition.instructions)
@@ -35,7 +38,7 @@ def decompose(task: Task, user_id: str) -> None:
         tokens=(usage.prompt_tokens, usage.completion_tokens),
     )
 
-    print_price(usage)
+    print_price(usage, cost_in, cost_out)
 
 
 def implement(task: Task, user_id: str, language: str, additional_prompt: str | None = None) -> None:
@@ -83,7 +86,7 @@ def implement(task: Task, user_id: str, language: str, additional_prompt: str | 
         tokens=(usage.prompt_tokens, usage.completion_tokens),
     )
 
-    print_price(usage)
+    print_price(usage, cost_in, cost_out)
 
 
 def _add_decomposition_step(message: Message, t: Task):
