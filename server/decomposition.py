@@ -1,8 +1,8 @@
-from chatgpt import Message, print_price, MessageRole
 import database
 from task import Task, TaskCreationMode
 import json
 import prompts
+from dav_tools.chatgpt import Message, print_price, MessageRole, AIModel
 
 
 def decompose(task: Task, user_id: str) -> None:
@@ -16,7 +16,7 @@ def decompose(task: Task, user_id: str) -> None:
     message.add_message('user', prompts.Decomposition.prompt(task))
     # message.print()
 
-    answer_json = message.generate_answer(require_json=True, add_to_messages=False)
+    answer_json = message.generate_answer(require_json=True, add_to_messages=False, model=AIModel.GPT4o_mini)
     answer = json.loads(answer_json)
     subtasks = answer['result']
 
@@ -69,7 +69,7 @@ def implement(task: Task, user_id: str, language: str, additional_prompt: str | 
     # message.print()
 
     # Get the result
-    answer = message.generate_answer(require_json=False, add_to_messages=False)
+    answer = message.generate_answer(require_json=False, add_to_messages=False, model=AIModel.GPT4o_mini)
 
     task.implementation = answer
     usage = message.usage[-1]
