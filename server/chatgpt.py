@@ -8,6 +8,18 @@ from dav_tools.chatgpt import Message, print_price, MessageRole, AIModel
 cost_in = .15
 cost_out = .6
 
+
+def create_name(description: str) -> str:
+    message = Message()
+    message.add_message(MessageRole.SYSTEM, prompts.CreateName.instructions)
+    message.add_message(MessageRole.USER, prompts.CreateName.prompt(description))
+
+    answer = message.generate_answer(require_json=True, model=AIModel.GPT4o_mini)
+    answer = json.loads(answer)
+    print_price(message.usage[-1], cost_in, cost_out)
+
+    return answer['name']
+
 def decompose(task: Task, user_id: str) -> None:
     message = Message()
     message.add_message(MessageRole.SYSTEM, prompts.Decomposition.instructions)
@@ -16,7 +28,7 @@ def decompose(task: Task, user_id: str) -> None:
     task.for_each_parent(lambda t: _add_decomposition_step(message, t))
     
     # Add request for next task
-    message.add_message('user', prompts.Decomposition.prompt(task))
+    message.add_message(MessageRole.USER, prompts.Decomposition.prompt(task))
     # message.print()
 
     answer_json = message.generate_answer(require_json=True, add_to_messages=False, model=AIModel.GPT4o_mini)

@@ -2,6 +2,18 @@ import json
 from task import Task
 
 
+class CreateName:
+    instructions = '''
+Each task is represented by a name and a description.
+The user will provide you with the description and you need to create a short name to represent it. Names should be very short sentences that describe the action performed by the task. Provide the answer as a JSON object containing the field "name".
+'''
+
+    def prompt(description):
+        return f'''
+-- task --
+{description}
+'''
+
 class Decomposition:
     instructions = '''
 Decompose the current task into the smallest possible number of subtasks (usually two or three).

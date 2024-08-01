@@ -4,7 +4,7 @@ from flask_cors import CORS
 import task
 import json
 
-import decomposition
+import server.chatgpt as chatgpt
 import database
 
 
@@ -24,8 +24,9 @@ def login():
 def create_tree():
     user_id = json.loads(request.form['user_id'])
     
-    name = json.loads(request.form['name'])
+    # name = json.loads(request.form['name'])
     description = json.loads(request.form['description'])
+    name = chatgpt.create_name(description)
 
     tree_id = database.create_tree(name, description, user_id)
 
@@ -106,7 +107,7 @@ def decompose_task():
 
     current_task = database.load_task(task_id, user_id)
 
-    decomposition.decompose(
+    chatgpt.decompose(
         task=current_task,
         user_id=user_id,
     )
@@ -134,7 +135,7 @@ def implement():
             tokens=None
         )
     else:
-        decomposition.implement(
+        chatgpt.implement(
             task=task,
             language=language,
             user_id=user_id,

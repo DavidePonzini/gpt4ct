@@ -56,7 +56,7 @@ function new_tree() {
     if (!check_user_id())
         return;
 
-    let name = $('#new-task-name').val();
+    // let name = $('#new-task-name').val();
     let description = $('#new-task-description').val();
 
     $.ajax({
@@ -64,7 +64,7 @@ function new_tree() {
         url: `http://${SERVER_ADDR}/create-tree`,
         data: {
             'user_id': JSON.stringify(user_id),
-            'name': JSON.stringify(name),
+            // 'name': JSON.stringify(name),
             'description': JSON.stringify(description),
         },
         success: function(d) {
