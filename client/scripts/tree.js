@@ -539,8 +539,6 @@ function generate_decomposition(item) {
     task.generate_decomposition(user_id, function(d) {
         task.running = false;
 
-        d = JSON.parse(d);
-
         if (d.status == 'not_allowed') {
             alert('This option is not enabled for your account');
             return;
@@ -670,8 +668,6 @@ function generate_implementation(item, language, additional_instructions = null)
         return;    
 
     item.data.generate_implementation(user_id, language, additional_instructions, function(d) {
-        d = JSON.parse(d);
-
         if (d.status == 'not_allowed') {
             alert('This option is not enabled for your account');
             return;
