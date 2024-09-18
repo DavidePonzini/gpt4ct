@@ -541,6 +541,7 @@ function generate_decomposition(item) {
 
         if (d.status == 'not_allowed') {
             alert('This option is not enabled for your account');
+            update();
             return;
         }
 
@@ -670,6 +671,7 @@ function generate_implementation(item, language, additional_instructions = null)
     item.data.generate_implementation(user_id, language, additional_instructions, function(d) {
         if (d.status == 'not_allowed') {
             alert('This option is not enabled for your account');
+            update();
             return;
         }
 
