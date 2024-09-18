@@ -7,8 +7,6 @@ let last_update = null;
 let feedback_list = [];
 let expanded_tasks = [];
 
-let hide_implementation = true;
-
 const zoom = d3.zoom().on('zoom', function(e) {
     $('#task-data').modal('hide');
     g.attr('transform', e.transform);
@@ -19,7 +17,8 @@ const g = svg.append('g');
 
 const SERVER_ADDR = '15.237.153.101:5000';
 
-window.disable_feedback = false;
+window.disable_feedback = true;
+window.hide_implementation = true;
 
 
 $(document).ready(function() {
@@ -216,7 +215,7 @@ function draw() {
         .classed('node-icon-implementation', true)
         .classed('fa', true)
         .classed('fa-code', true)
-        .classed('hidden', d => d.data.get_state() != 'implementable' && !hide_implementation)
+        .classed('hidden', d => d.data.get_state() != 'implementable' || window.hide_implementation)
         .on('click', open_node_menu)       // needed since it's on top of the circle
         .attr('width', 20)
         .attr('height', 20)
@@ -258,7 +257,7 @@ function draw() {
         .classed('hidden', d => !d.data.has_children())
         .on('click', (e, d) => d.data.is_leaf() ? show_children(d.data, d) : hide_children(d.data, d));
     nodesG_update.select('.node-icon-implementation')
-        .classed('hidden', d => d.data.get_state() != 'implementable' && !hide_implementation)
+        .classed('hidden', d => d.data.get_state() != 'implementable' || window.hide_implementation)
         .on('click', open_node_menu);       // needed since it's on top of the circle
 
     // Nodes - Exit
@@ -500,7 +499,7 @@ function show_buttons(item) {
 
     // Implement: only available on unsolved tasks that can be implemented
     let button_implement = $('#implement');
-    if (!item.data.is_solved() && item.data.can_be_implemented() && !hide_implementation) {
+    if (!item.data.is_solved() && item.data.can_be_implemented() && !window.hide_implementation) {
         button_implement.show();
         $('#dont-implement').unbind().on('click', function() {
             delete_implementation(item);
