@@ -20,7 +20,9 @@ CREATE TABLE users (
   feedback_good DECIMAL(5) NOT NULL DEFAULT 0,
   feedback_received DECIMAL(5) NOT NULL DEFAULT 0,
   feedback_given DECIMAL(5) NOT NULL DEFAULT 0,
-  correct_guesses DECIMAL(5) NOT NULL DEFAULT 0
+  correct_guesses DECIMAL(5) NOT NULL DEFAULT 0,
+  can_generate_decomposition BOOLEAN NOT NULL DEFAULT FALSE,
+  can_generate_implementation BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE trees (
