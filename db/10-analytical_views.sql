@@ -37,4 +37,21 @@ CREATE OR REPLACE VIEW v_tree_summary AS (
   ORDER BY tree_id
 );
 
+CREATE OR REPLACE VIEW v_leaves AS (
+  SELECT
+    t.tree_id,
+    COUNT(*)
+  FROM v_trees t
+  WHERE
+    t.task_id NOT IN (
+      SELECT tt.parent_id
+      FROM v_trees tt
+      WHERE
+        t.tree_id = tt.tree_id AND
+        tt.parent_id IS NOT NULL
+      )
+  GROUP BY t.tree_id
+  ORDER BY t.tree_id;
+);
+
 COMMIT;
