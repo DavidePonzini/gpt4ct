@@ -51,7 +51,7 @@ CREATE OR REPLACE VIEW v_leaves AS (
         tt.parent_id IS NOT NULL
       )
   GROUP BY t.tree_id
-  ORDER BY t.tree_id;
+  ORDER BY t.tree_id
 );
 
 COMMIT;
