@@ -17,7 +17,8 @@ const g = svg.append('g');
 
 const SERVER_ADDR = '15.237.153.101:5000';
 
-window.disable_feedback = false;
+window.disable_feedback = true;
+window.hide_implementation = true;
 
 
 $(document).ready(function() {
@@ -214,7 +215,7 @@ function draw() {
         .classed('node-icon-implementation', true)
         .classed('fa', true)
         .classed('fa-code', true)
-        .classed('hidden', d => d.data.get_state() != 'implementable')
+        .classed('hidden', d => d.data.get_state() != 'implementable' || window.hide_implementation)
         .on('click', open_node_menu)       // needed since it's on top of the circle
         .attr('width', 20)
         .attr('height', 20)
@@ -256,7 +257,7 @@ function draw() {
         .classed('hidden', d => !d.data.has_children())
         .on('click', (e, d) => d.data.is_leaf() ? show_children(d.data, d) : hide_children(d.data, d));
     nodesG_update.select('.node-icon-implementation')
-        .classed('hidden', d => d.data.get_state() != 'implementable')
+        .classed('hidden', d => d.data.get_state() != 'implementable' || window.hide_implementation)
         .on('click', open_node_menu);       // needed since it's on top of the circle
 
     // Nodes - Exit
@@ -498,7 +499,7 @@ function show_buttons(item) {
 
     // Implement: only available on unsolved tasks that can be implemented
     let button_implement = $('#implement');
-    if (!item.data.is_solved() && item.data.can_be_implemented()) {
+    if (!item.data.is_solved() && item.data.can_be_implemented() && !window.hide_implementation) {
         button_implement.show();
         $('#dont-implement').unbind().on('click', function() {
             delete_implementation(item);
@@ -535,8 +536,14 @@ function generate_decomposition(item) {
 
     let task = item.data;
 
-    task.generate_decomposition(user_id, function() {
+    task.generate_decomposition(user_id, function(d) {
         task.running = false;
+
+        if (d.status == 'not_allowed') {
+            alert('This option is not enabled for your account');
+            update();
+            return;
+        }
 
         // show this task after refresh
         expanded_tasks.push(task.task_id);
@@ -661,7 +668,15 @@ function generate_implementation(item, language, additional_instructions = null)
     if (!check_user_id())
         return;    
 
-    item.data.generate_implementation(user_id, language, additional_instructions, update, function(e) {
+    item.data.generate_implementation(user_id, language, additional_instructions, function(d) {
+        if (d.status == 'not_allowed') {
+            alert('This option is not enabled for your account');
+            update();
+            return;
+        }
+
+        update();
+    }, function(e) {
         console.error(e);
         item.data.running = false;
         alert('error, see console for info');

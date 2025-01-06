@@ -105,6 +105,11 @@ def decompose_task():
     task_id = json.loads(request.form['task_id'])
     user_id = json.loads(request.form['user_id'])
 
+    if not database.can_generate_decomposition(user_id):
+        return {
+            'status': 'not_allowed'
+        }
+
     current_task = database.load_task(task_id, user_id)
 
     chatgpt.decompose(
@@ -122,6 +127,12 @@ def implement():
     language = json.loads(request.form['language'])
     user_id = json.loads(request.form['user_id'])
     additional_instructions = json.loads(request.form['additional_instructions'])
+
+    if not database.can_generate_implementation(user_id):
+        return {
+            'status': 'not_allowed'
+        }
+
 
     task = database.load_task(task_id, user_id)
 
