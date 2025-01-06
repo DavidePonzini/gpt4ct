@@ -98,8 +98,9 @@ def implement(task: Task, user_id: str, language: str, additional_prompt: str | 
 
     # Get the result
     answer = message.generate_answer(json_format=Implementation, add_to_messages=False, model=AIModel.GPT4o_mini)
+    answer = answer.implementation
 
-    task.implementation = answer.implementation
+    task.implementation = answer
     usage = message.usage[-1]
     
     database.set_implementation(
