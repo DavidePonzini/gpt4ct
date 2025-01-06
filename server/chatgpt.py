@@ -2,6 +2,7 @@ import database
 from task import Task, TaskCreationMode
 import json
 import prompts
+from pydantic import BaseModel
 from dav_tools.chatgpt import Message, print_price, MessageRole, AIModel
 
 
@@ -9,16 +10,29 @@ cost_in = .15
 cost_out = .6
 
 
+class Name(BaseModel):
+    name: str
+
+class NameDescription(BaseModel):
+    name: str
+    description: str
+
+class Decomposition(BaseModel):
+    result: list[NameDescription]
+
+class Implementation(BaseModel):
+    implementation: str
+
+
 def create_name(description: str) -> str:
     message = Message()
     message.add_message(MessageRole.SYSTEM, prompts.CreateName.instructions)
     message.add_message(MessageRole.USER, prompts.CreateName.prompt(description))
 
-    answer = message.generate_answer(require_json=True, model=AIModel.GPT4o_mini)
-    answer = json.loads(answer)
+    answer = message.generate_answer(json_format=Name, model=AIModel.GPT4o_mini)
     print_price(message.usage[-1], cost_in, cost_out)
 
-    return answer['name']
+    return answer.name
 
 def decompose(task: Task, user_id: str) -> None:
     message = Message()
@@ -31,9 +45,8 @@ def decompose(task: Task, user_id: str) -> None:
     message.add_message(MessageRole.USER, prompts.Decomposition.prompt(task))
     # message.print()
 
-    answer_json = message.generate_answer(require_json=True, add_to_messages=False, model=AIModel.GPT4o_mini)
-    answer = json.loads(answer_json)
-    subtasks = answer['result']
+    answer = message.generate_answer(json_format=Decomposition, add_to_messages=False, model=AIModel.GPT4o_mini)
+    subtasks = answer.result
 
     usage = message.usage[-1]
 
@@ -42,8 +55,8 @@ def decompose(task: Task, user_id: str) -> None:
         user_id=user_id,
         parent_id=task.task_id,
         tasks=[{
-            'name': subtask['name'],
-            'description': subtask['description'],
+            'name': subtask.name,
+            'description': subtask.description,
             'task_id': None,
         } for subtask in subtasks],
         new_task_creation_mode=TaskCreationMode.AI,
@@ -84,9 +97,9 @@ def implement(task: Task, user_id: str, language: str, additional_prompt: str | 
     # message.print()
 
     # Get the result
-    answer = message.generate_answer(require_json=False, add_to_messages=False, model=AIModel.GPT4o_mini)
+    answer = message.generate_answer(json_format=Implementation, add_to_messages=False, model=AIModel.GPT4o_mini)
 
-    task.implementation = answer
+    task.implementation = answer.implementation
     usage = message.usage[-1]
     
     database.set_implementation(

@@ -18,7 +18,7 @@ const g = svg.append('g');
 const SERVER_ADDR = '15.237.153.101:5000';
 
 window.disable_feedback = true;
-window.hide_implementation = true;
+window.hide_implementation = false;
 
 
 $(document).ready(function() {
