@@ -36,7 +36,7 @@ Format the result in JSON: provide a list of objects such as this: {"result": [{
 
 class Implementation:
     instructions = ''''From now on, you need to implement the following tasks.
-Provide the answer as a string.'''
+Return the result as a JSON object containing the `implementation` string.'''
 
     @staticmethod
     def prompt(task: Task, language: str):
