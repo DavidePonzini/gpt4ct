@@ -352,7 +352,7 @@ function open_node_menu(event, item) {
     if (item.data.implementation && item.data.implementation_language) {
         impl.show();
         let impl_text = $('#task-implementation-text');
-        impl_text.text(item.data.implementation.split('\n').slice(1, -1).join('\n'));       // remove first and last line (```python & ```)
+        impl_text.text(item.data.implementation);
         impl_text.attr('class', `language-${item.data.implementation_language}`);
 
         // highligth element (since the same html elem will be used, we need to unset data-highlighted)
