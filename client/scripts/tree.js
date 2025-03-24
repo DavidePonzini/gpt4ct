@@ -15,7 +15,7 @@ const zoom = d3.zoom().on('zoom', function(e) {
 const svg = d3.select('#tree');
 const g = svg.append('g');
 
-const SERVER_ADDR = '15.237.153.101:5000';
+const SERVER_ADDR = 'https://ponzidav.com/gpt4ct/api';
 
 window.disable_feedback = true;
 window.hide_implementation = false;
