@@ -1,4 +1,4 @@
-const SERVER_ADDR = '15.237.153.101:5000';
+const SERVER_ADDR = 'https://ponzidav.com/gpt4ct/api';
 
 class Task {
     constructor(tree_id, task_id, task_user_id, creation_mode, name, description, solved = false,
@@ -173,7 +173,7 @@ class Task {
 
         $.ajax({
             type: 'POST',
-            url: `http://${SERVER_ADDR}/decompose`,
+            url: `${SERVER_ADDR}/decompose`,
             data: {
                 'task_id': JSON.stringify(this_task.task_id),
                 'user_id': JSON.stringify(user_id),
@@ -192,7 +192,7 @@ class Task {
 
         $.ajax({
             type: 'POST',
-            url: `http://${SERVER_ADDR}/implement`,
+            url: `${SERVER_ADDR}/implement`,
             data: {
                 'task_id': JSON.stringify(this_task.task_id),
                 'language': JSON.stringify(language),
@@ -209,7 +209,7 @@ class Task {
 
         $.ajax({
             type: 'POST',
-            url: `http://${SERVER_ADDR}/implement`,
+            url: `${SERVER_ADDR}/implement`,
             data: {
                 'task_id': JSON.stringify(this_task.task_id),
                 'language': JSON.stringify(null),

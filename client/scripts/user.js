@@ -11,7 +11,7 @@ function login() {
 
     $.ajax({
         type: 'POST',
-        url: `http://${SERVER_ADDR}/get-user`,
+        url: `${SERVER_ADDR}/get-user`,
         data: {
             'user_id': JSON.stringify(uid),
         },
@@ -49,7 +49,7 @@ function update_user_data() {
 
     $.ajax({
         type: 'POST',
-        url: `http://${SERVER_ADDR}/get-user`,
+        url: `${SERVER_ADDR}/get-user`,
         data: {
             'user_id': JSON.stringify(user_id),
         },
@@ -92,7 +92,7 @@ function to_percent(num, tot) {
 function show_leaderboard() {
     $.ajax({
         type: 'GET',
-        url: `http://${SERVER_ADDR}/leaderboard`,
+        url: `${SERVER_ADDR}/leaderboard`,
         success: function(d) {
             let data = d;
 

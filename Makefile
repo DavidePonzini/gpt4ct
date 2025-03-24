@@ -1,7 +1,6 @@
 SHELL := /bin/bash
 
 ########## Makefile start ##########
-# Type: PyPi
 # Author: Davide Ponzini
 
 VENV=./venv

@@ -605,3 +605,47 @@ def _update_tree_ts(tree_id: int, connection: database.PostgreSQLConnection):
     connection.execute(query, {
         'tree_id': tree_id
     }, commit=False)
+
+def can_generate_decomposition(user_id: str):
+    query = database.sql.SQL('''
+                             SELECT
+                                can_generate_decomposition
+                             FROM
+                                {schema}.users
+                             WHERE
+                                user_id = {user_id}
+                             ''').format(
+                                 schema=database.sql.Identifier(schema),
+                                 user_id=database.sql.Placeholder('user_id')
+                             )
+    
+    result = db.execute_and_fetch(query, {
+        'user_id': user_id
+    })
+
+    if len(result) == 1:
+        return result[0][0]
+    
+    return False
+
+def can_generate_implementation(user_id: str):
+    query = database.sql.SQL('''
+                             SELECT
+                                can_generate_implementation
+                             FROM
+                                {schema}.users
+                             WHERE
+                                user_id = {user_id}
+                             ''').format(
+                                 schema=database.sql.Identifier(schema),
+                                 user_id=database.sql.Placeholder('user_id')
+                             )
+    
+    result = db.execute_and_fetch(query, {
+        'user_id': user_id
+    })
+
+    if len(result) == 1:
+        return result[0][0]
+    
+    return False
