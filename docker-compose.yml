@@ -11,8 +11,8 @@ services:
       - DB_USERNAME=postgres
       - DB_PASSWORD=password
       - DB_NAME=postgres
-    secrets:
-      - server_env
+    env_file:
+      - .env
 
   db:
     build: ./db
@@ -24,7 +24,3 @@ services:
 
 volumes:
   pgdata:
-
-secrets:
-  server_env:
-    file: .env
