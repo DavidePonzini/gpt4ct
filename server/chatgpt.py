@@ -30,7 +30,7 @@ def create_name(description: str) -> str:
     message.add_message(MessageRole.USER, prompts.CreateName.prompt(description))
 
     answer = message.generate_answer(json_format=Name, model=AIModel.GPT4o_mini)
-    print_price(message.usage[-1], cost_in, cost_out)
+    print_price(message.usage[-1], cost_in_per_million_tokens=cost_in, cost_out_per_million_tokens=cost_out)
 
     return answer.name
 
@@ -63,7 +63,7 @@ def decompose(task: Task, user_id: str) -> None:
         tokens=(usage.prompt_tokens, usage.completion_tokens),
     )
 
-    print_price(usage, cost_in, cost_out)
+    print_price(usage, cost_in_per_million_tokens=cost_in, cost_out_per_million_tokens=cost_out)
 
 
 def implement(task: Task, user_id: str, language: str, additional_prompt: str | None = None) -> None:
@@ -112,7 +112,7 @@ def implement(task: Task, user_id: str, language: str, additional_prompt: str | 
         tokens=(usage.prompt_tokens, usage.completion_tokens),
     )
 
-    print_price(usage, cost_in, cost_out)
+    print_price(usage, cost_in_per_million_tokens=cost_in, cost_out_per_million_tokens=cost_out)
 
 
 def _add_decomposition_step(message: Message, t: Task):
