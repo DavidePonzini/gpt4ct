@@ -11,13 +11,8 @@ endif
 
 .PHONY: start start_bg mount
 
-start: $(ENV) $(VENV) mount
-	sudo service postgresql start
-	source $(ENV) && $(VENV_BIN)/python ./server/main.py
-
-start_bg: $(ENV) $(VENV) mount
-	sudo service postgresql start
-	source $(ENV) && nohup $(VENV_BIN)/python ./server/main.py > log.txt 2>&1 &
+start: mount
+	docker compose up -d
 
 mount:
 	mkdir -p $(HTML_DIR)
@@ -25,7 +20,7 @@ mount:
 
 $(VENV):
 	python -m venv $(VENV)
-	$(VENV_BIN)/python -m pip install --upgrade -r requirements.txt
+	$(VENV_BIN)/python -m pip install --upgrade -r server/requirements.txt
 
 $(ENV):
 	cp $(ENV).template $(ENV)

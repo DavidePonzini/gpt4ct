@@ -1,5 +1,7 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
+const SERVER_ADDR = 'https://ponzidav.com/gpt4ct/api';
+
 // Main components
 let tree_data = null;
 let tree_id = null;
@@ -14,8 +16,6 @@ const zoom = d3.zoom().on('zoom', function(e) {
 
 const svg = d3.select('#tree');
 const g = svg.append('g');
-
-const SERVER_ADDR = 'https://ponzidav.com/gpt4ct/api';
 
 window.disable_feedback = true;
 window.hide_implementation = false;

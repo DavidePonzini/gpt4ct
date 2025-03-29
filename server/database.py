@@ -1,3 +1,4 @@
+import os
 from typing import Literal
 
 from dav_tools import database
@@ -8,10 +9,13 @@ from gamification import Credits
 
 schema = 'problem_decomposition'
 
-db = database.PostgreSQL(database='postgres',
-                         host='127.0.0.1',
-                         user='problem_decomposition_admin',
-                         password='decomp')
+db = database.PostgreSQL(
+    host=os.getenv('DB_HOST'),
+    port=os.getenv('DB_PORT'),
+    database=os.getenv('DB_NAME'),
+    user=os.getenv('DB_USER'),
+    password=os.getenv('DB_PASSWORD')
+)
 
 
 def create_tree(name: str, description: str, user_id: str) -> int:

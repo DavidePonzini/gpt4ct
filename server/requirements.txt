@@ -1,4 +1,4 @@
-dav_tools>=0.4.2
+dav_tools>=0.4.16
 Flask>=3.1.0
 Flask_Cors>=5.0.0
 pydantic>=2.10.4
