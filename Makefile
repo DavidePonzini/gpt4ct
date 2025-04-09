@@ -15,8 +15,10 @@ start: mount
 	docker compose up -d
 
 mount:
-	mkdir -p $(HTML_DIR)
-	sudo mount --bind client $(HTML_DIR)
+	rm -rf $(HTML_DIR)
+#mkdir -p $(HTML_DIR)
+	cp -r client $(HTML_DIR)
+#sudo mount --bind client $(HTML_DIR)
 
 $(VENV):
 	python -m venv $(VENV)
