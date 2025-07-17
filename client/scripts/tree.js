@@ -1,6 +1,6 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
-const SERVER_ADDR = 'https://ponzidav.com/gpt4ct/api';
+const SERVER_ADDR = '/api';
 
 // Main components
 let tree_data = null;

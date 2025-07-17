@@ -1,4 +1,4 @@
-const SERVER_ADDR = 'https://ponzidav.com/gpt4ct/api';
+const SERVER_ADDR = '/api';
 
 class Task {
     constructor(tree_id, task_id, task_user_id, creation_mode, name, description, solved = false,

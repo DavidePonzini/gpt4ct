@@ -1,11 +1,17 @@
 services:
+  nginx_prod:
+    build: .
+    container_name: gpt4ct_nginx
+    restart: unless-stopped
+    ports:
+      - "5000:80"
+
   server:
     build: ./server
+    container_name: gpt4ct_server
     restart: unless-stopped
     depends_on:
       - db
-    ports:
-      - "5000:5000"
     environment:
       - DB_HOST=db
       - DB_PORT=5432
@@ -17,11 +23,12 @@ services:
 
   db:
     build: ./db
+    container_name: gpt4ct_db
     restart: unless-stopped
     environment:
       POSTGRES_PASSWORD: password
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - gpt4ct_db_data:/var/lib/postgresql/data
 
 volumes:
-  pgdata:
+  gpt4ct_db_data:

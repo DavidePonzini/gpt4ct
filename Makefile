@@ -9,14 +9,14 @@ else
 	VENV_BIN=$(VENV)/bin
 endif
 
-.PHONY: start start_bg mount
+.PHONY: start psql
 
-start: mount
-	docker compose up -d
+start: $(ENV)
+	docker compose down
+	docker compose up -d --build
 
-mount:
-	mkdir -p $(HTML_DIR)
-	sudo mount --bind client $(HTML_DIR)
+psql:
+	docker exec -it gpt4ct_db psql -U postgres
 
 $(VENV):
 	python -m venv $(VENV)
