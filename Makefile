@@ -15,16 +15,8 @@ start: $(ENV)
 	docker compose down
 	docker compose up -d --build
 
-<<<<<<< HEAD
 psql:
 	docker exec -it gpt4ct_db psql -U postgres
-=======
-mount:
-	rm -rf $(HTML_DIR)
-#mkdir -p $(HTML_DIR)
-	cp -r client $(HTML_DIR)
-#sudo mount --bind client $(HTML_DIR)
->>>>>>> f5b3ffedcfe959a66f7af6e422c86b0117d6bfac
 
 $(VENV):
 	python -m venv $(VENV)
